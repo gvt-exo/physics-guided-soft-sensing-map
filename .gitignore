@@ -1,0 +1,59 @@
+# MATLAB
+*.asv
+*.autosave
+*.m~
+*.mlx~
+*.slxc
+*.mex*
+*.p
+*.fig
+*.mat
+*.mlproj
+*.prj
+*.slx.r20*
+*.mdl.r20*
+*.sldd.r20*
+*.mldatx.r20*
+*.slxc
+slprj/
+codegen/
+work/
+DerivedData/
+*.log
+*.tmp
+
+# MATLAB project/user state
+*.user
+*.suo
+*.sln
+*.ncb
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.VC.opendb
+
+# OS / editors
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*~
+
+# Local environments / secrets
+.env
+.env.*
+!.env.example
+
+# Local raw/intermediate data
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+
+# Generated results
+results/*
+!results/figures/
+!results/tables/
+!results/figures/.gitkeep
+!results/tables/.gitkeep
