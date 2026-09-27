@@ -54,7 +54,7 @@ Current I&EC Research requirements relevant to this paper:
 - a Supporting Information description when SI is supplied.
 
 Current manuscript status:
-- abstract: 143 words — compliant;
+- abstract: within the required 100–150-word range — compliant;
 - title/authors/affiliations: present;
 - corresponding e-mail: still to confirm;
 - TOC graphic: not yet created;
