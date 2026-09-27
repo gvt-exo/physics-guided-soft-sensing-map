@@ -58,7 +58,7 @@ Current manuscript status:
 - title/authors/affiliations: present;
 - corresponding e-mail: still to confirm;
 - TOC graphic: not yet created;
-- current BibTeX style is author-year for the cross-journal preprint and must be switched to ACS sequential numbering for I&EC submission;
+- current BibTeX style is author-year for the cross-journal preprint; ACS Review Ready permits any complete reference style at initial submission, while the final I&EC-formatted version should use sequential ACS-style numbering;
 - final SI paragraph/files still to prepare.
 
 I&EC Research permits the original submitted manuscript to be posted on a preprint server, but its current policy says the preprint should be disclosed in the cover letter and states that authors may not revise those preprints. If I&EC remains a live target, freeze the manuscript before depositing the public preprint.
