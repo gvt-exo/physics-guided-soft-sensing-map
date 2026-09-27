@@ -1,93 +1,88 @@
 ---
-title: "Physics-Guided Soft Sensing under Sparse Laboratory Measurements in Industrial Monoammonium Phosphate Production"
+title: "Physics-Guided Soft Sensing under Sparse Laboratory Measurements and Regime Shift in Industrial Monoammonium Phosphate Production"
 article_type: "Original Article"
 primary_target: "Digital Chemical Engineering"
 compatible_targets:
   - "Computers & Chemical Engineering"
   - "Industrial & Engineering Chemistry Research (Process Systems Engineering)"
-status: "Working preprint draft — complete the items marked [TO COMPLETE] before public posting"
+status: "Working preprint draft — updated after chronological validation"
+latex_source: "paper/main.tex"
 ---
 
-# Physics-Guided Soft Sensing under Sparse Laboratory Measurements in Industrial Monoammonium Phosphate Production
+# Physics-Guided Soft Sensing under Sparse Laboratory Measurements and Regime Shift in Industrial Monoammonium Phosphate Production
 
-**[Author 1]\(^a\), [Author 2]\(^a\), [Author 3]\(^b\), ...**
+**German A. Karnup\(^{a,b,*}\), Oleg A. Telminov\(^{b}\)**
 
-\(^a\) [Affiliation 1]  
-\(^b\) [Affiliation 2]  
-\* Corresponding author: [name, e-mail]
+\(^{a}\) Moscow Institute of Physics and Technology (National Research University), Dolgoprudny, Moscow Region, Russian Federation  
+\(^{b}\) Molecular Electronics Research Institute, JSC (NIIME), Zelenograd, Moscow, Russian Federation  
 
-> **Draft note.** The manuscript below is deliberately written as a journal-compatible preprint rather than as a technical report. It uses only results currently supported by the project technical specification and R&D report. Items that require additional calculations, source-data reconciliation, figures, or formal approval are marked **[TO COMPLETE]** and are also collected in the companion checklist.
+ORCID: German A. Karnup — 0000-0001-6517-4712  
+ORCID: Oleg A. Telminov — 0000-0002-2358-3689  
+
+\* Corresponding author: [e-mail to confirm before submission]
+
+> **Anonymization note.** The industrial data owner authorized use of the plant data for research calculations but requested de-identification of the company, production site, equipment identifiers, and internal signal tags. The manuscript therefore describes the facility only as an industrial monoammonium phosphate production line and uses generic variable names.
 
 ## Highlights
 
-- Physics-guided soft sensing reconstructs sparse MAP quality measurements.
-- One-minute plant telemetry is fused with laboratory data sampled every 2–8 h.
-- Operating-regime shifts cause measurable bias changes in virtual sensing.
-- Data quality is the main current limitation to deployment as decision support.
-
-## Graphical abstract / TOC graphic concept
-
-**[TO COMPLETE — FIGURE GA]** A compact left-to-right scheme:
-
-`1-min plant telemetry → quality screening + time alignment → latent acid properties → material-balance soft sensor → virtual molar ratio & density → 10-min operator decision support`
-
-Show sparse laboratory samples entering the calibration block from above and a regime-shift marker on the telemetry stream. For an I&EC Research submission, prepare the final TOC graphic at the journal-required aspect and size.
+- Chronological validation exposes a hidden physics-guided failure mode.
+- Ridge and LSBoost outperform the physics-guided model after regime shift.
+- Sparse laboratory labels make regime-aware validation essential.
+- One-minute telemetry enables virtual monitoring between laboratory samples.
 
 ## Abstract
 
-Industrial chemical plants often generate high-frequency process telemetry while key quality variables are available only from intermittent laboratory measurements. This study develops a physics-guided soft sensor for monoammonium phosphate production that combines one-minute plant telemetry, sparse laboratory references, low-order empirical mappings for latent phosphoric-acid properties, and material-balance calculations. The dataset covers 1 March–6 June 2026 and contains 139,681 telemetry records and 860 laboratory records; 121,414 and 767 records, respectively, passed quality screening. An abrupt conductivity shift on 21 May created two distinct operating regimes. On the combined development dataset, the model achieved RMSE values of 0.0358 for molar ratio and 0.0113 g cm\(^{-3}\) for solution density, with 53.7% and 65.12% of estimates within the specified tolerances. Error patterns and bias changes across regimes show that data quality and nonstationarity currently limit deployment. The results support virtual telemetry as an industrial decision-support layer while motivating regime-aware validation and improved measurement quality.
+Industrial plants generate high-frequency telemetry while key quality variables may be measured only every few hours. We evaluate a physics-guided soft sensor for an industrial monoammonium phosphate process using 139,681 one-minute records and 860 paired laboratory observations. Chronological validation used nine 14-day-train/7-day-test windows in the initial regime and one transfer test across a conductivity-driven regime shift. The physics-guided model showed unstable generalization: pooled initial-regime RMSE was 0.2125 for molar ratio and 0.0176 g cm\(^{-3}\) for density, driven by one catastrophic window. Ridge regression was more stable (0.0156/0.0085). On regime transfer, gradient boosting achieved 0.0188/0.0134 versus 0.0707/0.0310 for the physics-guided model. Physical structure alone therefore did not guarantee robustness under sparse labels and regime drift, motivating regime-aware calibration and leakage-safe temporal validation.
 
-**Keywords:** soft sensor; virtual sensor; hybrid modeling; process monitoring; industrial digitalization; monoammonium phosphate
+**Keywords:** soft sensor; virtual sensor; hybrid modeling; process monitoring; regime shift; monoammonium phosphate
 
 ## Nomenclature
 
 | Symbol | Definition | Unit |
 |---|---|---|
-| \(c\) | phosphoric-acid conductivity measurement | [TO VERIFY unit] |
+| \(c\) | online conductivity signal used as a proxy for acid state | process unit |
 | \(Q_A\) | clarified phosphoric-acid volumetric flow | m\(^3\) h\(^{-1}\) |
-| \(\dot m_N\) | ammonia mass flow to the tubular reactor | kg h\(^{-1}\) |
+| \(\dot m_N\) | ammonia mass flow | kg h\(^{-1}\) |
 | \(Q_W\) | process-water volumetric flow | m\(^3\) h\(^{-1}\) |
 | \(w_{P_2O_5}\) | mass fraction of \(P_2O_5\) in the acid stream | fraction or % |
 | \(\rho_A\) | phosphoric-acid density | kg m\(^{-3}\) |
 | \(R\) | \(NH_3/H_3PO_4\) molar ratio | dimensionless |
-| \(\rho_M\) | solution density in the downstream vessel | g cm\(^{-3}\) |
-| \(M_i\) | molar mass of component \(i\) | g mol\(^{-1}\) |
-| \(\tau\) | time lag between process telemetry and laboratory reference | min |
-| \(W\) | aggregation window around a laboratory reference | min |
-| MAE | mean absolute error | variable-dependent |
-| RMSE | root mean squared error | variable-dependent |
-| P95 | 95th percentile of absolute error | variable-dependent |
+| \(\rho_M\) | downstream solution density | g cm\(^{-3}\) |
+| \(\tau\) | time lag between telemetry and laboratory reference | min |
+| \(W\) | aggregation-window length | min |
 
 # 1. Introduction
 
-Chemical-process plants increasingly collect large volumes of online measurements through distributed control, manufacturing execution, and laboratory information systems. However, the variables that most directly describe product quality are frequently unavailable at the same temporal resolution as process telemetry. They may require laboratory analysis, manual sampling, or instruments that are expensive or impractical to deploy at every relevant process location. Soft sensors address this mismatch by using continuously available measurements to infer hard-to-measure quality variables between direct observations (Kadlec et al., 2009; Souza et al., 2016).
+Chemical-process plants routinely collect high-frequency online measurements while the variables that most directly describe product quality are measured less frequently by laboratory analysis or manual sampling. Soft sensors address this mismatch by inferring hard-to-measure quality variables from continuously available process measurements (Kadlec et al., 2009; Souza et al., 2016).
 
-Industrial deployment is more difficult than benchmark soft-sensor development. Real plant data contain missing values, sensor faults, short transients, asynchronous sampling, process-mode changes, and uncertain reference measurements. These conditions can degrade nominally accurate models after deployment and often make data preparation and maintenance as important as model class selection (Kadlec et al., 2009; Offermans et al., 2024; Dai et al., 2025). Recent work has therefore emphasized hybrid and physics-guided modeling, in which empirical relationships are embedded in or constrained by process knowledge rather than learned as unconstrained mappings (Sansana et al., 2021; Bradley et al., 2022; Schweidtmann et al., 2024; Mousa et al., 2025).
+Industrial deployment is substantially harder than benchmark soft-sensor development. Real plant data contain missing values, sensor faults, short transients, asynchronous sampling, changing operating conditions, and uncertain reference measurements. Data preparation, temporal alignment, and model-maintenance strategy can therefore be as important as model class selection (Kadlec et al., 2009; Offermans et al., 2024; Dai et al., 2025).
 
-Soft sensing is also increasingly treated as an enabling layer for process digitalization rather than as an isolated regression task. Industrial examples combine process knowledge, data analytics, online monitoring, and decision support to construct virtual measurements from existing sensing infrastructure (Hamid et al., 2022; Pietrasik et al., 2024; Boskabadi et al., 2025). Recent industrial studies have explicitly addressed sparse quality sampling, interpretability, transfer between operating conditions, concept drift, and lifecycle management of deployed soft sensors (Kay et al., 2024; Metcalfe et al., 2025; Fricz et al., 2026).
+Hybrid and physics-guided models are often proposed as a way to improve interpretability and extrapolation by embedding empirical relationships inside process knowledge rather than learning an unconstrained input-output map (Sansana et al., 2021; Bradley et al., 2022; Schweidtmann et al., 2024; Mousa et al., 2025). Industrial soft sensors are also increasingly treated as a digitalization layer that converts existing sensing infrastructure into higher-level virtual measurements for monitoring and decision support (Hamid et al., 2022; Pietrasik et al., 2024; Boskabadi et al., 2025).
 
-Fertilizer production is a relevant case because composition and neutralization variables strongly affect product quality while several feed and intermediate-state properties are not measured continuously. Hybrid soft sensing has previously been demonstrated for nutrient-content estimation in compound-fertilizer production (Fu et al., 2007). The present study therefore does not claim novelty from applying soft sensing to fertilizer production alone. Instead, it focuses on a specific industrial monoammonium phosphate (MAP) process in which: (i) plant telemetry is sampled every minute while reference quality measurements are obtained only every 2–8 h; (ii) two important phosphoric-acid properties are latent during normal operation; (iii) the available plant data contain substantial missingness, outliers, and sensor nonstationarity; and (iv) a pronounced operating-regime change occurs within the study interval.
+Fertilizer production provides a relevant test case because composition and neutralization variables strongly affect product quality while several feed and intermediate-state properties are not continuously available. Hybrid soft sensing has previously been demonstrated for nutrient-content estimation in compound-fertilizer production (Fu et al., 2007). The novelty claimed here is therefore not the generic application of a soft sensor to fertilizer production. Instead, this study examines an industrial monoammonium phosphate (MAP) process with four characteristics that are important for real deployment: one-minute telemetry versus laboratory measurements every few hours, latent feed properties, substantial data-quality problems, and a pronounced operating-regime shift during the observation interval.
 
-The objective is to construct and evaluate a physics-guided virtual-telemetry layer for estimating the \(NH_3/H_3PO_4\) molar ratio and downstream solution density from existing plant data. The scientific questions are:
+The original engineering prototype used a physics-guided model to estimate molar ratio and downstream solution density and then supplied those estimates to an offline operator-recommendation layer. The present paper asks a stricter scientific question: **does the physics-guided structure remain reliable under chronological hold-out testing and a real operating-regime shift, and how does it compare with simple data-driven baselines?**
 
-1. Can sparse laboratory measurements be combined with one-minute plant telemetry and material-balance constraints to produce useful virtual measurements of MAP process quality?
-2. How strongly do data quality and operating-regime changes affect soft-sensor error?
-3. Can the resulting virtual measurements support an operator-facing decision-support layer without claiming closed-loop control readiness?
+The contributions are:
 
-The main contributions are an industrial multi-rate case study, a low-complexity hybrid architecture that reconstructs latent feed properties before applying process balances, an explicit analysis of regime-dependent error, and a practical separation between soft sensing and downstream operator recommendations.
+1. a real industrial multi-rate soft-sensing case with 139,681 minute records and 860 paired laboratory observations;
+2. a reproducible chronological evaluation using fixed 14-day training and 7-day test windows;
+3. comparison of the physics-guided model with Ridge, physics-only, and LSBoost baselines on identical temporal splits;
+4. explicit analysis of a catastrophic physics-guided failure window and cross-regime transfer;
+5. documentation of data-alignment and preprocessing choices that can create operational look-ahead even when target leakage is absent.
 
 # 2. Industrial process and data
 
 ## 2.1. Process description
 
-The investigated process is part of an industrial MAP production line. Clarified phosphoric acid is transferred from an upstream acid source to an intermediate vessel and then supplied to a tubular reactor. Ammonia is introduced for neutralization and process water is adjusted to influence downstream solution density. The principal reaction is represented in simplified form as
+The investigated process is part of an industrial MAP production line. Clarified phosphoric acid is transferred through an intermediate stage to a tubular neutralization reactor. Ammonia is introduced for neutralization and process water is adjusted to influence downstream solution density. The principal reaction is represented in simplified form as
 
 \[
 NH_3 + H_3PO_4 \rightarrow NH_4H_2PO_4.
 \tag{1}
 \]
 
-The reactor product is collected in a downstream vessel in which the two principal quality variables considered in this work are the \(NH_3/H_3PO_4\) molar ratio \(R\) and solution density \(\rho_M\). The operational targets used in the project were
+The two quality variables considered in this work are the \(NH_3/H_3PO_4\) molar ratio \(R\) and downstream solution density \(\rho_M\). The operational targets used during prototype development were
 
 \[
 R_{\mathrm{target}} = 1.06,
@@ -96,126 +91,87 @@ R_{\mathrm{target}} = 1.06,
 \tag{2}
 \]
 
-The corresponding reference measurements were available from laboratory/operator records rather than at the one-minute frequency of the process historian. Two phosphoric-acid properties required by the process calculations—the \(P_2O_5\) mass fraction and acid density—were not continuously available with sufficient reliability during the study. They were therefore treated as latent variables and reconstructed during model calibration.
+The reference values were obtained from sparse laboratory/operator measurements rather than at the one-minute frequency of the process historian. Two phosphoric-acid properties needed by the material-balance calculation, the \(P_2O_5\) fraction and acid density, were not continuously measured with sufficient reliability and were therefore treated as latent variables.
 
-**[TO COMPLETE — FIGURE 1]** Redraw the process diagram as a publication-quality schematic containing only the equipment and variables relevant to the paper: acid feed, intermediate tank, tubular reactor, ammonia and water feeds, downstream sampling vessel, online telemetry, and laboratory reference measurements. Remove internal UI notes, unresolved tag comments, and commercially sensitive plant identifiers.
+**Figure 1 [to redraw before public release].** An anonymized process/soft-sensor schematic should show only generic units and variables: acid feed, intermediate vessel, reactor, ammonia and water feeds, downstream quality-sampling point, online telemetry, sparse laboratory references, latent-property reconstruction, material balance, and virtual outputs. Internal equipment numbers and plant tags must not appear.
 
-## 2.2. Data sources and sampling structure
+## 2.2. Data sources
 
-The study interval was 1 March–6 June 2026. The process dataset combined high-frequency plant telemetry, sparse laboratory reference measurements, and daily production records.
+The study interval covers 1 March–6 June 2026.
 
-| Data source | Variables used | Sampling / count | Role |
+| Data source | Variables | Sampling / count | Role |
 |---|---|---:|---|
-| Plant telemetry | acid flow, ammonia flow, water flow, acid conductivity; selected downstream flows for production estimate | 139,681 one-minute records; 121,414 passed joint validity screening | soft-sensor inputs |
-| Laboratory / operator reference data | molar ratio and solution density | 860 records, typically every 2–8 h; 767 passed screening | calibration/reference targets |
-| Production records | daily MAP output | 92 daily values | exploratory downstream validation |
-| Substitute historical density values | three downstream stream densities | fixed averages from April 2025 where contemporaneous sensors were unavailable | exploratory production-balance calculation |
+| Plant telemetry | conductivity, acid flow, ammonia flow, water flow | 139,681 one-minute records; 121,414 jointly valid after authoritative preprocessing | model inputs |
+| Laboratory/operator references | molar ratio and solution density | 860 paired observations, typically every 2–8 h | calibration and evaluation targets |
+| Downstream production records | product-flow information | daily / lower-frequency | exploratory calculation only |
 
-The joint process-data screening retained approximately 86.9% of one-minute records, while approximately 89.2% of laboratory records were retained. A laboratory record was accepted only when it passed its own plausibility checks and sufficient valid process observations were available around the reference time.
+The number of usable laboratory rows depends on lag and averaging-window configuration because a laboratory observation is eligible only when the required process window is sufficiently valid. This explains an apparent count inconsistency in the original development report. Under the regime-specific development configurations, 637 regime-A and 119 regime-B observations were obtained. These counts are produced by different masks and therefore should not be added. Under the single combined-model mask \(\tau=50\) min, \(W=60\) min, the partition is 643 regime-A plus 124 regime-B observations, giving the reported total of 767.
 
-The laboratory and process measurements are intrinsically multi-rate. A single laboratory value may correspond to material that passed through the upstream process tens of minutes or hours earlier. The development procedure therefore treated time lag and aggregation window as model-selection parameters rather than assuming synchronous sampling.
+## 2.3. Data quality and preprocessing
 
-## 2.3. Data-quality limitations
+The source data contain noisy process signals, short spikes and dropouts, missing or invalid values, incomplete time-series segments, and operating-regime changes. The preprocessing logic used in the validation study follows the R&D implementation documented in the NTO and is treated as authoritative for this paper.
 
-The source data contained several characteristics typical of industrial historian data:
+The workflow is:
 
-- noisy process signals;
-- short spikes and dropouts in flow measurements;
-- missing and invalid values;
-- periods with incomplete time-series coverage;
-- operating-regime changes;
-- nonfunctioning sensors for selected downstream density measurements;
-- possible inconsistencies among laboratory logs, plant-system exports, dispatcher records, and technical reports.
+1. read the native one-minute process series;
+2. select the active redundant flow channel where applicable;
+3. apply the NTO conductivity filter and flow despiking;
+4. apply process plausibility/range checks;
+5. construct timestamps at which all required inputs are jointly valid;
+6. associate each laboratory observation with an eligible process window determined by lag \(\tau\) and window length \(W\).
 
-These issues are not treated as incidental preprocessing details. They define the practical domain of applicability of the virtual sensor because the target tolerance for the predicted variables is of the same order as, or smaller than, the uncertainty introduced by some input measurements.
+A total of 3,156 conductivity values were corrected by the authoritative process filter. Filtering does not use laboratory target values.
 
 ## 2.4. Operating-regime shift
 
-The acid-conductivity signal exhibited a pronounced abrupt shift on 21 May 2026. The development report consequently separated the data into two periods:
+The conductivity trajectory changes abruptly on 21 May 2026. The study therefore defines:
 
-- **Regime A:** 1 March–20 May, conductivity level approximately 20 in the project scale;
-- **Regime B:** 21 May–6 June, conductivity level approximately 10 in the project scale.
+- **Regime A:** 1 March to 21 May;
+- **Regime B:** 21 May onward.
 
-A model was also evaluated on the combined interval. This natural regime change provides a useful industrial test of nonstationarity: changes in model bias across the two periods indicate whether a single global calibration can remain stable when the relationship between conductivity and latent feed properties changes.
+The regime boundary is used as an externally observed process change, not as a label learned by the prediction models.
 
-**[TO COMPLETE — FIGURE 2]** Plot conductivity and the three principal manipulated/measured flows across the full study period. Mark 21 May and show valid/invalid segments. This figure should make the regime shift and data-quality problem visible before any model results are presented.
+**Figure 2. Process signals, invalid intervals, and the operating-regime boundary.** Use the anonymized version of the supplied process-timeline figure. Replace the internal conductivity tag with “conductivity signal” before public release.
+
+**Figure 3. Sparse laboratory references on the process timeline.** Use the supplied multi-rate sampling figure after replacing the internal conductivity tag with a generic label.
 
 # 3. Methodology
 
-## 3.1. Signal validation and preprocessing
+## 3.1. Physics-guided soft sensor
 
-The online variables entering the soft-sensor layer were acid conductivity \(c\), acid flow \(Q_A\), ammonia flow \(\dot m_N\), and water flow \(Q_W\). The project specification defined process-specific plausibility limits, outlier removal, active-channel selection for redundant ammonia-flow measurements, and rejection of any calculation step for which required inputs were missing, nonnumeric, negative where physically impossible, or outside permitted operating ranges.
-
-The processing sequence was:
-
-1. read the process measurements at their native one-minute sampling interval;
-2. select the active ammonia-flow channel;
-3. remove or invalidate short abnormal excursions according to process-specific rules;
-4. apply range checks;
-5. construct valid multi-channel timestamps only when all required inputs are simultaneously valid;
-6. align process windows with laboratory reference timestamps using candidate lags and aggregation windows.
-
-No online retraining was planned during normal operation. Model identification and calibration were performed offline and the selected parameterization was then intended to be fixed for deployment until a controlled recalibration.
-
-**[TO COMPLETE — TABLE S1 / Methods text]** Reconcile the exact outlier-duration rule and final validity thresholds between the technical specification and implementation logs before release.
-
-## 3.2. Time alignment of telemetry and laboratory measurements
-
-For each laboratory observation at time \(t_j\), candidate process windows were constructed with lag \(\tau\) and window length \(W\). The project specification searched
-
-\[
-\tau \in \{0,10,\ldots,180\}\ \mathrm{min}
-\tag{3}
-\]
-
-and
-
-\[
-W \in \{10,20,30,60\}\ \mathrm{min}.
-\tag{4}
-\]
-
-Process observations in the selected window were aggregated to obtain the model inputs associated with the laboratory sample. Linear, quadratic, and piecewise-cubic Hermite interpolation (PCHIP) relationships were considered for the empirical latent-variable mappings.
-
-The development report identified different time-alignment settings in the two operating regimes: \(\tau=180\) min and \(W=60\) min for Regime A, \(\tau=20\) min and \(W=20\) min for Regime B, and \(\tau=50\) min and \(W=60\) min for the combined dataset. The large difference in selected lag is itself evidence that a single stationary model may not adequately represent both periods.
-
-## 3.3. Physics-guided latent-variable reconstruction
-
-The soft sensor was structured as a grey-box model rather than as a direct black-box regression from all telemetry channels to both outputs. Conductivity was first mapped to the latent \(P_2O_5\) fraction,
+The soft sensor is a grey-box sequence rather than a direct unconstrained regression. Conductivity is first mapped to a latent \(P_2O_5\) fraction,
 
 \[
 \widehat{w}_{P_2O_5}=f_{\theta}(c),
+\tag{3}
+\]
+
+followed by a mapping from estimated composition to acid density,
+
+\[
+\widehat{\rho}_{A}=g_{\phi}\!\left(\widehat{w}_{P_2O_5}\right).
+\tag{4}
+\]
+
+The candidate mappings are linear, quadratic, and PCHIP spline functions.
+
+The acid mass flow and \(P_2O_5\) mass flow are then
+
+\[
+\dot m_A=\widehat{\rho}_A Q_A,
 \tag{5}
 \]
 
-and the resulting composition estimate was mapped to phosphoric-acid density,
-
 \[
-\widehat{\rho}_{A}=g_{\phi}\!\left(\widehat{w}_{P_2O_5}\right),
+\dot m_{P_2O_5}=\dot m_A\widehat{w}_{P_2O_5}.
 \tag{6}
 \]
 
-where \(f_\theta\) and \(g_\phi\) were selected from low-order linear, quadratic, and PCHIP candidates.
-
-These latent estimates were then inserted into material-balance calculations. The phosphoric-acid mass flow is
-
-\[
-\dot m_A=\widehat{\rho}_A Q_A.
-\tag{7}
-\]
-
-The estimated \(P_2O_5\) mass flow is
-
-\[
-\dot m_{P_2O_5}=\dot m_A \widehat{w}_{P_2O_5}.
-\tag{8}
-\]
-
-Using the stoichiometric conversion factor employed in the project specification,
+The prototype converts \(P_2O_5\) mass to equivalent 100% phosphoric-acid mass using
 
 \[
 \dot m_{H_3PO_4,100\%}=1.38\,\dot m_{P_2O_5}.
-\tag{9}
+\tag{7}
 \]
 
 The corresponding molar flows are
@@ -226,292 +182,253 @@ The corresponding molar flows are
 \qquad
 \dot n_{NH_3}=
 \frac{\dot m_N}{M_{NH_3}},
+\tag{8}
+\]
+
+with \(M_{H_3PO_4}=98\) g mol\(^{-1}\) and \(M_{NH_3}=17\) g mol\(^{-1}\). The virtual molar ratio is
+
+\[
+\widehat R=
+\frac{\dot n_{NH_3}}{\dot n_{H_3PO_4}}.
+\tag{9}
+\]
+
+For publication, the downstream density balance is written in dimensionally explicit form as
+
+\[
+\widehat{\rho}_M=
+\frac{\sum_i \dot m_i}{\sum_i Q_i},
+\qquad
+\dot m_i=\rho_iQ_i,
 \tag{10}
 \]
 
-with \(M_{H_3PO_4}=98\) g mol\(^{-1}\) and \(M_{NH_3}=17\) g mol\(^{-1}\). The virtual molar ratio is then
+where the sums contain the streams used by the implemented downstream balance. Equation (10) uses the additive-volume approximation of the prototype. Any plant-specific correction terms should be stated separately rather than folded into the definition of density.
+
+## 3.2. Time alignment and model selection
+
+Candidate lags and aggregation windows are
 
 \[
-\widehat{R}=
-\frac{\dot n_{NH_3}}{\dot n_{H_3PO_4}}.
+\tau\in\{0,10,\ldots,180\}\ \mathrm{min},
+\qquad
+W\in\{10,20,30,60\}\ \mathrm{min}.
 \tag{11}
 \]
 
-The second soft-sensor output, downstream solution density \(\widehat{\rho}_M\), was obtained from the project material-balance model using the acid, ammonia, and water streams together with the reconstructed acid properties.
-
-**[TO COMPLETE — EQUATION 12]** Insert the exact implemented density equation after a dimensional-consistency audit. The current technical specification contains a shorthand density expression that is insufficiently defined for publication and should not be reproduced without reconciliation with the source code/calculation workbook.
-
-This two-stage architecture preserves a direct physical interpretation: the data-driven part estimates missing feed properties, while the process model propagates them to the quality variables of interest.
-
-## 3.4. Model selection and error metrics
-
-Candidate lag, window, and nonlinearity configurations were compared using errors between virtual and laboratory measurements. The reported metrics were MAE, RMSE, bias, P95 absolute error, and the fraction of observations within the project tolerances:
+For each validation scenario, lag, window, and physics-guided mapping type were selected using only the scenario training data. The first 9 days of the initial training interval were used for fitting and the following 5 days for inner chronological validation. The selection score was
 
 \[
-|R-\widehat{R}| \le 0.03
+J=
+\frac{\mathrm{RMSE}_R}{0.03}
++
+\frac{\mathrm{RMSE}_{\rho}}{0.01}.
 \tag{12}
 \]
 
-and
+The selected configuration was then frozen for all outer splits in that scenario, while fitted coefficients were re-estimated from each outer training interval only.
 
-\[
-|\rho_M-\widehat{\rho}_M| \le 0.01\ \mathrm{g\,cm^{-3}}.
-\tag{13}
-\]
+For within-regime-A evaluation the selected configuration was \(\tau=90\) min, \(W=60\) min with a quadratic latent-property mapping. For the A-to-B transfer scenario it was \(\tau=100\) min, \(W=30\) min with PCHIP mapping.
 
-For a target variable \(y_i\) and estimate \(\hat y_i\),
+## 3.3. Baseline models
+
+All baselines use the same temporally aligned rows as the physics-guided model.
+
+- **Ridge:** standardized multivariate Ridge regression using conductivity, acid flow, ammonia flow, and water flow; regularization selected on chronological inner validation.
+- **Physics-only:** acid flow, ammonia flow, and water flow with \(P_2O_5\) fixed at 52 wt% and an unfitted acid-density prior.
+- **Gradient boosting:** LSBoost with 100 cycles, learning rate 0.05, minimum leaf size 10, and maximum 20 splits.
+
+The physics-only model is a reference calculation, not a separately calibrated mechanistic model.
+
+## 3.4. Chronological validation
+
+The prespecified outer protocol is a fixed 14-day training interval followed immediately by a 7-day held-out interval. Within Regime A, rolling origins advance by 7 days and yield nine complete tests (A01–A09).
+
+Regime B does not contain the 21 days of paired laboratory coverage required for a complete within-regime 14+7-day split. No shortened or randomly sampled substitute was introduced.
+
+Cross-regime transfer is evaluated using:
+
+- train: 7 May–21 May 2026;
+- test: 21 May–28 May 2026.
+
+No random shuffling is used.
+
+## 3.5. Evaluation metrics
+
+For target \(y_i\) and prediction \(\hat y_i\),
 
 \[
 \mathrm{MAE}=\frac{1}{n}\sum_{i=1}^{n}|y_i-\hat y_i|,
-\tag{14}
+\tag{13}
 \]
 
 \[
 \mathrm{RMSE}=
 \sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat y_i)^2},
-\tag{15}
+\tag{14}
 \]
 
 \[
 \mathrm{Bias}=
 \frac{1}{n}\sum_{i=1}^{n}(\hat y_i-y_i).
+\tag{15}
+\]
+
+We also report the 95th percentile of absolute error and the fraction of predictions within the prototype tolerances:
+
+\[
+|R-\widehat R|\le0.03,
+\qquad
+|\rho_M-\widehat{\rho}_M|\le0.01\ \mathrm{g\,cm^{-3}}.
 \tag{16}
 \]
 
-P95 is the 95th percentile of \(|y_i-\hat y_i|\).
-
-## 3.5. Temporal validation protocol
-
-The project specification defines chronological validation rather than random train/test splitting: an early 14-day interval is used for model fitting and the following 7-day interval for testing, subject to minimum laboratory-sample counts.
-
-This temporal design is appropriate because randomly mixing nearby one-minute observations would produce information leakage and would not test the model under evolving plant conditions. For a publication-grade analysis, the protocol should be executed as repeated rolling-origin windows within each operating regime and, separately, as a transfer test across the 21 May regime change.
-
-**Current evidence limitation:** the available R&D report provides aggregate development metrics but does not unambiguously identify which reported metrics are strictly held-out results. Consequently, Section 4 reports the existing metrics as **development-set performance** and leaves the publication-critical held-out comparison to be inserted after the temporal-validation run.
-
-## 3.6. Baseline models
-
-**[TO COMPLETE BEFORE PREPRINT RELEASE]** At minimum, two baselines should be evaluated on the identical temporal splits:
-
-1. a simple data-driven baseline such as ridge regression or PLS using the same aligned process inputs;
-2. a physics-only / fixed-parameter baseline in which the empirical latent-variable calibration is removed or frozen.
-
-For Computers & Chemical Engineering in particular, a comparison against at least one additional nonlinear baseline (e.g., random forest, gradient boosting, or a compact feedforward neural network) would materially strengthen the methodological argument. The main paper does not require an exhaustive benchmark suite; the purpose is to show whether the hybrid structure provides value beyond a trivial regression and beyond the uncalibrated balance model.
-
-## 3.7. Downstream decision-support layer
-
-The prototype used the virtual measurements to calculate recommended acid, ammonia, and water flows every 10 min. The recommendations were designed to move the modeled state toward the target molar ratio and density while retaining the process mass-balance structure.
-
-These calculations are treated here as a downstream **decision-support demonstration**, not as a validated control strategy. The recommendations were evaluated offline by recalculating the model outputs after the proposed flow changes; they were not prospectively tested as closed-loop actions on the industrial process during the reported study.
-
-Because the scientific contribution of this paper is the virtual-sensing layer, the detailed recommendation algebra is better placed in Supporting Information after a dimensional and process-logic audit.
-
-## 3.8. Exploratory production-output reconstruction
-
-A secondary model estimated MAP production from downstream suspension and mother-liquor flows:
-
-\[
-\dot m_{\mathrm{prod}}=
-\left(\dot m_{1}+\dot m_{2}-\dot m_{3}\right)K,
-\tag{17}
-\]
-
-with
-
-\[
-\dot m_1=F_{350}\rho_{350},\qquad
-\dot m_2=F_{389}\rho_{389},\qquad
-\dot m_3=F_{305}\rho_{305}.
-\tag{18}
-\]
-
-During the study, contemporaneous density measurements were unavailable for part of this calculation, so fixed historical averages from April 2025 were used: \(\rho_{350}=1.315\), \(\rho_{389}=1.299\), and \(\rho_{305}=1.31\) g cm\(^{-3}\). The project used a factor \(K=1.55\) associated with product moisture.
-
-Because the physical interpretation and units of \(K\) must be formally documented and because several densities were substituted by historical averages, this calculation is treated as exploratory and is not used to support the main soft-sensor claim.
+Molar-ratio predictions from the physics-guided implementation are rounded to two decimal places before validation, matching the production reporting setting.
 
 # 4. Results
 
-## 4.1. Data retention and process nonstationarity
+## 4.1. Within-regime-A rolling validation
 
-Of 139,681 one-minute plant records, 121,414 (86.9%) passed simultaneous validity screening. Of 860 laboratory records, 767 (89.2%) were retained for model development. These retention rates show that the dataset is large in terms of telemetry samples but comparatively sparse in supervised target observations.
+Nine non-overlapping 7-day test intervals produced 509 held-out laboratory observations in total. Training-set size varied from 99 to 138 laboratory observations.
 
-The conductivity trajectory changed abruptly on 21 May, motivating separate calibrations for Regimes A and B. The selected time lags differed substantially between the regimes (180 min versus 20 min), suggesting that the relation among sampled quality, transport delay, and process signals was not stationary across the study.
+**Table 1. Pooled held-out performance across the nine Regime-A test intervals.**
 
-**[TO COMPLETE — FIGURE 3]** Show laboratory molar-ratio and density measurements over time on top of the aligned one-minute process timeline. Indicate the two operating regimes and the sampling sparsity.
+| Model | RMSE \(R\) | MAE \(R\) | Within ±0.03 | RMSE \(\rho_M\), g cm\(^{-3}\) | MAE \(\rho_M\) | Within ±0.01 |
+|---|---:|---:|---:|---:|---:|---:|
+| Physics-guided | 0.2125 | 0.0421 | 0.580 | 0.0176 | 0.0096 | 0.668 |
+| Ridge | 0.0156 | 0.0114 | 0.914 | 0.0085 | 0.0063 | 0.827 |
+| Physics-only | 0.1053 | 0.1002 | 0.020 | 0.0842 | 0.0838 | 0.000 |
+| Gradient boosting | 0.0168 | 0.0128 | 0.894 | 0.0110 | 0.0087 | 0.625 |
 
-## 4.2. Development-set soft-sensor accuracy
+The pooled molar-ratio RMSE of the physics-guided model is dominated by split A08. In that window, the model produced an RMSE of 0.7489, MAE of 0.2368, and P95 absolute error of 2.685. The remaining windows are substantially more stable. Across the nine windows, the **median** physics-guided RMSE is 0.0288 for molar ratio and 0.0100 g cm\(^{-3}\) for density. The median characterization is reported only to describe the distribution of split behavior; A08 remains part of all pooled metrics and is not excluded from any model comparison.
 
-Table 1 summarizes the metrics currently available from the R&D report.
+Ridge regression is the most stable model across the Regime-A rolling tests for the two outputs jointly. Gradient boosting gives similarly low molar-ratio errors but higher density error than Ridge. The physics-only reference is systematically biased and does not approach the specified tolerances.
 
-**Table 1. Reported development-set performance of the physics-guided soft sensor.**
+**Figure 4. Held-out measured versus predicted values.** The supplied figure shows all Regime-A rolling tests and the A-to-B transfer test. The extreme physics-guided predictions visible in Regime A correspond to the A08 failure and explain the pooled RMSE.
 
-| Metric | Regime A: 1 Mar–20 May | Regime B: 21 May–6 Jun | Combined: 1 Mar–6 Jun |
-|---|---:|---:|---:|
-| Conductivity regime | ~20 | ~10 | mixed |
-| Laboratory points | 637* | 119* | 767* |
-| Selected lag, min | 180 | 20 | 50 |
-| Selected window, min | 60 | 20 | 60 |
-| RMSE, molar ratio | 0.0342 | 0.0321 | 0.0358 |
-| MAE, molar ratio | 0.0263 | 0.0287 | 0.0277 |
-| Bias, molar ratio | -0.0139 | +0.0169 | -0.0097 |
-| P95 absolute error, molar ratio | 0.0665 | 0.0500 | 0.0700 |
-| Within \(\pm0.03\), molar ratio | 55.71% | 35.90% | 53.70% |
-| RMSE, density, g cm\(^{-3}\) | 0.0119 | 0.0094 | 0.0113 |
-| MAE, density, g cm\(^{-3}\) | 0.0092 | 0.0082 | 0.0086 |
-| Bias, density, g cm\(^{-3}\) | +0.0043 | -0.0057 | +0.0019 |
-| P95 absolute error, density, g cm\(^{-3}\) | 0.0227 | 0.0167 | 0.0214 |
-| Within \(\pm0.01\) g cm\(^{-3}\), density | 62.86% | 56.41% | 65.12% |
+## 4.2. A-to-B regime transfer
 
-\* **[TO RECONCILE]** The two regime counts reported in the source table sum to 756 rather than the stated combined total of 767. The final manuscript must regenerate this table directly from the analysis dataset.
+The transfer experiment trains on the final 14 days of Regime A and tests on the first 7 days of Regime B, with 99 training and 56 test laboratory observations.
 
-The combined model reproduced the overall level of both target variables but did not meet the project tolerance for a substantial fraction of observations. Molar-ratio RMSE was 0.0358 against a target tolerance of \(\pm0.03\), while density RMSE was 0.0113 g cm\(^{-3}\) against a tolerance of \(\pm0.01\) g cm\(^{-3}\).
+**Table 2. Held-out A-to-B transfer performance.**
 
-The most informative feature of Table 1 is the change in bias sign between the two regimes. Molar-ratio bias changed from \(-0.0139\) in Regime A to \(+0.0169\) in Regime B, while density bias changed from \(+0.0043\) to \(-0.0057\) g cm\(^{-3}\). This pattern is consistent with calibration drift or a change in the relationship between conductivity, latent acid properties, and downstream quality.
+| Model | RMSE \(R\) | MAE \(R\) | Bias \(R\) | Within ±0.03 | RMSE \(\rho_M\), g cm\(^{-3}\) | MAE \(\rho_M\) | Bias \(\rho_M\) | Within ±0.01 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Physics-guided | 0.0707 | 0.0659 | -0.0655 | 0.089 | 0.0310 | 0.0291 | +0.0289 | 0.036 |
+| Ridge | 0.0224 | 0.0179 | +0.0171 | 0.732 | 0.0114 | 0.0088 | -0.0063 | 0.643 |
+| Physics-only | 0.0966 | 0.0912 | +0.0912 | 0.018 | 0.0877 | 0.0871 | -0.0871 | 0.000 |
+| Gradient boosting | 0.0188 | 0.0145 | +0.0063 | 0.875 | 0.0134 | 0.0111 | -0.0047 | 0.500 |
 
-**[TO COMPLETE — FIGURE 4]** Publication-quality time-series panels for each regime: laboratory reference, virtual estimate, and residual for molar ratio and density. Use the held-out predictions after temporal validation, not the current training/development curves.
+The transfer test changes the interpretation of the prototype. The physics-guided architecture remains better than the uncalibrated physics-only reference, but it generalizes substantially worse than the data-driven baselines. Gradient boosting gives the lowest molar-ratio RMSE, while Ridge gives the lowest density RMSE. The physics-guided model exhibits a strong negative molar-ratio bias and positive density bias after the regime transition.
 
-**[TO COMPLETE — FIGURE 5]** Predicted-versus-measured scatter plots for the two outputs, split by operating regime. Include the identity line and report \(n\), RMSE, MAE, and bias in the caption.
+**Figure 5. A-to-B transfer hold-out: physics-guided predictions and residuals.** The supplied time-series plot shows a persistent negative residual for molar ratio and positive residual for density through most of the transfer week.
 
-## 4.3. Temporal hold-out and baseline comparison
+**Figure 6. Held-out baseline comparison.** RMSE values normalized by the engineering tolerances show the large Regime-A physics-guided penalty caused by A08 and the performance degradation of all physics-based variants under A-to-B transfer.
 
-**[TO COMPLETE — CORE RESULT]** Replace this section with the results of the chronological 14-day/7-day rolling validation and baseline models.
+## 4.3. No complete within-regime-B test
 
-Recommended final table:
+The first paired laboratory record in Regime B occurs after the 21 May boundary and the final paired record is on 5 June. Consequently, there is no complete 14-day training plus 7-day held-out interval entirely within Regime B. The study reports this absence directly rather than shortening the test horizon or introducing a different validation protocol after observing the data.
 
-| Model | Test regime | \(R\) RMSE | \(R\) MAE | \(R\) within tolerance | \(\rho_M\) RMSE | \(\rho_M\) MAE | \(\rho_M\) within tolerance |
-|---|---|---:|---:|---:|---:|---:|---:|
-| Physics-guided soft sensor | within Regime A | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| Physics-guided soft sensor | within Regime B | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| Physics-guided soft sensor | A \(\rightarrow\) B transfer | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| PLS / ridge baseline | same splits | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
-| Physics-only baseline | same splits | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+## 4.4. Implications for model selection
 
-The final discussion should distinguish three questions: interpolation within a stable regime, prediction on later data from the same regime, and transfer across the regime shift.
+The hold-out results do not support a claim that the current physics-guided model is the most accurate virtual sensor. Instead, they show a more useful deployment result: **the interpretable grey-box structure is vulnerable to calibration instability and operating-regime change, and its development-set performance is insufficient evidence of prospective robustness.**
 
-## 4.4. Sensitivity of modeled quality variables to manipulated flows
-
-The development report calculated local partial derivatives of the modeled outputs with respect to the three principal flow variables:
-
-**Table 2. Reported local sensitivities of the model outputs.**
-
-| Output | phosphoric-acid flow | ammonia flow | water flow |
-|---|---:|---:|---:|
-| Molar ratio \(R\) | -0.123 | +0.00055 | 0 |
-| Density \(\rho_M\) | +0.021 | -0.00003 | -0.007 |
-
-The signs agree with the intended control interpretation of the prototype: ammonia primarily changes molar ratio, water primarily changes density, and acid flow couples the two objectives. The numerical derivative magnitudes cannot be directly compared across columns because the inputs have different physical units.
-
-**[TO COMPLETE]** Add units and the operating point at which the derivatives were evaluated. For publication, either normalize the sensitivities or report them as dimensional derivatives with explicit units.
-
-## 4.5. Offline decision-support demonstration
-
-The prototype generated 10-min recommendations for acid, ammonia, and water flows by solving the process-specific algebraic correction layer using the estimated quality variables. Offline back-calculation showed that the recommendation engine could produce candidate settings consistent with the model targets.
-
-These results should not be interpreted as evidence of closed-loop control performance. Recommendation accuracy inherits the error of the soft sensor, and no prospective plant trial was reported. Accordingly, the paper presents this layer as evidence that virtual telemetry can support operator decision making, while reserving control-performance claims for a future intervention study.
-
-**[TO COMPLETE — OPTIONAL FIGURE 6]** If the recommendation layer remains in the main paper, plot current versus recommended flows for a short representative interval and the corresponding predicted movement of \(R\) and \(\rho_M\). Avoid using the entire three-month high-density plot, which is difficult to interpret.
-
-## 4.6. Exploratory production-output reconstruction
-
-The production-balance model was compared with daily dispatcher and technical-report values. Monthly results were:
-
-| Month | Calculated production, t | Dispatcher production, t | Technical-report production, t | Daily MAPE |
-|---|---:|---:|---:|---:|
-| March | 1,214 | 4,800 | 4,640 | 79.1% |
-| April | 4,482 | 4,622 | 4,573 | 41.8% |
-| May | 4,726 | 4,560 | 4,557 | 24.2% |
-
-Performance improved as the fraction of valid downstream measurements increased, but the daily error remained too large for this module to support the principal publication claim. The May monthly total was close to the documented output, yet only 32.3% of May days had a reported daily error below 10%.
-
-For a minimal and focused preprint, this subsection can remain as an exploratory demonstration or be moved to Supporting Information. It should not appear in the title or abstract.
+For the present dataset, simple Ridge regression is markedly more stable across both outputs. Gradient boosting is competitive within Regime A and gives the lowest molar-ratio error in the A-to-B transfer. The physics-only reference performs poorly, showing that first-principles structure without calibrated latent-feed information is insufficient.
 
 # 5. Discussion
 
-## 5.1. Virtual telemetry as a digitalization layer
+## 5.1. Why the chronological result matters
 
-The industrial value of the proposed architecture is not that it replaces physical instrumentation. Rather, it converts already available plant telemetry into higher-level virtual measurements at a frequency closer to process operation than manual laboratory sampling. This is consistent with the broader role of soft sensors as part of process digitalization: they increase observability without requiring a new physical analyzer at every location (Hamid et al., 2022; Pietrasik et al., 2024; Boskabadi et al., 2025).
+The original development metrics suggested that the physics-guided prototype tracked the overall level of molar ratio and density. Chronological hold-out testing reveals a qualitatively different issue: most Regime-A windows are moderate, but one window is catastrophically unstable and the model transfers poorly across the later regime shift.
 
-The architecture is deliberately low-complexity. The empirical component is restricted to latent feed-property reconstruction, while downstream calculations retain explicit process structure. This makes the output easier to audit than a direct high-capacity black-box predictor and is aligned with hybrid-modeling arguments that process knowledge can improve interpretability and extrapolation behavior (Sansana et al., 2021; Bradley et al., 2022; Schweidtmann et al., 2024).
+This distinction is central for industrial soft sensing. A model used between laboratory measurements must remain bounded and predictable when process conditions move away from the calibration interval. Average fit on a mixed development dataset can hide rare but operationally unacceptable failures.
 
-## 5.2. Comparison with industrial soft-sensor literature
+## 5.2. Physics guidance does not guarantee robustness
 
-The case shares the classical characteristics summarized by Kadlec et al. (2009): unequal sampling rates, noise, outliers, missing data, and time-varying operating conditions. The present dataset also illustrates why expert process knowledge remains important in industrial soft-sensor development. Only a small set of physically relevant flow and conductivity signals was used, and latent variables were connected through material balances rather than inferred from unrestricted feature engineering, consistent with the findings of Offermans et al. (2024).
+Physics-guided structure provides interpretability: conductivity is used to reconstruct latent acid composition and density, and these variables enter a material-balance calculation. However, the learned latent-property mappings are still empirical. When their calibration becomes unstable or the conductivity-to-composition relationship changes, the physical downstream equations propagate rather than remove the error.
 
-The work is also related to recent industrial studies in which quality measurements are available only every several hours. Fricz et al. (2026), for example, evaluated soft-sensor models for an industrial quality variable with sparse sampling, while Boskabadi et al. (2025) combined process knowledge and machine learning for virtual sensing in a large-scale production environment. The present MAP case differs in using a simple grey-box sequence of latent-property reconstruction and material-balance calculation and in explicitly exposing a strong within-study operating-regime shift.
+The comparison with Ridge and gradient boosting is therefore not an argument against physics-guided modeling in general. It shows that the present grey-box implementation needs explicit safeguards: bounded latent-property mappings, extrapolation detection, regime-conditioned calibration, or fallback to a more stable model when the current input domain is outside calibration support.
 
-A fertilizer-specific precedent is particularly important. Fu et al. (2007) combined data-driven and simplified first-principles models for online nutrient-content estimation in compound-fertilizer production. Therefore, the contribution here is not the generic idea of a fertilizer soft sensor. The differentiating aspects are the MAP neutralization process, sparse multi-rate laboratory references, reconstruction of phosphoric-acid feed properties, and quantitative analysis of data-quality and regime-shift limitations in an industrial dataset.
+## 5.3. Regime shift and maintenance
 
-## 5.3. Regime dependence and model maintenance
+The A-to-B experiment demonstrates that the relation among conductivity, latent feed properties, and downstream quality is not stationary enough for the current calibration to be carried unchanged across the boundary. A deployment architecture should therefore include at least one of the following:
 
-The bias reversal across the 21 May shift is operationally more important than the small difference in RMSE between the two development subsets. A model can retain similar average error while changing the direction of systematic error. For operator decision support, this can produce persistent over- or under-correction.
+- explicit operating-regime detection;
+- drift monitoring on model inputs and residuals;
+- bounded or monotonic latent-property mappings where physically justified;
+- controlled recalibration using new laboratory results;
+- a fallback predictor selected on prospective validation rather than development fit alone.
 
-The project results therefore support a regime-aware deployment strategy. One practical option is to maintain separate calibrations for stable conductivity regimes and use a fallback global model only when the current regime is uncertain. A more general approach would use drift detection and controlled recalibration. Recent work on industrial soft-sensor lifecycle management similarly treats concept drift and maintenance as first-class deployment problems (Metcalfe et al., 2025).
+## 5.4. Sparse labels and validation design
 
-## 5.4. Data quality as the dominant current limitation
+The dataset is large in telemetry count but small in independent target observations. Nine Regime-A test windows contain only 40–74 laboratory targets each, and the transfer test contains 56. This makes random row-wise splitting particularly inappropriate because adjacent process observations are highly correlated and because the laboratory sampling process itself is sparse and multi-rate.
 
-The current model error is comparable with the operational tolerances, while several process measurements contain spikes, dropouts, and periods of missing data. In addition, the study lacked reliable contemporaneous measurements for some variables and substituted historical averages for part of the production calculation.
+The fixed 14-day/7-day rolling protocol gives a more realistic estimate of operational performance, but it also makes uncertainty across windows visible. Future work should extend the observation horizon and report performance over additional regime transitions.
 
-This suggests that increasing model complexity alone is unlikely to solve the present limitation. Recent soft-sensor research has shown that missing-data treatment and quality-aware imputation can materially affect downstream prediction (Dai et al., 2025). For this process, however, the highest-priority improvements are more basic: establish a trusted data pipeline, reconcile conflicting sources, restore direct measurement of critical feed properties where feasible, and define regime-specific data-quality rules.
+## 5.5. Preprocessing and operational look-ahead
 
-## 5.5. Limitations
+The validation contains no outer-test target leakage: hyperparameter selection is nested chronologically and outer-test laboratory values are not used for fitting. Two preprocessing details nevertheless matter for prospective deployment.
 
-The current study has five principal limitations.
+First, the authoritative conductivity filtering and signal-repair routines include centered operations, including robust windows, Savitzky–Golay smoothing, and PCHIP repair, which can use nearby future process values. Second, laboratory alignment uses a centered averaging window around \(t_{\mathrm{lab}}-\tau\); when \(\tau<W/2\), the window can extend beyond the nominal laboratory timestamp.
 
-First, the available technical report does not unambiguously distinguish fitted/development metrics from strict chronological test metrics. Temporal hold-out evaluation is therefore required before the preprint should be posted.
+These operations are retained because the present study validates the implemented R&D prototype. A truly online deployment study should replace them with causal alternatives and repeat the validation.
 
-Second, no baseline model comparison is currently available. Without a simple data-driven and physics-only baseline, the incremental value of the hybrid architecture cannot be quantified.
+## 5.6. Decision-support scope
 
-Third, the laboratory reference itself may contain timing and measurement uncertainty. Because laboratory sampling is sparse and process transport delays vary, part of the model residual may originate from reference alignment rather than from the virtual-sensor equations.
+The prototype also calculates 10-minute recommendations for acid, ammonia, and water flows. Those calculations remain an offline decision-support demonstration. Because recommendation quality inherits soft-sensor error and no prospective plant intervention was performed, the present article does not claim closed-loop control performance, safety benefit, or economic benefit.
 
-Fourth, the dataset spans only approximately three months and contains one major regime transition. Broader seasonal and feedstock variability remains untested.
+The production-output calculation used during the R&D project is likewise excluded from the primary claim because contemporaneous density measurements were unavailable for part of that calculation. The plant uses a moisture coefficient \(K=1.55\); that module is best retained as Supporting Information until independently validated with complete time-series inputs.
 
-Fifth, the recommendation engine was evaluated offline only. The results support decision-support feasibility but not automated control performance, safety, or economic benefit.
+# 6. Limitations
 
-# 6. Conclusions
+1. Only approximately three months of operation and one major regime transition are available.
+2. A complete within-Regime-B 14+7-day validation split is unavailable.
+3. The laboratory reference itself has timing and measurement uncertainty.
+4. The authoritative preprocessing contains short-horizon look-ahead and should be made causal for prospective deployment.
+5. The extreme A08 failure is identified but not yet attributed to a single physical or numerical cause; root-cause analysis of the fitted latent-property mapping is required before deployment.
+6. Raw industrial data cannot be released publicly under the data-owner agreement, limiting third-party reproduction from the original plant signals.
 
-A physics-guided soft-sensor prototype was developed for an industrial MAP process in which one-minute plant telemetry must be reconciled with quality measurements obtained only every 2–8 h. The model reconstructs latent phosphoric-acid properties from conductivity and combines them with material-balance calculations to estimate the \(NH_3/H_3PO_4\) molar ratio and downstream solution density.
+# 7. Conclusions
 
-On the combined development dataset, the reported RMSE was 0.0358 for molar ratio and 0.0113 g cm\(^{-3}\) for density. An abrupt conductivity shift divided the study into two operating regimes and produced a reversal in prediction bias, demonstrating that nonstationarity is a central deployment issue. The analysis also shows that noise, missing values, inconsistent data sources, and unavailable direct measurements currently constrain accuracy at least as strongly as model form.
+A physics-guided soft-sensor prototype was evaluated for an industrial MAP process in which one-minute telemetry must be reconciled with laboratory quality measurements obtained only every few hours. Strict chronological validation produced nine complete 14-day-train/7-day-test windows within the initial operating regime and one transfer test across a real conductivity-driven regime shift.
 
-The results support virtual telemetry as a practical intermediate layer between raw plant signals and operator decision support. Before public release and journal submission, the analysis should be completed with chronological hold-out validation, simple baselines, a reconciled data audit, and an exact publication-ready specification of the density calculation.
+The principal result is a robustness limitation rather than an accuracy claim. The physics-guided model was acceptable in several individual windows but suffered a catastrophic molar-ratio failure in A08 and degraded strongly during A-to-B transfer. Ridge and gradient boosting were substantially more stable on the same held-out data. The physics-only reference performed poorly.
+
+The study therefore shows that physical structure alone does not guarantee reliable virtual telemetry. For industrial deployment, physics-guided soft sensors require leakage-safe temporal validation, bounded or monitored extrapolation, regime-aware maintenance, and explicit fallback behavior. These requirements are especially important when labels are sparse and the empirical part of a hybrid model reconstructs latent feed properties that directly drive downstream material-balance calculations.
 
 # Author contributions
 
-**[TO COMPLETE]** Use CRediT roles, e.g. Conceptualization; Methodology; Software; Validation; Formal analysis; Investigation; Data curation; Writing – original draft; Writing – review & editing; Visualization; Project administration; Supervision.
+**[TO CONFIRM BEFORE SUBMISSION]** Final CRediT roles must be agreed by both authors. Recommended roles to assign explicitly are Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Data curation, Writing – original draft, Writing – review & editing, Visualization, Project administration, and Supervision.
 
 # Funding
 
-**[TO COMPLETE]** State the contractual / institutional funding source in a form approved for publication. Do not reproduce confidential contract identifiers unless authorized.
+This work was performed within an industrial R&D project. The industrial data owner requested anonymization of the company, production site, equipment identifiers, and internal project identifiers. Funding metadata should be finalized before journal submission in a form consistent with that agreement.
 
 # Declaration of competing interest
 
 The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
 
-**[TO VERIFY with all authors and industrial partner before submission.]**
-
 # Data availability
 
-The raw plant historian, laboratory, and production datasets contain proprietary industrial information and are not currently approved for public release. The authors intend to provide the variable definitions, preprocessing logic, model equations, and aggregated evaluation results required to assess the reported conclusions. Subject to industrial-partner approval, a de-identified sample or synthetic dataset and analysis code may be released with the final article.
-
-**[TO VERIFY against the final confidentiality agreement and target-journal data policy.]**
+The industrial data owner authorized use of the operational data for research calculations but requested de-identification of the company, site, equipment identifiers, and internal signal tags. Raw historian and laboratory data therefore cannot be made public. The manuscript reports derived aggregate metrics and the validation protocol. Subject to the same confidentiality constraints, analysis code and de-identified derived results may be released with the final article.
 
 # Declaration of generative AI and AI-assisted technologies in the writing process
 
-**[TO COMPLETE AT SUBMISSION]** If required by the target journal, disclose the use of generative AI tools for drafting or language/structure assistance according to the journal policy in force at submission. All scientific content, calculations, citations, and conclusions must be checked and approved by the authors.
+Generative AI tools were used for language and structural assistance during manuscript preparation. All scientific content, equations, calculations, citations, interpretations, and conclusions are subject to author verification and approval. The final disclosure should be adapted to the policy of the selected journal at submission.
 
 # Supporting Information
 
 Recommended Supporting Information:
 
-- detailed signal-validity rules and thresholds;
-- complete latent-variable model coefficients for each operating regime;
-- exact downstream density equation;
-- rolling temporal-validation results for all windows;
-- baseline model configurations and hyperparameters;
-- additional residual plots and error distributions;
-- recommendation-layer equations and offline examples;
-- production-output reconstruction details;
-- negative turbidity-correlation analysis;
-- data dictionary and provenance map.
+- exact NTO preprocessing thresholds and signal-validity rules;
+- latent-property model coefficients for each chronological fit;
+- all per-split validation metrics;
+- diagnostic output for the A08 failure;
+- baseline configurations and regularization settings;
+- additional residual distributions;
+- decision-support equations and offline examples;
+- production-output reconstruction using the plant moisture coefficient \(K=1.55\);
+- data-provenance table using anonymized variable names.
 
 # References
 
