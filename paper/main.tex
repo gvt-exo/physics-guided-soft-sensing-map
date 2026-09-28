@@ -65,14 +65,14 @@ The industrial data owner authorized use of the plant data for research calculat
 
 \section*{Highlights}
 \begin{itemize}[leftmargin=1.5em]
-\item Chronological validation exposes a hidden physics-guided failure mode.
+\item Process-validity filtering removes non-production conductivity excursions.
 \item Ridge and LSBoost outperform the physics-guided model after regime shift.
 \item Sparse laboratory labels make regime-aware validation essential.
 \item One-minute telemetry enables virtual monitoring between laboratory samples.
 \end{itemize}
 
 \begin{abstract}
-Industrial plants generate high-frequency telemetry while key quality variables may be measured only every few hours. We evaluate a physics-guided soft sensor for an industrial monoammonium phosphate process using 139,681 one-minute records and 860 paired laboratory observations. Chronological validation used nine 14-day-train/7-day-test windows in the initial regime and one transfer test across a conductivity-driven regime shift. The physics-guided model showed unstable generalization: pooled initial-regime RMSE was 0.2125 for molar ratio and 0.0176 g cm$^{-3}$ for density, driven by one catastrophic window. Ridge regression was more stable (0.0156/0.0085). On regime transfer, gradient boosting achieved 0.0188/0.0134 versus 0.0707/0.0310 for the physics-guided model. Physical structure alone therefore did not guarantee robustness under sparse labels and regime drift, motivating regime-aware calibration and leakage-safe temporal validation.
+Industrial plants generate high-frequency telemetry while key quality variables may be measured only every few hours. We evaluate a physics-guided soft sensor for an industrial monoammonium phosphate process using 139,681 one-minute records and 860 paired laboratory observations. A process-domain rule excluded conductivity values above the production-valid range, identified by plant technologists as wash or other non-production operation. Chronological validation used nine 14-day-train/7-day-test windows and one transfer test across an operating-regime shift. Within the initial regime, the physics-guided model achieved pooled RMSE values of 0.0362 for molar ratio and 0.0111 g cm$^{-3}$ for density; Ridge achieved 0.0155/0.0085. During regime transfer, Ridge and gradient boosting remained substantially more stable than the physics-guided model. These results show that process-validity filtering and regime-aware validation are both essential for reliable virtual telemetry under sparse laboratory supervision.
 \end{abstract}
 
 \noindent\textbf{Keywords:} soft sensor; virtual sensor; hybrid modeling; process monitoring; regime shift; monoammonium phosphate
@@ -113,7 +113,7 @@ The contributions are:
 \item a real industrial multi-rate soft-sensing case with 139,681 minute records and 860 paired laboratory observations;
 \item a reproducible chronological evaluation using fixed 14-day training and 7-day test windows;
 \item comparison of the physics-guided model with Ridge, physics-only, and LSBoost baselines on identical temporal splits;
-\item explicit analysis of a catastrophic physics-guided failure window and cross-regime transfer;
+\item explicit analysis of process-domain filtering and cross-regime transfer;
 \item documentation of data-alignment and preprocessing choices that can create operational look-ahead even when target leakage is absent.
 \end{enumerate}
 
@@ -156,14 +156,14 @@ The study interval covers 1 March--6 June 2026.
 \toprule
 Data source & Variables & Sampling / count & Role\\
 \midrule
-Plant telemetry & conductivity, acid flow, ammonia flow, water flow & 139,681 one-minute records; 121,414 jointly valid after preprocessing & model inputs\\
+Plant telemetry & conductivity, acid flow, ammonia flow, water flow & 139,681 one-minute records; 118,647 jointly valid after preprocessing & model inputs\\
 Laboratory/operator references & molar ratio and solution density & 860 paired observations, typically every 2--8 h & calibration/evaluation targets\\
 Downstream production records & product-flow information & daily / lower-frequency & exploratory only\\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The number of usable laboratory rows depends on lag and averaging-window configuration because a laboratory observation is eligible only when the required process window is sufficiently valid. Under the regime-specific development configurations, 637 regime-A and 119 regime-B observations were obtained. These counts are produced by different masks and therefore should not be added. Under the single combined-model mask $\tau=50$ min, $W=60$ min, the partition is 643 regime-A plus 124 regime-B observations, giving 767.
+The number of usable laboratory rows depends on lag and averaging-window configuration because a laboratory observation is eligible only when the required process window is sufficiently valid. Before the production-validity update, the canonical rerun reproduced the original development counts: 637 regime-A observations under $\tau=180$ min, $W=60$ min; 119 regime-B observations under $\tau=20$ min, $W=20$ min; and 767 observations under the combined $\tau=50$ min, $W=60$ min mask. The first two counts arise from different acceptance masks and should therefore not be added. After exclusion of non-production high-conductivity intervals, the corresponding counts are 619, 119, and 750; the current combined mask partitions as 626 regime-A plus 124 regime-B observations.
 
 \subsection{Data quality and preprocessing}
 
@@ -179,7 +179,7 @@ The workflow is:
 \item associate each laboratory observation with an eligible process window determined by lag $\tau$ and window length $W$.
 \end{enumerate}
 
-A total of 3,156 conductivity values were corrected by the authoritative process filter. Filtering does not use laboratory target values.
+A plant technologist confirmed that conductivity values above 30 are outside normal production operation; such values can occur during vessel washing or other non-production tests and are not representative of MAP production. Accordingly, the production-validity rule $c>30$ was added to the preprocessing pipeline. The rule is process-based rather than model-error-based and is applied globally before conductivity smoothing, model fitting, and laboratory-window aggregation. It invalidates 2,828 raw process minutes. After this update, 118,647 of 139,681 minute records are jointly valid. The conductivity filter corrected 5,586 values in total. None of these preprocessing steps uses laboratory target values.
 
 \subsection{Operating-regime shift}
 
@@ -266,7 +266,7 @@ J=
 \frac{\mathrm{RMSE}_{\rho}}{0.01}.
 \end{equation}
 
-The selected configuration was then frozen for all outer splits in that scenario, while fitted coefficients were re-estimated from each outer training interval only. Within Regime A the selected configuration was $\tau=90$ min, $W=60$ min with a quadratic latent-property mapping. For A-to-B transfer it was $\tau=100$ min, $W=30$ min with PCHIP mapping.
+The selected configuration was then frozen for all outer splits in that scenario, while fitted coefficients were re-estimated from each outer training interval only. Within Regime A the selected configuration was $\tau=90$ min, $W=60$ min with a quadratic latent-property mapping. For A-to-B transfer it was $\tau=100$ min, $W=30$ min with a quadratic mapping.
 
 \subsection{Baseline models}
 
@@ -321,7 +321,7 @@ Molar-ratio predictions from the physics-guided implementation are rounded to tw
 
 \subsection{Within-regime-A rolling validation}
 
-Nine non-overlapping 7-day test intervals produced 509 held-out laboratory observations in total. Training-set size varied from 99 to 138 observations.
+Nine non-overlapping 7-day test intervals produced 499 held-out laboratory observations in total. Training-set size varied from 96 to 138 observations.
 
 \begin{table}[htbp]
 \centering
@@ -332,28 +332,28 @@ Nine non-overlapping 7-day test intervals produced 509 held-out laboratory obser
 \toprule
 Model & RMSE $R$ & MAE $R$ & Within $\pm0.03$ & RMSE $\rho_M$ & MAE $\rho_M$ & Within $\pm0.01$\\
 \midrule
-Physics-guided & 0.2125 & 0.0421 & 0.580 & 0.0176 & 0.0096 & 0.668\\
-Ridge & 0.0156 & 0.0114 & 0.914 & 0.0085 & 0.0063 & 0.827\\
-Physics-only & 0.1053 & 0.1002 & 0.020 & 0.0842 & 0.0838 & 0.000\\
-Gradient boosting & 0.0168 & 0.0128 & 0.894 & 0.0110 & 0.0087 & 0.625\\
+Physics-guided & 0.0362 & 0.0267 & 0.581 & 0.0111 & 0.0086 & 0.667\\
+Ridge & 0.0155 & 0.0114 & 0.914 & 0.0085 & 0.0063 & 0.830\\
+Physics-only & 0.1055 & 0.1005 & 0.020 & 0.0841 & 0.0837 & 0.000\\
+Gradient boosting & 0.0171 & 0.0130 & 0.886 & 0.0110 & 0.0086 & 0.629\\
 \bottomrule
 \end{tabular}}
 \end{table}
 
-The pooled molar-ratio RMSE of the physics-guided model is dominated by split A08. In that window, the model produced RMSE 0.7489, MAE 0.2368, and P95 absolute error 2.685. Across all nine windows, the median physics-guided RMSE is 0.0288 for molar ratio and 0.0100 g cm$^{-3}$ for density. This median is reported only to describe the split distribution; A08 remains included in all pooled metrics.
+The process-validity update removes the previously observed catastrophic behavior in split A08 without discarding the complete test interval. A08 retains 37 held-out laboratory observations and yields RMSE 0.0419 for molar ratio and 0.0115 g cm$^{-3}$ for density. The threshold was introduced after process review identified conductivity above 30 as non-production operation, then applied globally to the full dataset before preprocessing and model fitting.
 
-Ridge regression is the most stable model across the Regime-A rolling tests for both outputs jointly. Gradient boosting gives similarly low molar-ratio errors but higher density error than Ridge. The physics-only reference is systematically biased and does not approach the specified tolerances.
+Across Regime A, the physics-guided model now shows bounded but consistently lower predictive accuracy than Ridge. Ridge regression is the most stable model across the rolling tests for both outputs jointly. Gradient boosting gives similarly low molar-ratio errors but slightly higher density error than Ridge. The physics-only reference is systematically biased and does not approach the specified tolerances.
 
 \begin{figure}[htbp]
 \centering
 \figplaceholder{figures/fig_predicted_vs_measured.png}{0.96\linewidth}
-\caption{Held-out measured versus predicted values. The extreme physics-guided predictions in Regime A correspond to the A08 failure and dominate the pooled molar-ratio RMSE.}
+\caption{Held-out measured versus predicted values after application of the production-validity filter.}
 \label{fig:scatter}
 \end{figure}
 
 \subsection{A-to-B regime transfer}
 
-The transfer experiment trains on the final 14 days of Regime A and tests on the first 7 days of Regime B, with 99 training and 56 test laboratory observations.
+The transfer experiment trains on the final 14 days of Regime A and tests on the first 7 days of Regime B, with 84 training and 56 test laboratory observations.
 
 \begin{table}[htbp]
 \centering
@@ -364,15 +364,15 @@ The transfer experiment trains on the final 14 days of Regime A and tests on the
 \toprule
 Model & RMSE $R$ & MAE $R$ & Bias $R$ & Within $\pm0.03$ & RMSE $\rho_M$ & MAE $\rho_M$ & Bias $\rho_M$ & Within $\pm0.01$\\
 \midrule
-Physics-guided & 0.0707 & 0.0659 & -0.0655 & 0.089 & 0.0310 & 0.0291 & +0.0289 & 0.036\\
-Ridge & 0.0224 & 0.0179 & +0.0171 & 0.732 & 0.0114 & 0.0088 & -0.0063 & 0.643\\
+Physics-guided & 0.0966 & 0.0932 & -0.0932 & 0.018 & 0.0588 & 0.0574 & +0.0574 & 0.000\\
+Ridge & 0.0170 & 0.0132 & +0.0093 & 0.875 & 0.0130 & 0.0106 & +0.0082 & 0.536\\
 Physics-only & 0.0966 & 0.0912 & +0.0912 & 0.018 & 0.0877 & 0.0871 & -0.0871 & 0.000\\
-Gradient boosting & 0.0188 & 0.0145 & +0.0063 & 0.875 & 0.0134 & 0.0111 & -0.0047 & 0.500\\
+Gradient boosting & 0.0174 & 0.0136 & +0.0039 & 0.911 & 0.0134 & 0.0110 & -0.0040 & 0.536\\
 \bottomrule
 \end{tabular}}
 \end{table}
 
-The transfer test changes the interpretation of the prototype. The physics-guided architecture remains better than the uncalibrated physics-only reference, but it generalizes substantially worse than the data-driven baselines. Gradient boosting gives the lowest molar-ratio RMSE, while Ridge gives the lowest density RMSE. The physics-guided model exhibits a strong negative molar-ratio bias and positive density bias after the regime transition.
+The transfer test changes the interpretation of the prototype. After the production-validity filter has removed non-production excursions, the physics-guided architecture still generalizes substantially worse than the data-driven baselines across the regime boundary. Ridge gives the lowest molar-ratio and density RMSE values, while gradient boosting is nearly identical in RMSE and gives the highest molar-ratio tolerance hit rate. The physics-guided model exhibits a strong negative molar-ratio bias and positive density bias after the regime transition.
 
 \begin{figure}[htbp]
 \centering
@@ -394,17 +394,17 @@ The first paired laboratory record in Regime B occurs after the 21 May boundary 
 
 \subsection{Implications for model selection}
 
-The hold-out results do not support a claim that the current physics-guided model is the most accurate virtual sensor. Instead, they show a deployment-relevant result: the interpretable grey-box structure is vulnerable to calibration instability and operating-regime change, and development-set performance is insufficient evidence of prospective robustness.
+The hold-out results do not support a claim that the current physics-guided model is the most accurate virtual sensor. Instead, they separate two distinct effects: non-production measurements can create misleading model failures if process-state validity is not enforced, while a genuine operating-regime shift still causes a substantial loss of transfer accuracy after those invalid intervals are removed.
 
-For the present dataset, simple Ridge regression is markedly more stable across both outputs. Gradient boosting is competitive within Regime A and gives the lowest molar-ratio error in the A-to-B transfer. The physics-only reference performs poorly, showing that first-principles structure without calibrated latent-feed information is insufficient.
+For the present dataset, simple Ridge regression is markedly more stable across both outputs. Gradient boosting is competitive within Regime A and closely matches Ridge during A-to-B transfer. The physics-only reference performs poorly, showing that first-principles structure without calibrated latent-feed information is insufficient.
 
 \section{Discussion}
 
 \subsection{Why the chronological result matters}
 
-The original development metrics suggested that the physics-guided prototype tracked the overall level of molar ratio and density. Chronological hold-out testing reveals a qualitatively different issue: most Regime-A windows are moderate, but one window is catastrophically unstable and the model transfers poorly across the later regime shift.
+The original development metrics suggested that the physics-guided prototype tracked the overall level of molar ratio and density. Chronological hold-out testing first exposed an apparent catastrophic failure in A08. Process review then showed that the affected interval contained conductivity values outside the production-valid domain. A plant technologist confirmed that such values are associated with washing or other non-production operation rather than MAP production. Applying the resulting $c>30$ exclusion globally removed the artificial failure while preserving a normal-sized held-out A08 test set.
 
-This distinction is central for industrial soft sensing. A model used between laboratory measurements must remain bounded and predictable when process conditions move away from the calibration interval. Average fit on a mixed development dataset can hide rare but operationally unacceptable failures.
+This distinction is central for industrial soft sensing. Process-state validity must be established independently of prediction error; otherwise maintenance or test operation can be mistaken for model failure. After this correction, the remaining scientific limitation is not an isolated unstable window but poor transfer of the physics-guided calibration across a genuine operating-regime change.
 
 \subsection{Physics guidance does not guarantee robustness}
 
@@ -418,7 +418,7 @@ The A-to-B experiment demonstrates that the relation among conductivity, latent 
 
 \subsection{Sparse labels and validation design}
 
-The dataset is large in telemetry count but small in independent target observations. Regime-A test windows contain only 40--74 laboratory targets each, and the transfer test contains 56. Random row-wise splitting would therefore be inappropriate because adjacent process observations are highly correlated and the laboratory sampling process is sparse and multi-rate.
+The dataset is large in telemetry count but small in independent target observations. Regime-A test windows contain 37--74 laboratory targets each, and the transfer test contains 56. Random row-wise splitting would therefore be inappropriate because adjacent process observations are highly correlated and the laboratory sampling process is sparse and multi-rate.
 
 The fixed 14-day/7-day rolling protocol gives a more realistic estimate of operational performance, but it also makes uncertainty across windows visible. Future work should extend the observation horizon and include additional regime transitions.
 
@@ -443,7 +443,7 @@ The production-output calculation used during the R\&D project is likewise exclu
 \item A complete within-Regime-B 14+7-day validation split is unavailable.
 \item The laboratory reference itself has timing and measurement uncertainty.
 \item The authoritative preprocessing contains short-horizon look-ahead and should be made causal for prospective deployment.
-\item The extreme A08 failure is identified but not yet attributed to a single physical or numerical cause; root-cause analysis of the fitted latent-property mapping is required before deployment.
+\item The $c>30$ production-validity threshold is supported by plant-technologist process knowledge; a prospective implementation should derive the same exclusion from explicit equipment-state or operating-mode signals where available.
 \item Raw industrial data cannot be released publicly under the data-owner agreement, limiting third-party reproduction from the original plant signals.
 \end{enumerate}
 
@@ -451,9 +451,9 @@ The production-output calculation used during the R\&D project is likewise exclu
 
 A physics-guided soft-sensor prototype was evaluated for an industrial MAP process in which one-minute telemetry must be reconciled with laboratory quality measurements obtained only every few hours. Strict chronological validation produced nine complete 14-day-train/7-day-test windows within the initial operating regime and one transfer test across a real conductivity-driven regime shift.
 
-The principal result is a robustness limitation rather than an accuracy claim. The physics-guided model was acceptable in several individual windows but suffered a catastrophic molar-ratio failure in A08 and degraded strongly during A-to-B transfer. Ridge and gradient boosting were substantially more stable on the same held-out data. The physics-only reference performed poorly.
+The production-validity filter removed non-production high-conductivity intervals and eliminated the previously observed A08 failure. Across the nine Regime-A held-out windows, the physics-guided model achieved pooled RMSE values of 0.0362 for molar ratio and 0.0111 g cm$^{-3}$ for density. Ridge remained more accurate at 0.0155 and 0.0085, respectively. Across the A-to-B regime transition, physics-guided performance degraded to 0.0966 and 0.0588, whereas Ridge remained at 0.0170 and 0.0130.
 
-The study therefore shows that physical structure alone does not guarantee reliable virtual telemetry. For industrial deployment, physics-guided soft sensors require leakage-safe temporal validation, bounded or monitored extrapolation, regime-aware maintenance, and explicit fallback behavior. These requirements are especially important when labels are sparse and the empirical part of a hybrid model reconstructs latent feed properties that directly drive downstream material-balance calculations.
+The study therefore distinguishes data-validity failures from genuine model-transfer limitations. Physics-guided virtual telemetry can provide bounded estimates within the production domain, but physical structure alone does not guarantee robustness to operating-regime change. Industrial deployment should combine process-state validation, leakage-safe temporal testing, regime-aware maintenance, and explicit fallback behavior, particularly when sparse laboratory labels are used to calibrate latent feed properties.
 
 \section*{Author contributions}
 
@@ -482,7 +482,7 @@ Recommended Supporting Information:
 \item exact NTO preprocessing thresholds and signal-validity rules;
 \item latent-property model coefficients for each chronological fit;
 \item all per-split validation metrics;
-\item diagnostic output for the A08 failure;
+\item validation of the production-domain conductivity exclusion and its effect on A08;
 \item baseline configurations and regularization settings;
 \item additional residual distributions;
 \item decision-support equations and offline examples;
