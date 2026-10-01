@@ -70,7 +70,7 @@ Evgeny S. Gornev\textsuperscript{b}\\[0.35em]
 \end{itemize}
 
 \begin{abstract}
-Industrial plants collect high-frequency telemetry while critical quality variables may be measured only every few hours. We study soft sensing for an industrial monoammonium phosphate process using 260,642 one-minute records and 1,325 paired laboratory observations. The grey-box model reconstructs latent acid properties from conductivity and combines them with material-balance calculations to estimate molar ratio and downstream density. Validation is entirely chronological: nine pre-gap rolling tests, a short-term regime-transfer test, a strict external post-gap test on 249 future laboratory pairs, and four post-gap rolling comparisons. Process-specific validity filtering is applied before model fitting and temporal alignment. Physics-guided structure improves interpretability but does not ensure temporal robustness. Across regime change and the post-gap period, Ridge and LSBoost remain substantially more accurate than the physics-guided model, demonstrating the need for regime-aware updating of industrial virtual telemetry.
+Industrial plants collect high-frequency telemetry while critical quality variables may be measured only every few hours. We study soft sensing for an industrial monoammonium phosphate process using 260,642 one-minute records and 1,325 paired laboratory observations. The grey-box model reconstructs latent acid properties from conductivity and combines them with material-balance calculations to estimate molar ratio and downstream density. Validation is entirely chronological: nine pre-gap rolling tests, a short-term regime-transfer test, a strict external post-gap test on 438 future laboratory pairs, and ten post-gap rolling comparisons. To prevent uncontrolled extrapolation, the conductivity input to the fitted latent-property mappings is limited to the range observed in the corresponding training data. Ridge and LSBoost remain more accurate than the physics-guided model, particularly in the independent long-horizon evaluation. The results show that physical structure improves interpretability but does not by itself ensure temporal robustness, motivating regime-aware monitoring, recalibration, and fallback logic for industrial virtual telemetry.
 \end{abstract}
 
 \noindent\textbf{Keywords:} soft sensor; virtual sensor; hybrid modeling; process monitoring; regime shift; monoammonium phosphate
@@ -145,13 +145,13 @@ The full study covers 1 March--29 September 2026 and preserves the one-month dat
 \toprule
 Data source & Variables & Sampling / count & Role\\
 \midrule
-Plant telemetry & conductivity, acid flow, ammonia flow, water flow & 260,642 one-minute records; 184,387 jointly valid after preprocessing & model inputs\\
+Plant telemetry & conductivity, acid flow, ammonia flow, water flow & 260,642 one-minute records; 225,114 jointly valid after preprocessing & model inputs\\
 Laboratory/operator references & molar ratio and solution density & 1,325 paired observations & calibration and evaluation targets\\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The dataset comprises 139,679 pre-gap process rows and 120,961 post-gap rows. Laboratory coverage comprises 860 paired observations before the gap and 465 paired observations after the gap. For the frozen pre-gap configuration, 760 pre-gap and 249 post-gap laboratory pairs are aligned; for the adapted post-gap configuration, 256 post-gap pairs are aligned.
+The dataset comprises 139,679 pre-gap process rows and 120,961 post-gap rows. Laboratory coverage comprises 860 paired observations before the gap and 465 paired observations after the gap. The strict external evaluation contains 761 aligned pre-gap training pairs and 438 post-gap test pairs. All ten post-gap rolling windows satisfy the pre-specified minimum-sample criterion, yielding 357 pooled held-out test pairs.
 
 \subsection{Data quality and preprocessing}
 
@@ -197,9 +197,17 @@ The overall soft-sensor architecture is summarized in Fig.~\ref{fig:soft_sensor_
 
 \subsection{Physics-guided soft sensor}
 
-The soft sensor is a grey-box sequence rather than a direct unconstrained regression. Conductivity is first mapped to a latent $P_2O_5$ fraction,
+The soft sensor is a grey-box sequence rather than a direct unconstrained regression. Before evaluating the fitted latent-property mapping, the conductivity input is limited to the conductivity range observed in the corresponding training data,
 \begin{equation}
-\widehat{w}_{P_2O_5}=f_{\theta}(c),
+\widetilde c=
+\min\!\left[
+\max\!\left(c,c_{\min}^{\mathrm{train}}\right),
+c_{\max}^{\mathrm{train}}
+\right].
+\end{equation}
+The bounds $c_{\min}^{\mathrm{train}}$ and $c_{\max}^{\mathrm{train}}$ are determined from training inputs only; no test targets are used to define them. This training-domain guard prevents unconstrained polynomial or spline extrapolation without removing test observations. The guarded conductivity is then mapped to a latent $P_2O_5$ fraction,
+\begin{equation}
+\widehat{w}_{P_2O_5}=f_{\theta}(\widetilde c),
 \end{equation}
 followed by a mapping from estimated composition to acid density,
 \begin{equation}
@@ -260,9 +268,13 @@ J=
 \frac{\mathrm{RMSE}_{\rho}}{0.01}.
 \end{equation}
 
-The selected configuration is then frozen for the relevant outer scenario, while fitted coefficients are re-estimated from each outer training interval only.
-
-For the final pre-gap frozen model, the selected configuration is $\tau=0$ min, $W=60$ min, with a quadratic mapping. For the adapted post-gap physics-guided model, the selected configuration is $\tau=140$ min, $W=10$ min, with PCHIP spline mapping.
+The selected configuration is then frozen for the relevant outer scenario, while fitted coefficients are re-estimated from each outer training interval only. The selected physics-guided configurations are:
+\begin{itemize}[leftmargin=1.5em]
+\item pre-gap within-regime validation: $\tau=90$ min, $W=60$ min, PCHIP spline;
+\item A-to-B transfer: $\tau=100$ min, $W=30$ min, quadratic mapping;
+\item strict external frozen model: $\tau=0$ min, $W=60$ min, quadratic mapping;
+\item post-gap adapted model: $\tau=140$ min, $W=10$ min, PCHIP spline.
+\end{itemize}
 
 \subsection{Baseline models}
 
@@ -286,7 +298,7 @@ Validation is entirely temporal. No random shuffling is used.
 
 \textbf{External post-gap evaluation.} The strict external test trains on all eligible pre-gap observations and evaluates on the post-gap period 7 July--29 September 2026. This scenario is denoted \texttt{external\_transfer\_full}.
 
-\textbf{Post-gap frozen-versus-adapted comparison.} Ten post-gap calendar windows are considered, each using 14 days for training and the next 7 days for testing. A window enters the pooled comparison only if temporal alignment leaves at least 40 training and 10 common test laboratory pairs. Four of the ten candidate windows satisfy this rule (P01--P04); the other six are excluded explicitly and do not contribute to pooled metrics.
+\textbf{Post-gap frozen-versus-adapted comparison.} Ten post-gap calendar windows (P01--P10) are considered, each using 14 days for training and the next 7 days for testing. A window enters the pooled comparison only if temporal alignment leaves at least 40 training and 10 common test laboratory pairs. All ten windows satisfy this pre-specified criterion and therefore contribute to the pooled comparison. Rolling training intervals overlap, whereas the held-out test intervals do not; pooled metrics are therefore treated as descriptive summaries rather than independent-fold confidence estimates.
 
 \subsection{Evaluation metrics}
 
@@ -316,7 +328,7 @@ Molar-ratio predictions from the physics-guided implementation are rounded to tw
 
 \subsection{Within-regime-A rolling validation}
 
-Nine non-overlapping 7-day test intervals produced 499 held-out laboratory observations in total. Training-set size varied from 96 to 138 observations.
+Nine non-overlapping 7-day test intervals produced 500 held-out laboratory observations in total. Training-set size varied from 96 to 138 observations.
 
 \begin{table}[htbp]
 \centering
@@ -327,19 +339,19 @@ Nine non-overlapping 7-day test intervals produced 499 held-out laboratory obser
 \toprule
 Model & RMSE $R$ & MAE $R$ & Within $\pm0.03$ & RMSE $\rho_M$ & MAE $\rho_M$ & Within $\pm0.01$\\
 \midrule
-Physics-guided & 0.0362 & 0.0267 & 0.581 & 0.0111 & 0.0086 & 0.667\\
-Ridge & 0.0155 & 0.0114 & 0.914 & 0.0085 & 0.0063 & 0.830\\
+Physics-guided & 0.0340 & 0.0260 & 0.604 & 0.0112 & 0.0087 & 0.636\\
+Ridge & 0.0155 & 0.0114 & 0.914 & 0.0085 & 0.0063 & 0.832\\
 Physics-only & 0.1055 & 0.1005 & 0.020 & 0.0841 & 0.0837 & 0.000\\
-Gradient boosting & 0.0171 & 0.0130 & 0.886 & 0.0110 & 0.0086 & 0.629\\
+Gradient boosting & 0.0171 & 0.0130 & 0.884 & 0.0111 & 0.0086 & 0.626\\
 \bottomrule
 \end{tabular}}
 \end{table}
 
-After process-validity filtering, split A08 retains 37 held-out laboratory observations and yields RMSE 0.0419 for molar ratio and 0.0115 g cm$^{-3}$ for density. Across Regime A, the physics-guided model shows bounded but consistently lower predictive accuracy than Ridge. Ridge regression is the most stable model across the rolling tests for both outputs jointly. Gradient boosting gives similarly low molar-ratio errors but slightly higher density error than Ridge. The physics-only reference is systematically biased and does not approach the specified tolerances.
+Across Regime~A, the physics-guided model provides bounded and interpretable estimates but remains less accurate than Ridge. Ridge regression is the most stable model across both outputs jointly, while gradient boosting gives similarly low molar-ratio error with somewhat higher density error. The physics-only reference remains strongly biased and does not approach the specified tolerances.
 
 \subsection{A-to-B regime transfer}
 
-The transfer experiment trains on the final 14 days of Regime A and tests on the first 7 days of Regime B, with 84 training and 56 test laboratory observations.
+The transfer experiment trains on the final 14 days of Regime~A and tests on the first 7 days of Regime~B, with 84 training and 56 test laboratory observations.
 
 \begin{table}[htbp]
 \centering
@@ -350,15 +362,15 @@ The transfer experiment trains on the final 14 days of Regime A and tests on the
 \toprule
 Model & RMSE $R$ & MAE $R$ & Bias $R$ & Within $\pm0.03$ & RMSE $\rho_M$ & MAE $\rho_M$ & Bias $\rho_M$ & Within $\pm0.01$\\
 \midrule
-Physics-guided & 0.0966 & 0.0932 & -0.0932 & 0.018 & 0.0588 & 0.0574 & +0.0574 & 0.000\\
+Physics-guided & 0.0320 & 0.0263 & -0.0152 & 0.500 & 0.0191 & 0.0166 & +0.0158 & 0.304\\
 Ridge & 0.0170 & 0.0132 & +0.0093 & 0.875 & 0.0130 & 0.0106 & +0.0082 & 0.536\\
-Physics-only & 0.0966 & 0.0912 & +0.0912 & 0.018 & 0.0877 & 0.0871 & -0.0871 & 0.000\\
+Physics-only & 0.0966 & 0.0913 & +0.0913 & 0.018 & 0.0877 & 0.0871 & -0.0871 & 0.000\\
 Gradient boosting & 0.0174 & 0.0136 & +0.0039 & 0.911 & 0.0134 & 0.0110 & -0.0040 & 0.536\\
 \bottomrule
 \end{tabular}}
 \end{table}
 
-The physics-guided model generalizes substantially worse than the data-driven baselines across the regime boundary. Ridge gives the lowest molar-ratio and density RMSE values, while gradient boosting is nearly identical in RMSE and gives the highest molar-ratio tolerance hit rate. The physics-guided model exhibits a strong negative molar-ratio bias and positive density bias after the regime transition.
+With training-domain input saturation, the physics-guided model remains numerically stable across the short-term regime boundary, although Ridge and gradient boosting retain lower held-out errors on both outputs. The larger performance separation emerges in the independent long-horizon post-gap evaluation.
 
 \subsection{No complete within-regime-B test}
 
@@ -366,7 +378,7 @@ The first paired laboratory record in Regime B occurs after the 21 May boundary 
 
 \subsection{Independent external post-gap validation}
 
-The most stringent evaluation uses all eligible pre-gap observations for training and tests the frozen models on the future post-gap period from 7 July to 29 September 2026. This deployment-style experiment contains 760 aligned training pairs and 249 aligned post-gap test pairs.
+The most stringent evaluation uses all eligible pre-gap observations for training and tests the frozen models on the future post-gap period from 7 July to 29 September 2026. This deployment-style experiment contains 761 aligned training pairs and 438 aligned post-gap test pairs.
 
 \begin{table}[htbp]
 \centering
@@ -377,45 +389,45 @@ The most stringent evaluation uses all eligible pre-gap observations for trainin
 \toprule
 Model & RMSE $R$ & MAE $R$ & Bias $R$ & Within $\pm0.03$ & RMSE $\rho_M$ & MAE $\rho_M$ & Bias $\rho_M$ & Within $\pm0.01$\\
 \midrule
-Physics-guided frozen & 0.1277 & 0.1023 & -0.0931 & 0.112 & 0.0335 & 0.0289 & +0.0286 & 0.076\\
-Ridge frozen & 0.0321 & 0.0174 & -0.0049 & 0.775 & 0.0147 & 0.0116 & +0.0104 & 0.490\\
-Physics-only & 0.0962 & 0.0685 & +0.0089 & 0.281 & 0.0651 & 0.0637 & -0.0635 & 0.000\\
-Gradient boosting frozen & 0.0328 & 0.0196 & -0.0098 & 0.711 & 0.0137 & 0.0102 & +0.0060 & 0.602\\
+Physics-guided frozen & 0.1795 & 0.1524 & -0.1472 & 0.066 & 0.0456 & 0.0401 & +0.0400 & 0.043\\
+Ridge frozen & 0.0286 & 0.0182 & -0.0096 & 0.731 & 0.0141 & 0.0114 & +0.0103 & 0.495\\
+Physics-only & 0.1254 & 0.0992 & -0.0519 & 0.199 & 0.0587 & 0.0564 & -0.0563 & 0.000\\
+Gradient boosting frozen & 0.0288 & 0.0186 & -0.0107 & 0.724 & 0.0128 & 0.0094 & +0.0039 & 0.653\\
 \bottomrule
 \end{tabular}}
 \end{table}
 
-Because neither fitting nor hyperparameter selection uses post-gap target values, this scenario provides an independent future-period evaluation. The physics-guided model preserves interpretability but transfers poorly, whereas Ridge and LSBoost remain substantially more accurate on both outputs.
+Because neither fitting nor hyperparameter selection uses post-gap target values, this scenario provides an independent future-period evaluation. Ridge gives the lowest molar-ratio RMSE, while gradient boosting gives the lowest density RMSE. The frozen physics-guided model shows a substantial negative molar-ratio bias and positive density bias over the future period and does not match the transfer performance of the statistical baselines.
 
 The persistence of this performance gap over the full July--September period shows that the weak transfer of the physics-guided calibration is not confined to the short interval around the 21 May regime boundary. Although the downstream material-balance relations remain physically interpretable, the learned mappings used to reconstruct latent acid properties remain data-dependent; changes in these mappings can therefore propagate through an otherwise physically structured calculation.
 
 \subsection{Post-gap frozen versus adapted comparison}
 
-The post-gap rolling comparison evaluates frozen and adapted models on identical held-out laboratory rows across four valid windows (P01--P04), for a pooled total of 95 test pairs.
+All ten post-gap rolling windows (P01--P10) satisfy the pre-specified sample-size criterion. Frozen and adapted models are evaluated on identical held-out laboratory rows within each window, yielding a pooled total of 357 non-overlapping test pairs.
 
 \begin{table}[htbp]
 \centering
-\caption{Post-gap rolling comparison on identical held-out samples (4 included windows, 95 pooled test pairs).}
+\caption{Post-gap rolling comparison on identical held-out samples (10 windows, 357 pooled test pairs).}
 \label{tab:postgapcomparison}
 \resizebox{\linewidth}{!}{%
 \begin{tabular}{@{}lrrrrrrrr@{}}
 \toprule
 Model & RMSE $R$ & MAE $R$ & Bias $R$ & Within $\pm0.03$ & RMSE $\rho_M$ & MAE $\rho_M$ & Bias $\rho_M$ & Within $\pm0.01$\\
 \midrule
-Physics-guided frozen & 0.1386 & 0.1218 & -0.1218 & 0.021 & 0.0366 & 0.0331 & +0.0331 & 0.021\\
-Ridge frozen & 0.0195 & 0.0141 & -0.0061 & 0.811 & 0.0136 & 0.0105 & +0.0102 & 0.537\\
-Physics-only & 0.0753 & 0.0574 & -0.0136 & 0.274 & 0.0622 & 0.0610 & -0.0610 & 0.000\\
-Gradient boosting frozen & 0.0233 & 0.0179 & -0.0124 & 0.705 & 0.0139 & 0.0097 & +0.0067 & 0.663\\
-Physics-guided adapted & 0.1290 & 0.1129 & +0.0111 & 0.105 & 0.0234 & 0.0198 & -0.0040 & 0.274\\
-Ridge adapted & 0.0235 & 0.0182 & -0.0039 & 0.747 & 0.0116 & 0.0087 & +0.0032 & 0.674\\
-Gradient boosting adapted & 0.0260 & 0.0203 & -0.0001 & 0.663 & 0.0127 & 0.0104 & -0.0057 & 0.568\\
+Physics-guided frozen & 0.1903 & 0.1678 & -0.1677 & 0.028 & 0.0486 & 0.0442 & +0.0442 & 0.008\\
+Ridge frozen & 0.0216 & 0.0170 & -0.0111 & 0.739 & 0.0143 & 0.0119 & +0.0111 & 0.462\\
+Physics-only & 0.1264 & 0.1016 & -0.0710 & 0.182 & 0.0558 & 0.0536 & -0.0536 & 0.000\\
+Gradient boosting frozen & 0.0219 & 0.0171 & -0.0112 & 0.731 & 0.0126 & 0.0094 & +0.0045 & 0.655\\
+Physics-guided adapted & 0.1549 & 0.1288 & +0.0090 & 0.109 & 0.0222 & 0.0188 & +0.0011 & 0.300\\
+Ridge adapted & 0.0197 & 0.0142 & -0.0007 & 0.829 & 0.0134 & 0.0093 & +0.0051 & 0.683\\
+Gradient boosting adapted & 0.0230 & 0.0177 & -0.0057 & 0.745 & 0.0110 & 0.0088 & -0.0052 & 0.650\\
 \bottomrule
 \end{tabular}}
 \end{table}
 
-Adapting the physics-guided model on the new period improves density relative to the frozen physics-guided version but does not recover competitiveness with Ridge or LSBoost. In contrast, the data-driven models remain substantially more stable.
+Rolling adaptation substantially reduces the physics-guided density error and improves its molar-ratio error relative to the frozen physics-guided model, but it does not close the molar-ratio gap to Ridge or gradient boosting. Ridge adaptation gives the lowest pooled molar-ratio RMSE, while gradient-boosting adaptation gives the lowest density RMSE.
 
-Figure~\ref{fig:postgaprmse} summarizes the normalized held-out errors for the frozen and adapted strategies on identical post-gap samples. Figure~\ref{fig:frozenadapted} shows the corresponding physics-guided time series and residuals, illustrating that rolling adaptation reduces the density bias but does not resolve the molar-ratio transfer error.
+Figure~\ref{fig:postgaprmse} summarizes the normalized held-out errors for the frozen and adapted strategies on identical post-gap samples. Figure~\ref{fig:frozenadapted} shows the corresponding physics-guided time series and residuals.
 
 \begin{figure}[htbp]
 \centering
@@ -427,25 +439,25 @@ Figure~\ref{fig:postgaprmse} summarizes the normalized held-out errors for the f
 \begin{figure}[htbp]
 \centering
 \figplaceholder{figures/fig_extended_transfer_timeseries.pdf}{0.98\linewidth}
-\caption{Frozen pre-gap physics-guided model versus 14-day rolling adaptation on post-gap held-out dates. The adapted model reduces density bias but does not resolve the molar-ratio transfer limitation.}
+\caption{Frozen pre-gap physics-guided model versus 14-day rolling adaptation on post-gap held-out dates. Adaptation reduces the density error substantially but does not eliminate the molar-ratio transfer limitation.}
 \label{fig:frozenadapted}
 \end{figure}
 
 \subsection{Implications for model selection and deployment}
 
-Across all validations, the physics-guided model is less accurate than the strongest data-driven baselines under temporal shift. After consistent process-data preprocessing, the principal limitation is the transfer of the physics-guided calibration across operating-regime change and the post-gap period. For the present dataset, Ridge is the most stable model across both outputs, while LSBoost is generally close to Ridge and the physics-only reference remains substantially worse than all fitted models.
+Across all validations, Ridge and gradient boosting provide the strongest predictive transfer under temporal shift, while the physics-guided model provides a more explicit process interpretation but larger long-horizon errors. The training-domain guard is important because it prevents uncontrolled polynomial or spline extrapolation without discarding difficult test observations; however, domain control alone does not ensure temporal transferability.
 
 The results therefore support a lifecycle rather than a static view of industrial soft sensing. This is consistent with previous work emphasizing model maintenance, transfer, and continuous monitoring in industrial soft-sensor systems \citep{kadlec2009,kay2024,metcalfe2025}. A deployed model should be accompanied by process-state or distribution-shift monitoring and by periodic comparison against newly available laboratory measurements.
 
-For a physics-guided implementation, recalibration alone should not be assumed to restore validity after a substantial shift: in the post-gap comparison, adaptation improves the density estimate but does not close the molar-ratio performance gap. A practical deployment workflow should therefore distinguish between validated operating conditions and unvalidated conditions. When a substantial shift is detected, the system should either use an independently validated fallback predictor or report the virtual measurement as unavailable or unreliable until sufficient new laboratory references support recalibration and prospective validation. This deployment implication follows from the observed transfer behavior rather than from the introduction of a new soft-sensor architecture.
+The post-gap results further show that recalibration can improve a physics-guided model without necessarily restoring competitive accuracy on every target. A practical deployment workflow should therefore distinguish between validated and unvalidated operating conditions. When a substantial shift is detected, the system should either use an independently validated fallback predictor or report the virtual measurement as unavailable or unreliable until sufficient new laboratory references support recalibration and prospective validation. This deployment implication follows from the observed transfer behavior rather than from the introduction of a new soft-sensor architecture.
 
 \section{Conclusions}
 
-A physics-guided soft sensor was evaluated for industrial MAP production using 260,642 minute-scale process records and 1,325 paired laboratory measurements. Process-specific validity filtering was applied consistently before model fitting and temporal alignment. Chronological validation showed that the main limitation of the physics-guided approach is temporal transfer across changing operating conditions.
+A physics-guided soft sensor was evaluated for industrial MAP production using 260,642 minute-scale process records and 1,325 paired laboratory measurements. The final preprocessing retained 225,114 valid process rows, and the physics-guided latent-property mappings were protected against uncontrolled extrapolation by limiting conductivity inputs to their corresponding training-domain ranges.
 
-Across nine pre-gap rolling windows, the physics-guided model remained interpretable but less accurate than Ridge. In the short-term A-to-B regime-transfer test, its performance degraded substantially. In the independent post-gap validation, when trained only on pre-gap data, the physics-guided model achieved RMSE values of 0.1277 for molar ratio and 0.0335 g cm$^{-3}$ for density on 249 future laboratory pairs, whereas Ridge achieved 0.0321 and 0.0147, respectively. Rolling post-gap adaptation improved the physics-guided density estimate but did not close the gap to the data-driven baselines.
+Across nine pre-gap rolling windows, the physics-guided model remained interpretable but less accurate than Ridge. With training-domain input control, short-term A-to-B transfer remained numerically stable, with physics-guided RMSE values of 0.0320 for molar ratio and 0.0191 g cm$^{-3}$ for density. The independent long-horizon post-gap evaluation was more demanding: on 438 future laboratory pairs, the frozen physics-guided model achieved RMSE values of 0.1795 and 0.0456, compared with 0.0286 and 0.0141 for Ridge; gradient boosting achieved a density RMSE of 0.0128 g cm$^{-3}$. Across ten post-gap rolling windows and 357 held-out pairs, adaptation improved the physics-guided model but did not close the molar-ratio gap to the data-driven baselines.
 
-The study therefore shows that physics-guided virtual telemetry can provide interpretable estimates, but physical structure alone does not guarantee robustness to operating change. Industrial deployment should combine process-state validation, leakage-safe temporal testing, regime-aware maintenance, and explicit fallback behavior under sparse laboratory supervision.
+The study therefore shows that physically structured virtual telemetry can provide interpretable estimates and can be safeguarded against uncontrolled extrapolation, but physical structure alone does not guarantee robustness to temporal process change. Industrial deployment should combine training-domain control, process-state monitoring, leakage-safe temporal validation, regime-aware recalibration, and explicit fallback behavior under sparse laboratory supervision.
 
 \section*{CRediT authorship contribution statement}
 
