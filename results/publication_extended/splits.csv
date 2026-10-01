@@ -1,0 +1,12 @@
+Scenario,SplitID,TrainStart,TrainEnd,TestStart,TestEnd,Eligible,Note,NTrainAligned,NTestAligned
+external_transfer_full,X01,01-Mar-2026,06-Jun-2026,07-Jul-2026,29-Sep-2026,1,Included: 760 eligible pre-repair train and 249 post-repair test laboratory pairs,760,249
+post_repair_comparison,P01,07-Jul-2026,21-Jul-2026,21-Jul-2026,28-Jul-2026,1,Included after process-window alignment: 68 train and 30 common test pairs,68,30
+post_repair_comparison,P02,14-Jul-2026,28-Jul-2026,28-Jul-2026,04-Aug-2026,1,Included after process-window alignment: 67 train and 26 common test pairs,67,26
+post_repair_comparison,P03,21-Jul-2026,04-Aug-2026,04-Aug-2026,11-Aug-2026,1,Included after process-window alignment: 60 train and 21 common test pairs,60,21
+post_repair_comparison,P04,28-Jul-2026,11-Aug-2026,11-Aug-2026,18-Aug-2026,1,Included after process-window alignment: 56 train and 18 common test pairs,56,18
+post_repair_comparison,P05,04-Aug-2026,18-Aug-2026,18-Aug-2026,25-Aug-2026,0,Excluded after process-window alignment: 56 train and 4 common test pairs; required at least 40/10,56,4
+post_repair_comparison,P06,11-Aug-2026,25-Aug-2026,25-Aug-2026,01-Sep-2026,0,Excluded after process-window alignment: 34 train and 0 common test pairs; required at least 40/10,34,0
+post_repair_comparison,P07,18-Aug-2026,01-Sep-2026,01-Sep-2026,08-Sep-2026,0,Excluded after process-window alignment: 11 train and 1 common test pairs; required at least 40/10,11,1
+post_repair_comparison,P08,25-Aug-2026,08-Sep-2026,08-Sep-2026,15-Sep-2026,0,Excluded after process-window alignment: 6 train and 1 common test pairs; required at least 40/10,6,1
+post_repair_comparison,P09,01-Sep-2026,15-Sep-2026,15-Sep-2026,22-Sep-2026,0,Excluded after process-window alignment: 4 train and 26 common test pairs; required at least 40/10,4,26
+post_repair_comparison,P10,08-Sep-2026,22-Sep-2026,22-Sep-2026,29-Sep-2026,0,Excluded after process-window alignment: 29 train and 27 common test pairs; required at least 40/10,29,27

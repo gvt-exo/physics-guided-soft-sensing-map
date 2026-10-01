@@ -1,0 +1,8 @@
+Model,TrainingStrategy,Configuration
+physics_guided_frozen,All eligible pre-repair observations,Physics-guided mapping selected before repair and then frozen
+physics_guided_adapted,Previous 14 post-repair days,Physics-guided mapping selected on first post-repair training window; coefficients refit per fold
+ridge_frozen,All eligible pre-repair observations,Ridge lambda selected chronologically within the pre-repair training set
+ridge_adapted,Previous 14 post-repair days,Ridge lambda selected chronologically within each 14-day training set
+physics_only,No fitted target mapping,P2O5 fixed at 52 wt%; unfitted acid-density prior
+gradient_boosting_frozen,All eligible pre-repair observations,Fixed LSBoost hyperparameters; 100 cycles
+gradient_boosting_adapted,Previous 14 post-repair days,Fixed LSBoost hyperparameters; 100 cycles

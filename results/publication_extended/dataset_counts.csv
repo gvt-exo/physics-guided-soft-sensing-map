@@ -1,0 +1,16 @@
+Item,Count
+process_rows_total,260642
+process_rows_pre_repair,139679
+process_rows_post_repair,120961
+process_rows_valid_total,184387
+temporal_filter_segments,2
+laboratory_rows_imported_including_blank,2774
+laboratory_rows_with_timestamp,2773
+laboratory_pairs_complete_total,1325
+laboratory_pairs_pre_repair,860
+laboratory_pairs_post_repair,465
+aligned_pre_configuration_pre_repair,760
+aligned_pre_configuration_post_repair,249
+aligned_post_configuration_post_repair,256
+source_backward_time_transitions,181
+source_duplicate_timestamps,181

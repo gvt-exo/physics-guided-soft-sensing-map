@@ -1,0 +1,5 @@
+Model,Inputs,Configuration
+physics_guided,"conductivity, acid flow, ammonia flow, water flow","Joint latent-property fit; linear/quadratic/PCHIP selected chronologically"
+ridge,"conductivity, acid flow, ammonia flow, water flow","Standardized multivariate ridge; lambda selected by chronological inner holdout"
+physics_only,"acid flow, ammonia flow, water flow","P2O5 fixed at 52 wt%; acid density from the unfitted physical prior"
+gradient_boosting,"conductivity, acid flow, ammonia flow, water flow","LSBoost, 100 cycles, learn rate 0.05, min leaf 10, max splits 20"

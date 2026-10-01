@@ -9,6 +9,11 @@ Expected filenames:
 - fig_predicted_vs_measured.png
 - fig_holdout_timeseries.png
 - fig_baseline_comparison.png
+- fig_extended_validation_timeline.png
+- fig_extended_adaptation_comparison.png
+- fig_extended_transfer_timeseries.png
+
+The three extended-validation figures are also supplied as vector PDF files.
 
 Before public release, regenerate or edit the first two figures so that internal process tags (for example the conductivity tag used in the R&D materials) are replaced by generic labels. The company name, site, equipment identifiers, and internal signal identifiers must not appear in public figures.
 

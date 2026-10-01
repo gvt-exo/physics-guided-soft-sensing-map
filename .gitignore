@@ -51,9 +51,28 @@ data/raw/*
 data/interim/*
 !data/interim/.gitkeep
 
+# Confidential industrial validation inputs are never published.
+data/publication/
+
+# Local ingestion utilities retain private workbook schema details.
+scripts/publication/prepare_extended_dataset.py
+scripts/publication/build_extended_dataset.mjs
+scripts/publication/node_modules/
+
 # Generated results
 results/*
 !results/figures/
 !results/tables/
 !results/figures/.gitkeep
 !results/tables/.gitkeep
+!results/publication/
+!results/publication/**
+!results/publication_extended/
+!results/publication_extended/**
+results/publication_extended/*.log
+
+# Private diagnostics are not part of the publication freeze.
+results/publication_extended/acid_channel_*.csv
+paper/figures/fig_acid_flow_duplicate.*
+paper/figures/fig_data_regimes.*
+paper/figures/fig_sparse_sampling.*

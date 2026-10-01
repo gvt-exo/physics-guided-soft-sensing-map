@@ -109,13 +109,13 @@ The number of usable laboratory rows depends on lag and averaging-window configu
 
 ## 2.3. Data quality and preprocessing
 
-The source data contain noisy process signals, short spikes and dropouts, missing or invalid values, incomplete time-series segments, and operating-regime changes. The preprocessing logic used in the validation study follows the R&D implementation documented in the NTO and is treated as authoritative for this paper.
+The source data contain noisy process signals, short spikes and dropouts, missing or invalid values, incomplete time-series segments, and operating-regime changes. The preprocessing logic used in the validation study follows the documented engineering implementation and is treated as authoritative for this paper.
 
 The workflow is:
 
 1. read the native one-minute process series;
 2. select the active redundant flow channel where applicable;
-3. apply the NTO conductivity filter and flow despiking;
+3. apply the documented conductivity filter and flow despiking;
 4. apply process plausibility/range checks;
 5. construct timestamps at which all required inputs are jointly valid;
 6. associate each laboratory observation with an eligible process window determined by lag \(\tau\) and window length \(W\).
@@ -420,7 +420,7 @@ Generative AI tools were used for language and structural assistance during manu
 
 Recommended Supporting Information:
 
-- exact NTO preprocessing thresholds and signal-validity rules;
+- exact engineering preprocessing thresholds and signal-validity rules;
 - latent-property model coefficients for each chronological fit;
 - all per-split validation metrics;
 - diagnostic output for the A08 failure;

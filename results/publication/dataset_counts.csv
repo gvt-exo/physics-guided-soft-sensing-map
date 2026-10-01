@@ -1,0 +1,12 @@
+Item,Count,Definition
+process_rows_imported,139681,"Minute-resolution historian rows"
+process_rows_jointly_valid,118647,"All required channels pass authoritative preprocessing"
+laboratory_rows_imported,2308,"Rows imported from the laboratory worksheet, including empty targets"
+laboratory_pairs_nonmissing,860,"Rows with both MO and density present"
+laboratory_pairs_regime_A_raw,727,"Nonmissing target pairs before process alignment"
+laboratory_pairs_regime_B_raw,133,"Nonmissing target pairs before process alignment"
+report_A_valid_lag180_window60,619,"Regime-A report configuration"
+report_B_valid_lag20_window20,119,"Regime-B report configuration"
+combined_valid_lag50_window60,750,"Combined-report configuration"
+combined_mask_regime_A,626,"Regime-A subset under the combined acceptance mask"
+combined_mask_regime_B,124,"Regime-B subset under the combined acceptance mask"

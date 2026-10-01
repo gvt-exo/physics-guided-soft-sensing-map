@@ -1,0 +1,12 @@
+Scenario,SplitID,TrainStart,TrainEnd,TestStart,TestEnd,Eligible,Note
+A_within,A01,01-Mar-2026,15-Mar-2026,15-Mar-2026,22-Mar-2026,1,Fixed 14-day train and next 7-day test within regime A
+A_within,A02,08-Mar-2026,22-Mar-2026,22-Mar-2026,29-Mar-2026,1,Fixed 14-day train and next 7-day test within regime A
+A_within,A03,15-Mar-2026,29-Mar-2026,29-Mar-2026,05-Apr-2026,1,Fixed 14-day train and next 7-day test within regime A
+A_within,A04,22-Mar-2026,05-Apr-2026,05-Apr-2026,12-Apr-2026,1,Fixed 14-day train and next 7-day test within regime A
+A_within,A05,29-Mar-2026,12-Apr-2026,12-Apr-2026,19-Apr-2026,1,Fixed 14-day train and next 7-day test within regime A
+A_within,A06,05-Apr-2026,19-Apr-2026,19-Apr-2026,26-Apr-2026,1,Fixed 14-day train and next 7-day test within regime A
+A_within,A07,12-Apr-2026,26-Apr-2026,26-Apr-2026,03-May-2026,1,Fixed 14-day train and next 7-day test within regime A
+A_within,A08,19-Apr-2026,03-May-2026,03-May-2026,10-May-2026,1,Fixed 14-day train and next 7-day test within regime A
+A_within,A09,26-Apr-2026,10-May-2026,10-May-2026,17-May-2026,1,Fixed 14-day train and next 7-day test within regime A
+B_within,B00_unavailable,21-May-2026,04-Jun-2026,04-Jun-2026,11-Jun-2026,0,No complete 7-day test interval: last laboratory pair is 05-Jun-2026 10:00:11
+A_to_B_transfer,T01,07-May-2026,21-May-2026,21-May-2026,28-May-2026,1,Train on the final 14 days of A; test on the first 7 days of B

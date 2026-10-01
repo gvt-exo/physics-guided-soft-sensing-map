@@ -1,0 +1,3 @@
+Scenario,LagMin,WindowMin,ModelType,InnerTrainStart,InnerTrainEnd,InnerValidationStart,InnerValidationEnd,SelectionScore,InnerTrainDays
+A_within,90,60,quadratic,01-Mar-2026,10-Mar-2026,10-Mar-2026,15-Mar-2026,1.89821981556629,9
+A_to_B_transfer,100,30,quadratic,07-May-2026,16-May-2026,16-May-2026,21-May-2026,3.04169617854324,9

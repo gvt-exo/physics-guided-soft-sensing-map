@@ -1,0 +1,3 @@
+Scenario,LagMin,WindowMin,ModelType,InnerTrainStart,InnerTrainEnd,InnerValidationStart,InnerValidationEnd,SelectionScore,InnerTrainDays
+pre_repair_frozen,0,60,quadratic,23-May-2026,01-Jun-2026,01-Jun-2026,06-Jun-2026,1.79510210919798,9
+post_repair_adapted,140,10,pchip_spline,07-Jul-2026,16-Jul-2026,16-Jul-2026,21-Jul-2026,5.34936451383238,9
