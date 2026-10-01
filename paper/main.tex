@@ -469,16 +469,6 @@ First, the authoritative conductivity filtering and signal-reconstruction routin
 
 These operations are retained to reproduce the evaluated preprocessing pipeline. A prospective online implementation should replace them with causal alternatives and repeat the validation.
 
-\section{Limitations}
-
-\begin{enumerate}[leftmargin=1.8em]
-\item The authoritative preprocessing contains centered filtering and signal-reconstruction operations that can introduce short-horizon process-data look-ahead. A fully causal implementation should therefore be validated separately before online deployment.
-\item Only four post-gap rolling windows satisfy the pre-specified minimum-sample rule for the frozen-versus-adapted comparison, limiting the precision of conclusions about repeated short-horizon adaptation.
-\item The study covers a single industrial process and one major long-gap transition; broader seasonal, feedstock, and cross-site generalization remains untested.
-\item Raw industrial historian and laboratory data cannot be released publicly under the data-owner agreement, which limits exact third-party reproduction from the original signals.
-\item The duplicate acid-flow channel was assessed diagnostically but was not validated as an automatic failover input.
-\end{enumerate}
-
 \section{Conclusions}
 
 A physics-guided soft sensor was evaluated for industrial MAP production using 260,642 minute-scale process records and 1,325 paired laboratory measurements. Process-specific validity filtering was applied consistently before model fitting and temporal alignment. Chronological validation showed that the main limitation of the physics-guided approach is temporal transfer across changing operating conditions.
