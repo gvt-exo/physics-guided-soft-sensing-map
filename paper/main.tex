@@ -171,6 +171,8 @@ The preprocessing workflow is:
 
 Process-specific validity rules were applied to the telemetry channels to remove invalid measurements, short abnormal excursions, and observations outside the production domain before smoothing, model fitting, and laboratory-window aggregation. The same preprocessing rules were applied consistently across the analyzed periods and did not use laboratory target values. Because the one-month data gap exceeds the continuity limit, temporal filters reset at gaps longer than 5 minutes; the gap-aware processing therefore produces two independent telemetry segments.
 
+For retrospective validation, the evaluated preprocessing pipeline retains centered filtering and signal-reconstruction operations, including robust windows, Savitzky--Golay smoothing, and PCHIP repair. These operations can use nearby future process values. Laboratory alignment also uses a centered averaging window around $t_{\mathrm{lab}}-\tau$; when $\tau<W/2$, the window can extend beyond the nominal laboratory timestamp. No outer-test laboratory targets are used in fitting or hyperparameter selection, but a prospective online implementation should replace these process-data operations with causal alternatives.
+
 \subsection{Operating regimes and data gap}
 
 The conductivity trajectory changes abruptly on 21 May 2026. We define Regime~A as the period before 21 May and Regime~B as the period beginning 21 May. The boundary is used as an externally observed process change, not as a label learned by the prediction models. A one-month data gap from 6 June to 7 July is preserved explicitly and separates the earlier and later observation periods; no cause for this interruption is assumed in the analysis. The complete temporal coverage of process telemetry and sparse laboratory references across both periods is summarized in Fig.~\ref{fig:extendedcoverage}.
@@ -385,6 +387,8 @@ Gradient boosting frozen & 0.0328 & 0.0196 & -0.0098 & 0.711 & 0.0137 & 0.0102 &
 
 Because neither fitting nor hyperparameter selection uses post-gap target values, this scenario provides an independent future-period evaluation. The physics-guided model preserves interpretability but transfers poorly, whereas Ridge and LSBoost remain substantially more accurate on both outputs.
 
+The persistence of this performance gap over the full July--September period shows that the weak transfer of the physics-guided calibration is not confined to the short interval around the 21 May regime boundary. Although the downstream material-balance relations remain physically interpretable, the learned mappings used to reconstruct latent acid properties remain data-dependent; changes in these mappings can therefore propagate through an otherwise physically structured calculation.
+
 \subsection{Post-gap frozen versus adapted comparison}
 
 The post-gap rolling comparison evaluates frozen and adapted models on identical held-out laboratory rows across four valid windows (P01--P04), for a pooled total of 95 test pairs.
@@ -427,47 +431,13 @@ Figure~\ref{fig:postgaprmse} summarizes the normalized held-out errors for the f
 \label{fig:frozenadapted}
 \end{figure}
 
-\subsection{Implications for model selection}
+\subsection{Implications for model selection and deployment}
 
-Across all validations, the physics-guided model is less accurate than the strongest data-driven baselines under temporal shift. After consistent process-data preprocessing, the principal limitation is the transfer of the physics-guided calibration across operating-regime change and the post-gap period.
+Across all validations, the physics-guided model is less accurate than the strongest data-driven baselines under temporal shift. After consistent process-data preprocessing, the principal limitation is the transfer of the physics-guided calibration across operating-regime change and the post-gap period. For the present dataset, Ridge is the most stable model across both outputs, while LSBoost is generally close to Ridge and the physics-only reference remains substantially worse than all fitted models.
 
-For the present dataset, Ridge is the most stable model across both outputs. LSBoost is generally close to Ridge and sometimes slightly better on a single target, while the physics-only reference remains substantially worse than all fitted models.
+The results therefore support a lifecycle rather than a static view of industrial soft sensing. This is consistent with previous work emphasizing model maintenance, transfer, and continuous monitoring in industrial soft-sensor systems \citep{kadlec2009,kay2024,metcalfe2025}. A deployed model should be accompanied by process-state or distribution-shift monitoring and by periodic comparison against newly available laboratory measurements.
 
-\section{Discussion}
-
-\subsection{What problem is solved?}
-
-The study solves a practical digitalization problem: it shows how to reconstruct infrequently measured quality variables from minute-scale industrial telemetry in a MAP production process and, more importantly, how to evaluate whether such virtual telemetry remains trustworthy over time.
-
-The contribution is therefore not only a specific soft sensor. It is a validation framework for hybrid industrial soft sensing under sparse laboratory supervision, combining process-domain filtering, chronological train/test design, explicit regime-transfer testing, and an independent post-gap future-period evaluation.
-
-\subsection{Physics guidance does not guarantee robustness}
-
-Physics-guided structure provides interpretability: conductivity is used to reconstruct latent acid composition and density, and these variables enter a material-balance calculation. However, the learned latent-property mappings are still empirical. When their calibration becomes unstable or the conductivity-to-composition relationship changes, the physical downstream equations propagate rather than remove the error.
-
-The results indicate that this grey-box implementation requires explicit safeguards for temporal transfer, including bounded latent-property mappings, extrapolation detection, regime-conditioned calibration, or fallback to a more stable predictor when the input domain lies outside calibration support.
-
-\subsection{Regime shift and model updating}
-
-The A-to-B experiment demonstrates that the relation among conductivity, latent feed properties, and downstream quality is not stationary enough for a frozen calibration to be carried unchanged across the boundary. A deployment architecture should include operating-regime detection, drift monitoring, bounded mappings where physically justified, controlled recalibration, and fallback behavior selected on prospective validation.
-
-\subsection{Long-horizon temporal generalization}
-
-The extended observation period enables a stricter temporal generalization test than the short-horizon regime-transfer experiment alone. The external post-gap evaluation applies models fitted exclusively on pre-gap data to a completely future period without using post-gap targets. The persistence of the performance gap over this longer horizon indicates that the weak transfer of the physics-guided model is not confined to the short interval around the 21 May regime boundary.
-
-\subsection{Sparse labels and validation design}
-
-The process historian is large in minute-level telemetry count, but the number of independent target observations is much smaller. This makes random row-wise splitting inappropriate because adjacent process observations are highly correlated and the laboratory sampling process is sparse and multi-rate. The fixed 14-day/7-day protocol provides a more operationally meaningful estimate of future performance.
-
-The post-gap rolling comparison further illustrates that sample eligibility after alignment matters. Only four of ten calendar windows satisfy the pre-specified minimum of 40 aligned training and 10 common test pairs. Explicitly reporting the excluded windows avoids hidden selection bias.
-
-\subsection{Preprocessing and operational look-ahead}
-
-The validation contains no outer-test target leakage: hyperparameter selection is nested chronologically and outer-test laboratory values are not used for fitting. Two preprocessing details nevertheless matter for prospective deployment.
-
-First, the authoritative conductivity filtering and signal-reconstruction routines include centered operations, including robust windows, Savitzky--Golay smoothing, and PCHIP repair, which can use nearby future process values. Second, laboratory alignment uses a centered averaging window around $t_{\mathrm{lab}}-\tau$; when $\tau<W/2$, the window can extend beyond the nominal laboratory timestamp.
-
-These operations are retained to reproduce the evaluated preprocessing pipeline. A prospective online implementation should replace them with causal alternatives and repeat the validation.
+For a physics-guided implementation, recalibration alone should not be assumed to restore validity after a substantial shift: in the post-gap comparison, adaptation improves the density estimate but does not close the molar-ratio performance gap. A practical deployment workflow should therefore distinguish between validated operating conditions and unvalidated conditions. When a substantial shift is detected, the system should either use an independently validated fallback predictor or report the virtual measurement as unavailable or unreliable until sufficient new laboratory references support recalibration and prospective validation. This deployment implication follows from the observed transfer behavior rather than from the introduction of a new soft-sensor architecture.
 
 \section{Conclusions}
 
