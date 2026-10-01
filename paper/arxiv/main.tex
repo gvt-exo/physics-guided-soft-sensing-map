@@ -58,7 +58,7 @@ Evgeny S. Gornev\textsuperscript{b}\\[0.35em]
 \textsuperscript{a}Moscow Institute of Physics and Technology (National Research University), Dolgoprudny, Moscow Region, Russian Federation\\
 \textsuperscript{b}Molecular Electronics Research Institute, JSC (NIIME), Zelenograd, Moscow, Russian Federation\\
 \textsuperscript{c}UralAItech LLC, Russian Federation\\
-\textsuperscript{*}Corresponding author: \textit{[e-mail to confirm before submission]}
+\textsuperscript{*}Corresponding author: \href{mailto:gkarnup@niime.ru}{gkarnup@niime.ru}
 \end{center}
 
 \section*{Highlights}
@@ -66,11 +66,11 @@ Evgeny S. Gornev\textsuperscript{b}\\[0.35em]
 \item Virtual telemetry was validated on 260,642 minute records and 1,325 laboratory pairs.
 \item Process-validity filtering excludes non-production conductivity excursions.
 \item Simple Ridge and LSBoost models transfer better than the physics-guided model.
-\item Independent post-repair validation confirms the temporal-transfer limitation.
+\item Independent post-gap validation confirms the temporal-transfer limitation.
 \end{itemize}
 
 \begin{abstract}
-Industrial plants collect high-frequency telemetry while critical quality variables may be measured only every few hours. We study soft sensing for an industrial monoammonium phosphate process using 260,642 one-minute records and 1,325 paired laboratory observations. The grey-box model reconstructs latent acid properties from conductivity and combines them with material-balance calculations to estimate molar ratio and downstream density. Validation is entirely chronological: nine pre-repair rolling tests, a short-term regime-transfer test, a strict external post-repair test on 249 future laboratory pairs, and four post-repair rolling comparisons. A process-domain rule excludes conductivity values above 30, identified by plant technologists as washing or other non-production operation. Physics-guided structure improves interpretability but does not ensure temporal robustness. Across regime change and the post-repair period, Ridge and LSBoost remain substantially more accurate than the physics-guided model, demonstrating the need for regime-aware maintenance of industrial virtual telemetry.
+Industrial plants collect high-frequency telemetry while critical quality variables may be measured only every few hours. We study soft sensing for an industrial monoammonium phosphate process using 260,642 one-minute records and 1,325 paired laboratory observations. The grey-box model reconstructs latent acid properties from conductivity and combines them with material-balance calculations to estimate molar ratio and downstream density. Validation is entirely chronological: nine pre-gap rolling tests, a short-term regime-transfer test, a strict external post-gap test on 249 future laboratory pairs, and four post-gap rolling comparisons. A process-domain rule excludes conductivity values above 30, identified by plant technologists as washing or other non-production operation. Physics-guided structure improves interpretability but does not ensure temporal robustness. Across regime change and the post-gap period, Ridge and LSBoost remain substantially more accurate than the physics-guided model, demonstrating the need for regime-aware updating of industrial virtual telemetry.
 \end{abstract}
 
 \noindent\textbf{Keywords:} soft sensor; virtual sensor; hybrid modeling; process monitoring; regime shift; monoammonium phosphate
@@ -98,13 +98,13 @@ $W$ & aggregation-window length & min\\
 
 Chemical-process plants routinely collect high-frequency online measurements while the variables that most directly describe product quality are measured less frequently by laboratory analysis or manual sampling. Soft sensors address this mismatch by inferring hard-to-measure quality variables from continuously available process measurements \citep{kadlec2009,souza2016}.
 
-Industrial deployment is substantially harder than benchmark soft-sensor development. Real plant data contain missing values, sensor faults, short transients, asynchronous sampling, changing operating conditions, and uncertain reference measurements. Data preparation, temporal alignment, and model-maintenance strategy can therefore be as important as model class selection \citep{kadlec2009,offermans2024,dai2025}.
+Industrial deployment is substantially harder than benchmark soft-sensor development. Real plant data contain missing values, sensor faults, short transients, asynchronous sampling, changing operating conditions, and uncertain reference measurements. Data preparation, temporal alignment, and model-update strategy can therefore be as important as model class selection \citep{kadlec2009,offermans2024,dai2025}.
 
 Hybrid and physics-guided models are often proposed as a way to improve interpretability and extrapolation by embedding empirical relationships inside process knowledge rather than learning an unconstrained input-output map \citep{sansana2021,bradley2022,schweidtmann2024,mousa2025}. Industrial soft sensors are also increasingly treated as a digitalization layer that converts existing sensing infrastructure into higher-level virtual measurements for monitoring and decision support \citep{hamid2022,pietrasik2024,boskabadi2025}.
 
 Fertilizer production provides a relevant test case because composition and neutralization variables strongly affect product quality while several feed and intermediate-state properties are not continuously available. Hybrid soft sensing has previously been demonstrated for nutrient-content estimation in compound-fertilizer production \citep{fu2007}. The novelty claimed here is therefore not the generic application of a soft sensor to fertilizer production. Instead, this study examines an industrial monoammonium phosphate (MAP) process with four characteristics that are important for real deployment: one-minute telemetry versus laboratory measurements every few hours, latent feed properties, substantial data-quality problems, and a pronounced operating-regime shift during the observation interval.
 
-The original engineering prototype estimated molar ratio and downstream density from online measurements and used these estimates in an offline decision-support layer. The scientific question addressed here is stricter: \emph{how robust is a physics-guided soft sensor under chronological hold-out testing, regime change, and an independent post-repair period, and how does it compare with simpler data-driven baselines?}
+The original engineering prototype estimated molar ratio and downstream density from online measurements and used these estimates in an offline decision-support layer. The scientific question addressed here is stricter: \emph{how robust is a physics-guided soft sensor under chronological hold-out testing, regime change, and an independent post-gap period, and how does it compare with simpler data-driven baselines?}
 
 The contributions are:
 \begin{enumerate}[leftmargin=1.8em]
@@ -112,7 +112,7 @@ The contributions are:
 \item a reproducible chronological evaluation using fixed 14-day training and 7-day test windows;
 \item comparison of physics-guided, Ridge, physics-only, and LSBoost models on identical temporal splits;
 \item explicit separation of process-validity failures from genuine model-transfer limitations;
-\item a strict external post-repair validation showing the effect of long-term temporal shift.
+\item a strict external post-gap validation showing the effect of long-term temporal shift.
 \end{enumerate}
 
 \section{Industrial process and data}
@@ -135,7 +135,7 @@ The reference values were obtained from sparse laboratory/operator measurements 
 
 \subsection{Data sources}
 
-The full study covers 1 March--29 September 2026 and preserves the maintenance outage from 6 June to 7 July.
+The full study covers 1 March--29 September 2026 and preserves the one-month data gap from 6 June to 7 July.
 
 \begin{table}[htbp]
 \centering
@@ -152,7 +152,7 @@ Downstream production records & product-flow information & daily / lower-frequen
 \end{tabular}
 \end{table}
 
-The dataset comprises 139,679 pre-repair process rows and 120,961 post-repair rows. Laboratory coverage comprises 860 paired observations before repair and 465 paired observations after repair. For the frozen pre-repair configuration, 760 pre-repair and 249 post-repair laboratory pairs are aligned; for the adapted post-repair configuration, 256 post-repair pairs are aligned.
+The dataset comprises 139,679 pre-gap process rows and 120,961 post-gap rows. Laboratory coverage comprises 860 paired observations before the gap and 465 paired observations after the gap. For the frozen pre-gap configuration, 760 pre-gap and 249 post-gap laboratory pairs are aligned; for the adapted post-gap configuration, 256 post-gap pairs are aligned.
 
 \subsection{Data quality and preprocessing}
 
@@ -170,16 +170,16 @@ The preprocessing workflow is:
 \item associate each laboratory observation with an eligible process window determined by lag $\tau$ and window length $W$.
 \end{enumerate}
 
-A plant technologist confirmed that conductivity values above 30 are outside normal production operation and may correspond to vessel washing or other non-production tests. Accordingly, the process-validity rule $c>30$ was added to the preprocessing pipeline. This rule is process-based rather than model-error-based and is applied globally before conductivity smoothing, model fitting, and laboratory-window aggregation. Because the maintenance outage exceeds the continuity limit, temporal filters reset at gaps longer than 5 minutes; the gap-aware processing therefore produces two independent telemetry segments. None of these preprocessing steps uses laboratory target values.
+A plant technologist confirmed that conductivity values above 30 are outside normal production operation and may correspond to vessel washing or other non-production tests. Accordingly, the process-validity rule $c>30$ was added to the preprocessing pipeline. This rule is process-based rather than model-error-based and is applied globally before conductivity smoothing, model fitting, and laboratory-window aggregation. Because the one-month data gap exceeds the continuity limit, temporal filters reset at gaps longer than 5 minutes; the gap-aware processing therefore produces two independent telemetry segments. None of these preprocessing steps uses laboratory target values.
 
-\subsection{Operating regimes and maintenance gap}
+\subsection{Operating regimes and data gap}
 
-The conductivity trajectory changes abruptly on 21 May 2026. We define Regime~A as the period before 21 May and Regime~B as the period beginning 21 May. The boundary is used as an externally observed process change, not as a label learned by the prediction models. The maintenance outage from 6 June to 7 July is preserved explicitly and serves as the boundary for the independent post-repair validation. The complete temporal coverage of process telemetry and sparse laboratory references across both periods is summarized in Fig.~\ref{fig:extendedcoverage}.
+The conductivity trajectory changes abruptly on 21 May 2026. We define Regime~A as the period before 21 May and Regime~B as the period beginning 21 May. The boundary is used as an externally observed process change, not as a label learned by the prediction models. A one-month data gap from 6 June to 7 July is preserved explicitly and separates the earlier and later observation periods; no cause for this interruption is assumed in the analysis. The complete temporal coverage of process telemetry and sparse laboratory references across both periods is summarized in Fig.~\ref{fig:extendedcoverage}.
 
 \begin{figure}[htbp]
 \centering
 \figplaceholder{figures/fig_extended_validation_timeline.pdf}{0.98\linewidth}
-\caption{Extended process and laboratory coverage across the maintenance outage. The upper panel shows the conductivity signal; the lower panels show the sparse laboratory molar-ratio and density references used for calibration and validation.}
+\caption{Extended process and laboratory coverage across the one-month data gap. The upper panel shows the conductivity signal; the lower panels show the sparse laboratory molar-ratio and density references used for calibration and validation.}
 \label{fig:extendedcoverage}
 \end{figure}
 
@@ -261,7 +261,7 @@ J=
 
 The selected configuration is then frozen for the relevant outer scenario, while fitted coefficients are re-estimated from each outer training interval only.
 
-For the final pre-repair frozen model, the selected configuration is $\tau=0$ min, $W=60$ min, with a quadratic mapping. For the adapted post-repair physics-guided model, the selected configuration is $\tau=140$ min, $W=10$ min, with PCHIP spline mapping.
+For the final pre-gap frozen model, the selected configuration is $\tau=0$ min, $W=60$ min, with a quadratic mapping. For the adapted post-gap physics-guided model, the selected configuration is $\tau=140$ min, $W=10$ min, with PCHIP spline mapping.
 
 \subsection{Baseline models}
 
@@ -279,13 +279,13 @@ The physics-only model is a reference calculation, not a separately calibrated m
 
 Validation is entirely temporal. No random shuffling is used.
 
-\textbf{Pre-repair evaluation.} The prespecified outer protocol is a fixed 14-day training interval followed immediately by a 7-day held-out interval. Within Regime~A, rolling origins advance by 7 days and yield nine complete tests (A01--A09). Regime~B does not contain the 21 days of paired laboratory coverage required for a complete within-regime 14+7-day split.
+\textbf{Pre-gap evaluation.} The prespecified outer protocol is a fixed 14-day training interval followed immediately by a 7-day held-out interval. Within Regime~A, rolling origins advance by 7 days and yield nine complete tests (A01--A09). Regime~B does not contain the 21 days of paired laboratory coverage required for a complete within-regime 14+7-day split.
 
 \textbf{Short-term regime-transfer evaluation.} Cross-regime transfer uses 7 May--21 May 2026 for training and 21 May--28 May 2026 for testing.
 
-\textbf{External post-repair evaluation.} The strict external test trains on all eligible pre-repair observations and evaluates on the post-repair period 7 July--29 September 2026. This scenario is denoted \texttt{external\_transfer\_full}.
+\textbf{External post-gap evaluation.} The strict external test trains on all eligible pre-gap observations and evaluates on the post-gap period 7 July--29 September 2026. This scenario is denoted \texttt{external\_transfer\_full}.
 
-\textbf{Post-repair frozen-versus-adapted comparison.} Ten post-repair calendar windows are considered, each using 14 days for training and the next 7 days for testing. A window enters the pooled comparison only if temporal alignment leaves at least 40 training and 10 common test laboratory pairs. Four of the ten candidate windows satisfy this rule (P01--P04); the other six are excluded explicitly and do not contribute to pooled metrics.
+\textbf{Post-gap frozen-versus-adapted comparison.} Ten post-gap calendar windows are considered, each using 14 days for training and the next 7 days for testing. A window enters the pooled comparison only if temporal alignment leaves at least 40 training and 10 common test laboratory pairs. Four of the ten candidate windows satisfy this rule (P01--P04); the other six are excluded explicitly and do not contribute to pooled metrics.
 
 \subsection{Evaluation metrics}
 
@@ -365,13 +365,13 @@ The transfer test changes the interpretation of the prototype. After the product
 
 The first paired laboratory record in Regime B occurs after the 21 May boundary and the final paired record is on 5 June. Consequently, there is no complete 14-day training plus 7-day held-out interval entirely within Regime B. The study reports this absence directly rather than shortening the test horizon or introducing a different protocol after observing the data.
 
-\subsection{Independent external post-repair validation}
+\subsection{Independent external post-gap validation}
 
-The most stringent evaluation uses all eligible pre-repair observations for training and tests the frozen models on the future post-repair period from 7 July to 29 September 2026. This deployment-style experiment contains 760 aligned training pairs and 249 aligned post-repair test pairs.
+The most stringent evaluation uses all eligible pre-gap observations for training and tests the frozen models on the future post-gap period from 7 July to 29 September 2026. This deployment-style experiment contains 760 aligned training pairs and 249 aligned post-gap test pairs.
 
 \begin{table}[htbp]
 \centering
-\caption{Strict external post-repair validation (\texttt{external\_transfer\_full}).}
+\caption{Strict external post-gap validation (\texttt{external\_transfer\_full}).}
 \label{tab:externaltransfer}
 \resizebox{\linewidth}{!}{%
 \begin{tabular}{@{}lrrrrrrrr@{}}
@@ -386,16 +386,16 @@ Gradient boosting frozen & 0.0328 & 0.0196 & -0.0098 & 0.711 & 0.0137 & 0.0102 &
 \end{tabular}}
 \end{table}
 
-This result is the strongest evidence in the paper. Because neither fitting nor hyperparameter selection uses post-repair target values, the table represents a true future-period validation. The physics-guided model preserves interpretability but transfers poorly; Ridge and LSBoost remain substantially more accurate on both outputs.
+This result is the strongest evidence in the paper. Because neither fitting nor hyperparameter selection uses post-gap target values, the table represents a true future-period validation. The physics-guided model preserves interpretability but transfers poorly; Ridge and LSBoost remain substantially more accurate on both outputs.
 
-\subsection{Post-repair frozen versus adapted comparison}
+\subsection{Post-gap frozen versus adapted comparison}
 
-The post-repair rolling comparison evaluates frozen and adapted models on identical held-out laboratory rows across four valid windows (P01--P04), for a pooled total of 95 test pairs.
+The post-gap rolling comparison evaluates frozen and adapted models on identical held-out laboratory rows across four valid windows (P01--P04), for a pooled total of 95 test pairs.
 
 \begin{table}[htbp]
 \centering
-\caption{Post-repair rolling comparison on identical held-out samples (4 included windows, 95 pooled test pairs).}
-\label{tab:postrepaircomparison}
+\caption{Post-gap rolling comparison on identical held-out samples (4 included windows, 95 pooled test pairs).}
+\label{tab:postgapcomparison}
 \resizebox{\linewidth}{!}{%
 \begin{tabular}{@{}lrrrrrrrr@{}}
 \toprule
@@ -414,25 +414,25 @@ Gradient boosting adapted & 0.0260 & 0.0203 & -0.0001 & 0.663 & 0.0127 & 0.0104 
 
 Adapting the physics-guided model on the new period improves density relative to the frozen physics-guided version but does not recover competitiveness with Ridge or LSBoost. In contrast, the data-driven models remain substantially more stable.
 
-Figure~\ref{fig:postrepairrmse} summarizes the normalized held-out errors for the frozen and adapted strategies on identical post-repair samples. Figure~\ref{fig:frozenadapted} shows the corresponding physics-guided time series and residuals, illustrating that rolling adaptation reduces the density bias but does not resolve the molar-ratio transfer error.
+Figure~\ref{fig:postgaprmse} summarizes the normalized held-out errors for the frozen and adapted strategies on identical post-gap samples. Figure~\ref{fig:frozenadapted} shows the corresponding physics-guided time series and residuals, illustrating that rolling adaptation reduces the density bias but does not resolve the molar-ratio transfer error.
 
 \begin{figure}[htbp]
 \centering
 \figplaceholder{figures/fig_extended_adaptation_comparison.pdf}{0.98\linewidth}
-\caption{Post-repair held-out performance on identical rolling test samples. Bars show RMSE normalized by the engineering tolerance.}
-\label{fig:postrepairrmse}
+\caption{Post-gap held-out performance on identical rolling test samples. Bars show RMSE normalized by the engineering tolerance.}
+\label{fig:postgaprmse}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \figplaceholder{figures/fig_extended_transfer_timeseries.pdf}{0.98\linewidth}
-\caption{Frozen pre-repair physics-guided model versus 14-day rolling adaptation on post-repair held-out dates. The adapted model reduces density bias but does not resolve the molar-ratio transfer limitation.}
+\caption{Frozen pre-gap physics-guided model versus 14-day rolling adaptation on post-gap held-out dates. The adapted model reduces density bias but does not resolve the molar-ratio transfer limitation.}
 \label{fig:frozenadapted}
 \end{figure}
 
 \subsection{Implications for model selection}
 
-Across all validations, the hold-out results do not support a claim that the current physics-guided model is the most accurate virtual sensor. Instead, they distinguish two different issues. First, non-production measurements can create misleading apparent failures if process-state validity is not enforced. Second, even after invalid intervals are excluded, the physics-guided calibration transfers poorly across operating-regime change and the post-repair period.
+Across all validations, the hold-out results do not support a claim that the current physics-guided model is the most accurate virtual sensor. Instead, they distinguish two different issues. First, non-production measurements can create misleading apparent failures if process-state validity is not enforced. Second, even after invalid intervals are excluded, the physics-guided calibration transfers poorly across operating-regime change and the post-gap period.
 
 For the present dataset, Ridge is the most stable model across both outputs. LSBoost is generally close to Ridge and sometimes slightly better on a single target, while the physics-only reference remains substantially worse than all fitted models.
 
@@ -442,7 +442,7 @@ For the present dataset, Ridge is the most stable model across both outputs. LSB
 
 The study solves a practical digitalization problem: it shows how to reconstruct infrequently measured quality variables from minute-scale industrial telemetry in a MAP production process and, more importantly, how to evaluate whether such virtual telemetry remains trustworthy over time.
 
-The contribution is therefore not only a specific soft sensor. It is a validation framework for hybrid industrial soft sensing under sparse laboratory supervision, combining process-domain filtering, chronological train/test design, explicit regime-transfer testing, and an independent post-repair future-period evaluation.
+The contribution is therefore not only a specific soft sensor. It is a validation framework for hybrid industrial soft sensing under sparse laboratory supervision, combining process-domain filtering, chronological train/test design, explicit regime-transfer testing, and an independent post-gap future-period evaluation.
 
 \subsection{Physics guidance does not guarantee robustness}
 
@@ -450,25 +450,25 @@ Physics-guided structure provides interpretability: conductivity is used to reco
 
 The comparison with Ridge and gradient boosting is therefore not an argument against physics-guided modeling in general. It shows that the present grey-box implementation needs explicit safeguards: bounded latent-property mappings, extrapolation detection, regime-conditioned calibration, or fallback to a more stable predictor when the current input domain is outside calibration support.
 
-\subsection{Regime shift and maintenance}
+\subsection{Regime shift and model updating}
 
 The A-to-B experiment demonstrates that the relation among conductivity, latent feed properties, and downstream quality is not stationary enough for the current calibration to be carried unchanged across the boundary. A deployment architecture should include operating-regime detection, drift monitoring, bounded mappings where physically justified, controlled recalibration, and fallback behavior selected on prospective validation.
 
-\subsection{Why the post-repair extension strengthens the article}
+\subsection{Why the post-gap extension strengthens the article}
 
-The extended dataset changes the manuscript from a short-horizon industrial case study to a stronger temporal generalization study. The external post-repair experiment is especially important because it evaluates the frozen pre-repair models on a completely future period without using post-repair targets. This makes the central conclusion much more robust: the relative weakness of the physics-guided model is not an artifact of one short interval around 21 May.
+The extended dataset changes the manuscript from a short-horizon industrial case study to a stronger temporal generalization study. The external post-gap experiment is especially important because it evaluates the frozen pre-gap models on a completely future period without using post-gap targets. This makes the central conclusion much more robust: the relative weakness of the physics-guided model is not an artifact of one short interval around 21 May.
 
 \subsection{Sparse labels and validation design}
 
 The process historian is large in minute-level telemetry count, but the number of independent target observations is much smaller. This makes random row-wise splitting inappropriate because adjacent process observations are highly correlated and the laboratory sampling process is sparse and multi-rate. The fixed 14-day/7-day protocol provides a more operationally meaningful estimate of future performance.
 
-The post-repair rolling comparison further illustrates that sample eligibility after alignment matters. Only four of ten calendar windows satisfy the pre-specified minimum of 40 aligned training and 10 common test pairs. Explicitly reporting the excluded windows avoids hidden selection bias.
+The post-gap rolling comparison further illustrates that sample eligibility after alignment matters. Only four of ten calendar windows satisfy the pre-specified minimum of 40 aligned training and 10 common test pairs. Explicitly reporting the excluded windows avoids hidden selection bias.
 
 \subsection{Preprocessing and operational look-ahead}
 
 The validation contains no outer-test target leakage: hyperparameter selection is nested chronologically and outer-test laboratory values are not used for fitting. Two preprocessing details nevertheless matter for prospective deployment.
 
-First, the authoritative conductivity filtering and signal-repair routines include centered operations, including robust windows, Savitzky--Golay smoothing, and PCHIP repair, which can use nearby future process values. Second, laboratory alignment uses a centered averaging window around $t_{\mathrm{lab}}-\tau$; when $\tau<W/2$, the window can extend beyond the nominal laboratory timestamp.
+First, the authoritative conductivity filtering and signal-reconstruction routines include centered operations, including robust windows, Savitzky--Golay smoothing, and PCHIP repair, which can use nearby future process values. Second, laboratory alignment uses a centered averaging window around $t_{\mathrm{lab}}-\tau$; when $\tau<W/2$, the window can extend beyond the nominal laboratory timestamp.
 
 These operations are retained because the present study validates the implemented R\&D prototype. A truly online deployment study should replace them with causal alternatives and repeat the validation.
 
@@ -481,9 +481,9 @@ The production-output calculation used during the R\&D project is likewise exclu
 \section{Limitations}
 
 \begin{enumerate}[leftmargin=1.8em]
-\item The authoritative preprocessing contains centered filtering and repair operations that can introduce short-horizon process-data look-ahead. A fully causal implementation should therefore be validated separately before online deployment.
-\item Only four post-repair rolling windows satisfy the pre-specified minimum-sample rule for the frozen-versus-adapted comparison, limiting the precision of conclusions about repeated short-horizon adaptation.
-\item The study covers a single industrial process and one major maintenance transition; broader seasonal, feedstock, and cross-site generalization remains untested.
+\item The authoritative preprocessing contains centered filtering and signal-reconstruction operations that can introduce short-horizon process-data look-ahead. A fully causal implementation should therefore be validated separately before online deployment.
+\item Only four post-gap rolling windows satisfy the pre-specified minimum-sample rule for the frozen-versus-adapted comparison, limiting the precision of conclusions about repeated short-horizon adaptation.
+\item The study covers a single industrial process and one major long-gap transition; broader seasonal, feedstock, and cross-site generalization remains untested.
 \item Raw industrial historian and laboratory data cannot be released publicly under the data-owner agreement, which limits exact third-party reproduction from the original signals.
 \item The duplicate acid-flow channel was assessed diagnostically but was not validated as an automatic failover input.
 \end{enumerate}
@@ -492,7 +492,7 @@ The production-output calculation used during the R\&D project is likewise exclu
 
 A physics-guided soft-sensor prototype was evaluated for industrial MAP production using 260,642 minute-scale process records and 1,325 paired laboratory measurements. A process-domain rule excluded conductivity values above 30 as non-production operation, removing spurious failures caused by washing or test states. Chronological validation then showed that the main residual weakness of the physics-guided approach is temporal transfer rather than boundedness within the production domain.
 
-Across nine pre-repair rolling windows, the physics-guided model remained interpretable but less accurate than Ridge. In the short-term A-to-B regime transfer test, its performance degraded substantially. The strongest evidence came from the independent post-repair validation: when trained only on pre-repair data, the physics-guided model achieved RMSE values of 0.1277 for molar ratio and 0.0335 g cm$^{-3}$ for density on 249 future laboratory pairs, whereas Ridge achieved 0.0321 and 0.0147, respectively. Rolling post-repair adaptation improved the physics-guided density estimate but did not close the gap to the data-driven baselines.
+Across nine pre-gap rolling windows, the physics-guided model remained interpretable but less accurate than Ridge. In the short-term A-to-B regime transfer test, its performance degraded substantially. The strongest evidence came from the independent post-gap validation: when trained only on pre-gap data, the physics-guided model achieved RMSE values of 0.1277 for molar ratio and 0.0335 g cm$^{-3}$ for density on 249 future laboratory pairs, whereas Ridge achieved 0.0321 and 0.0147, respectively. Rolling post-gap adaptation improved the physics-guided density estimate but did not close the gap to the data-driven baselines.
 
 The study therefore shows that physics-guided virtual telemetry can provide interpretable estimates, but physical structure alone does not guarantee robustness to operating change. Industrial deployment should combine process-state validation, leakage-safe temporal testing, regime-aware maintenance, and explicit fallback behavior under sparse laboratory supervision.
 
@@ -522,7 +522,7 @@ Recommended Supporting Information:
 
 \begin{itemize}[leftmargin=1.5em]
 \item exact engineering preprocessing thresholds and signal-validity rules;
-\item the exact list of included and excluded post-repair windows;
+\item the exact list of included and excluded post-gap windows;
 \item all per-split validation metrics and residual summaries;
 \item latent-property model coefficients for each chronological fit;
 \item validation of the production-domain conductivity exclusion;
