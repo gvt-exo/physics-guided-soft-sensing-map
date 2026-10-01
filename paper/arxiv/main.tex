@@ -176,6 +176,168 @@ A plant technologist confirmed that conductivity values above 30 are outside nor
 
 The conductivity trajectory changes abruptly on 21 May 2026. We define Regime~A as the period before 21 May and Regime~B as the period beginning 21 May. The boundary is used as an externally observed process change, not as a label learned by the prediction models. The maintenance outage from 6 June to 7 July is preserved explicitly and serves as the boundary for the independent post-repair validation. The complete temporal coverage of process telemetry and sparse laboratory references across both periods is summarized in Fig.~\ref{fig:extendedcoverage}.
 
+\begin{figure}[htbp]
+\centering
+\figplaceholder{figures/fig_extended_validation_timeline.pdf}{0.98\linewidth}
+\caption{Extended process and laboratory coverage across the maintenance outage. The upper panel shows the conductivity signal; the lower panels show the sparse laboratory molar-ratio and density references used for calibration and validation.}
+\label{fig:extendedcoverage}
+\end{figure}
+
+\section{Methodology}
+
+The overall soft-sensor architecture is summarized in Fig.~\ref{fig:soft_sensor_architecture}. The main solid-arrow pathway represents online inference. Minute-scale process telemetry first passes process-validity filtering and temporal alignment; the conductivity signal is then used to reconstruct latent acid properties, which are propagated through the physics-guided material-balance model to obtain the virtual molar-ratio and solution-density estimates. The sparse laboratory measurements are not direct runtime inputs. Instead, they are used only for calibration, chronological model selection, and validation, as indicated by the dashed training pathway. This separation between the online inference path and the calibration path is important for interpreting the model as a deployable virtual-sensing layer rather than as an interpolation of contemporaneous laboratory measurements.
+
+\begin{figure}[htbp]
+\centering
+\figplaceholder{figures/soft_sensor_architecture.pdf}{0.98\linewidth}
+\caption{Architecture of the physics-guided soft sensor and its calibration/validation workflow. Solid arrows denote the online inference pathway, whereas dashed arrows denote the training, calibration, and validation pathway based on sparse laboratory reference measurements.}
+\label{fig:soft_sensor_architecture}
+\end{figure}
+
+\subsection{Physics-guided soft sensor}
+
+The soft sensor is a grey-box sequence rather than a direct unconstrained regression. Conductivity is first mapped to a latent $P_2O_5$ fraction,
+\begin{equation}
+\widehat{w}_{P_2O_5}=f_{\theta}(c),
+\end{equation}
+followed by a mapping from estimated composition to acid density,
+\begin{equation}
+\widehat{\rho}_{A}=g_{\phi}\!\left(\widehat{w}_{P_2O_5}\right).
+\end{equation}
+The candidate mappings are linear, quadratic, and PCHIP spline functions.
+
+The acid mass flow and $P_2O_5$ mass flow are
+\begin{equation}
+\dot m_A=\widehat{\rho}_A Q_A,
+\end{equation}
+\begin{equation}
+\dot m_{P_2O_5}=\dot m_A\widehat{w}_{P_2O_5}.
+\end{equation}
+
+The prototype converts $P_2O_5$ mass to equivalent 100\% phosphoric-acid mass using
+\begin{equation}
+\dot m_{H_3PO_4,100\%}=1.38\,\dot m_{P_2O_5}.
+\end{equation}
+
+The corresponding molar flows are
+\begin{equation}
+\dot n_{H_3PO_4}=
+\frac{\dot m_{H_3PO_4,100\%}}{M_{H_3PO_4}},
+\qquad
+\dot n_{NH_3}=
+\frac{\dot m_N}{M_{NH_3}},
+\end{equation}
+with $M_{H_3PO_4}=98$ g mol$^{-1}$ and $M_{NH_3}=17$ g mol$^{-1}$. The virtual molar ratio is
+\begin{equation}
+\widehat R=
+\frac{\dot n_{NH_3}}{\dot n_{H_3PO_4}}.
+\end{equation}
+
+For publication, the downstream density balance is written in dimensionally explicit form as
+\begin{equation}
+\widehat{\rho}_M=
+\frac{\sum_i \dot m_i}{\sum_i Q_i},
+\qquad
+\dot m_i=\rho_iQ_i,
+\end{equation}
+where the sums contain the streams used by the implemented downstream balance. This expression uses the additive-volume approximation of the prototype. Any plant-specific correction terms should be stated separately rather than folded into the definition of density.
+
+\subsection{Time alignment and model selection}
+
+Candidate lags and aggregation windows are
+\begin{equation}
+\tau\in\{0,10,\ldots,180\}\ \mathrm{min},
+\qquad
+W\in\{10,20,30,60\}\ \mathrm{min}.
+\end{equation}
+
+For each validation scenario, lag, window, and physics-guided mapping type are selected using only the corresponding training data. The first 9 days of a training interval are used for inner fitting and the following 5 days for inner chronological validation. The selection score is
+\begin{equation}
+J=
+\frac{\mathrm{RMSE}_R}{0.03}
++
+\frac{\mathrm{RMSE}_{\rho}}{0.01}.
+\end{equation}
+
+The selected configuration is then frozen for the relevant outer scenario, while fitted coefficients are re-estimated from each outer training interval only.
+
+For the final pre-repair frozen model, the selected configuration is $\tau=0$ min, $W=60$ min, with a quadratic mapping. For the adapted post-repair physics-guided model, the selected configuration is $\tau=140$ min, $W=10$ min, with PCHIP spline mapping.
+
+\subsection{Baseline models}
+
+All baselines use the same temporally aligned rows as the physics-guided model.
+
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{Ridge}: standardized multivariate Ridge regression using conductivity, acid flow, ammonia flow, and water flow; regularization selected on chronological inner validation.
+\item \textbf{Physics-only}: acid flow, ammonia flow, and water flow with $P_2O_5$ fixed at 52 wt\% and an unfitted acid-density prior.
+\item \textbf{Gradient boosting}: LSBoost with 100 cycles, learning rate 0.05, minimum leaf size 10, and maximum 20 splits.
+\end{itemize}
+
+The physics-only model is a reference calculation, not a separately calibrated mechanistic model.
+
+\subsection{Chronological validation design}
+
+Validation is entirely temporal. No random shuffling is used.
+
+\textbf{Pre-repair evaluation.} The prespecified outer protocol is a fixed 14-day training interval followed immediately by a 7-day held-out interval. Within Regime~A, rolling origins advance by 7 days and yield nine complete tests (A01--A09). Regime~B does not contain the 21 days of paired laboratory coverage required for a complete within-regime 14+7-day split.
+
+\textbf{Short-term regime-transfer evaluation.} Cross-regime transfer uses 7 May--21 May 2026 for training and 21 May--28 May 2026 for testing.
+
+\textbf{External post-repair evaluation.} The strict external test trains on all eligible pre-repair observations and evaluates on the post-repair period 7 July--29 September 2026. This scenario is denoted \texttt{external\_transfer\_full}.
+
+\textbf{Post-repair frozen-versus-adapted comparison.} Ten post-repair calendar windows are considered, each using 14 days for training and the next 7 days for testing. A window enters the pooled comparison only if temporal alignment leaves at least 40 training and 10 common test laboratory pairs. Four of the ten candidate windows satisfy this rule (P01--P04); the other six are excluded explicitly and do not contribute to pooled metrics.
+
+\subsection{Evaluation metrics}
+
+For target $y_i$ and prediction $\hat y_i$,
+\begin{equation}
+\mathrm{MAE}=\frac{1}{n}\sum_{i=1}^{n}|y_i-\hat y_i|,
+\end{equation}
+\begin{equation}
+\mathrm{RMSE}=
+\sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat y_i)^2},
+\end{equation}
+\begin{equation}
+\mathrm{Bias}=
+\frac{1}{n}\sum_{i=1}^{n}(\hat y_i-y_i).
+\end{equation}
+
+We also report P95 absolute error and the fractions within
+\begin{equation}
+|R-\widehat R|\le0.03,
+\qquad
+|\rho_M-\widehat{\rho}_M|\le0.01\ \mathrm{g\,cm^{-3}}.
+\end{equation}
+
+Molar-ratio predictions from the physics-guided implementation are rounded to two decimal places before validation, matching the production reporting setting.
+
+\section{Results}
+
+\subsection{Within-regime-A rolling validation}
+
+Nine non-overlapping 7-day test intervals produced 499 held-out laboratory observations in total. Training-set size varied from 96 to 138 observations.
+
+\begin{table}[htbp]
+\centering
+\caption{Pooled held-out performance across the nine Regime-A test intervals.}
+\label{tab:pooledA}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Model & RMSE $R$ & MAE $R$ & Within $\pm0.03$ & RMSE $\rho_M$ & MAE $\rho_M$ & Within $\pm0.01$\\
+\midrule
+Physics-guided & 0.0362 & 0.0267 & 0.581 & 0.0111 & 0.0086 & 0.667\\
+Ridge & 0.0155 & 0.0114 & 0.914 & 0.0085 & 0.0063 & 0.830\\
+Physics-only & 0.1055 & 0.1005 & 0.020 & 0.0841 & 0.0837 & 0.000\\
+Gradient boosting & 0.0171 & 0.0130 & 0.886 & 0.0110 & 0.0086 & 0.629\\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+The process-validity update removes the previously observed catastrophic behavior in split A08 without discarding the complete test interval. A08 retains 37 held-out laboratory observations and yields RMSE 0.0419 for molar ratio and 0.0115 g cm$^{-3}$ for density. The threshold was introduced after process review identified conductivity above 30 as non-production operation, then applied globally to the full dataset before preprocessing and model fitting.
+
+Across Regime A, the physics-guided model now shows bounded but consistently lower predictive accuracy than Ridge. Ridge regression is the most stable model across the rolling tests for both outputs jointly. Gradient boosting gives similarly low molar-ratio errors but slightly higher density error than Ridge. The physics-only reference is systematically biased and does not approach the specified tolerances.
+
 \subsection{A-to-B regime transfer}
 
 The transfer experiment trains on the final 14 days of Regime A and tests on the first 7 days of Regime B, with 84 training and 56 test laboratory observations.
@@ -357,6 +519,7 @@ Generative AI tools were used for language and structural assistance during manu
 \section*{Supporting Information}
 
 Recommended Supporting Information:
+
 \begin{itemize}[leftmargin=1.5em]
 \item exact engineering preprocessing thresholds and signal-validity rules;
 \item the exact list of included and excluded post-repair windows;
