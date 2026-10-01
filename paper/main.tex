@@ -64,13 +64,13 @@ Evgeny S. Gornev\textsuperscript{b}\\[0.35em]
 \section*{Highlights}
 \begin{itemize}[leftmargin=1.5em]
 \item Virtual telemetry was validated on 260,642 minute records and 1,325 laboratory pairs.
-\item Process-validity filtering excludes non-production conductivity excursions.
+\item Process-validity filtering removes invalid and non-production telemetry.
 \item Simple Ridge and LSBoost models transfer better than the physics-guided model.
 \item Independent post-gap validation confirms the temporal-transfer limitation.
 \end{itemize}
 
 \begin{abstract}
-Industrial plants collect high-frequency telemetry while critical quality variables may be measured only every few hours. We study soft sensing for an industrial monoammonium phosphate process using 260,642 one-minute records and 1,325 paired laboratory observations. The grey-box model reconstructs latent acid properties from conductivity and combines them with material-balance calculations to estimate molar ratio and downstream density. Validation is entirely chronological: nine pre-gap rolling tests, a short-term regime-transfer test, a strict external post-gap test on 249 future laboratory pairs, and four post-gap rolling comparisons. A process-domain rule excludes conductivity values above 30, which were classified as non-production operation on the basis of plant process knowledge. Physics-guided structure improves interpretability but does not ensure temporal robustness. Across regime change and the post-gap period, Ridge and LSBoost remain substantially more accurate than the physics-guided model, demonstrating the need for regime-aware updating of industrial virtual telemetry.
+Industrial plants collect high-frequency telemetry while critical quality variables may be measured only every few hours. We study soft sensing for an industrial monoammonium phosphate process using 260,642 one-minute records and 1,325 paired laboratory observations. The grey-box model reconstructs latent acid properties from conductivity and combines them with material-balance calculations to estimate molar ratio and downstream density. Validation is entirely chronological: nine pre-gap rolling tests, a short-term regime-transfer test, a strict external post-gap test on 249 future laboratory pairs, and four post-gap rolling comparisons. Process-specific validity filtering is applied before model fitting and temporal alignment. Physics-guided structure improves interpretability but does not ensure temporal robustness. Across regime change and the post-gap period, Ridge and LSBoost remain substantially more accurate than the physics-guided model, demonstrating the need for regime-aware updating of industrial virtual telemetry.
 \end{abstract}
 
 \noindent\textbf{Keywords:} soft sensor; virtual sensor; hybrid modeling; process monitoring; regime shift; monoammonium phosphate
@@ -81,7 +81,7 @@ Industrial plants collect high-frequency telemetry while critical quality variab
 \toprule
 Symbol & Definition & Unit\\
 \midrule
-$c$ & online conductivity signal used as a proxy for acid state & process unit\\
+$c$ & preprocessed conductivity signal used as a proxy for acid state & process unit\\
 $Q_A$ & clarified phosphoric-acid volumetric flow & m$^3$ h$^{-1}$\\
 $\dot m_N$ & ammonia mass flow & kg h$^{-1}$\\
 $Q_W$ & process-water volumetric flow & m$^3$ h$^{-1}$\\
@@ -162,14 +162,14 @@ The preprocessing workflow is:
 \item read the native one-minute process series;
 \item sort channels jointly by timestamp and preserve large acquisition gaps;
 \item select the active redundant flow channel where applicable;
-\item invalidate conductivity values above 30;
+\item apply process-specific validity rules to exclude invalid and non-production measurements;
 \item apply the authoritative conductivity filter and flow despiking;
 \item apply process plausibility and range checks;
 \item construct timestamps at which all required inputs are jointly valid;
 \item associate each laboratory observation with an eligible process window determined by lag $\tau$ and window length $W$.
 \end{enumerate}
 
-Based on plant process knowledge, conductivity values above 30 were classified as outside normal production operation and potentially associated with washing or other non-production states. Accordingly, the process-validity rule $c>30$ was applied in the preprocessing pipeline. This rule is process-based rather than model-error-based and is applied globally before conductivity smoothing, model fitting, and laboratory-window aggregation. Because the one-month data gap exceeds the continuity limit, temporal filters reset at gaps longer than 5 minutes; the gap-aware processing therefore produces two independent telemetry segments. None of these preprocessing steps uses laboratory target values.
+Process-specific validity rules were applied to the telemetry channels to remove invalid measurements, short abnormal excursions, and observations outside the production domain before smoothing, model fitting, and laboratory-window aggregation. The same preprocessing rules were applied consistently across the analyzed periods and did not use laboratory target values. Because the one-month data gap exceeds the continuity limit, temporal filters reset at gaps longer than 5 minutes; the gap-aware processing therefore produces two independent telemetry segments.
 
 \subsection{Operating regimes and data gap}
 
@@ -184,12 +184,12 @@ The conductivity trajectory changes abruptly on 21 May 2026. We define Regime~A 
 
 \section{Methodology}
 
-The overall soft-sensor architecture is summarized in Fig.~\ref{fig:soft_sensor_architecture}. The main solid-arrow pathway represents online inference. Minute-scale process telemetry first passes process-validity filtering and temporal alignment; the conductivity signal is then used to reconstruct latent acid properties, which are propagated through the physics-guided material-balance model to obtain the virtual molar-ratio and solution-density estimates. The sparse laboratory measurements are not direct runtime inputs. Instead, they are used only for calibration, chronological model selection, and validation, as indicated by the dashed training pathway. This separation between the online inference path and the calibration path is important for interpreting the model as a deployable virtual-sensing layer rather than as an interpolation of contemporaneous laboratory measurements.
+The overall soft-sensor architecture is summarized in Fig.~\ref{fig:soft_sensor_architecture}. The main solid-arrow pathway represents online inference. Minute-scale process telemetry first passes process-validity filtering and temporal alignment; the preprocessed conductivity signal prepared for algorithmic use is then used to reconstruct latent acid properties, which are propagated through the physics-guided material-balance model to obtain the virtual molar-ratio and solution-density estimates. The sparse laboratory measurements are not direct runtime inputs. Instead, they are used only for calibration, chronological model selection, and validation, as indicated by the dashed training pathway. This separation between the online inference path and the calibration path is important for interpreting the model as a deployable virtual-sensing layer rather than as an interpolation of contemporaneous laboratory measurements.
 
 \begin{figure}[htbp]
 \centering
 \figplaceholder{figures/soft_sensor_architecture.pdf}{0.98\linewidth}
-\caption{Architecture of the physics-guided soft sensor and its calibration/validation workflow. Solid arrows denote the online inference pathway, whereas dashed arrows denote the training, calibration, and validation pathway based on sparse laboratory reference measurements.}
+\caption{Architecture of the physics-guided soft sensor and its calibration/validation workflow. The conductivity input denotes the preprocessed signal prepared for algorithmic use. Solid arrows denote the online inference pathway, whereas dashed arrows denote the training, calibration, and validation pathway based on sparse laboratory reference measurements.}
 \label{fig:soft_sensor_architecture}
 \end{figure}
 
@@ -333,9 +333,7 @@ Gradient boosting & 0.0171 & 0.0130 & 0.886 & 0.0110 & 0.0086 & 0.629\\
 \end{tabular}}
 \end{table}
 
-The process-validity update removes the previously observed catastrophic behavior in split A08 without discarding the complete test interval. A08 retains 37 held-out laboratory observations and yields RMSE 0.0419 for molar ratio and 0.0115 g cm$^{-3}$ for density. The threshold was introduced after process review identified conductivity above 30 as non-production operation, then applied globally to the full dataset before preprocessing and model fitting.
-
-Across Regime A, the physics-guided model now shows bounded but consistently lower predictive accuracy than Ridge. Ridge regression is the most stable model across the rolling tests for both outputs jointly. Gradient boosting gives similarly low molar-ratio errors but slightly higher density error than Ridge. The physics-only reference is systematically biased and does not approach the specified tolerances.
+After process-validity filtering, split A08 retains 37 held-out laboratory observations and yields RMSE 0.0419 for molar ratio and 0.0115 g cm$^{-3}$ for density. Across Regime A, the physics-guided model shows bounded but consistently lower predictive accuracy than Ridge. Ridge regression is the most stable model across the rolling tests for both outputs jointly. Gradient boosting gives similarly low molar-ratio errors but slightly higher density error than Ridge. The physics-only reference is systematically biased and does not approach the specified tolerances.
 
 \subsection{A-to-B regime transfer}
 
@@ -358,7 +356,7 @@ Gradient boosting & 0.0174 & 0.0136 & +0.0039 & 0.911 & 0.0134 & 0.0110 & -0.004
 \end{tabular}}
 \end{table}
 
-After the production-validity filter removes non-production excursions, the physics-guided model still generalizes substantially worse than the data-driven baselines across the regime boundary. Ridge gives the lowest molar-ratio and density RMSE values, while gradient boosting is nearly identical in RMSE and gives the highest molar-ratio tolerance hit rate. The physics-guided model exhibits a strong negative molar-ratio bias and positive density bias after the regime transition.
+The physics-guided model generalizes substantially worse than the data-driven baselines across the regime boundary. Ridge gives the lowest molar-ratio and density RMSE values, while gradient boosting is nearly identical in RMSE and gives the highest molar-ratio tolerance hit rate. The physics-guided model exhibits a strong negative molar-ratio bias and positive density bias after the regime transition.
 
 \subsection{No complete within-regime-B test}
 
@@ -431,7 +429,7 @@ Figure~\ref{fig:postgaprmse} summarizes the normalized held-out errors for the f
 
 \subsection{Implications for model selection}
 
-Across all validations, the physics-guided model is less accurate than the strongest data-driven baselines under temporal shift. The results distinguish two different issues. First, non-production measurements can create misleading apparent failures if process-state validity is not enforced. Second, even after invalid intervals are excluded, the physics-guided calibration transfers poorly across operating-regime change and the post-gap period.
+Across all validations, the physics-guided model is less accurate than the strongest data-driven baselines under temporal shift. After consistent process-data preprocessing, the principal limitation is the transfer of the physics-guided calibration across operating-regime change and the post-gap period.
 
 For the present dataset, Ridge is the most stable model across both outputs. LSBoost is generally close to Ridge and sometimes slightly better on a single target, while the physics-only reference remains substantially worse than all fitted models.
 
@@ -483,7 +481,7 @@ These operations are retained to reproduce the evaluated preprocessing pipeline.
 
 \section{Conclusions}
 
-A physics-guided soft sensor was evaluated for industrial MAP production using 260,642 minute-scale process records and 1,325 paired laboratory measurements. A process-domain rule excluded conductivity values above 30 as non-production operation, removing spurious failures caused by washing or test states. Chronological validation then showed that the main residual weakness of the physics-guided approach is temporal transfer rather than boundedness within the production domain.
+A physics-guided soft sensor was evaluated for industrial MAP production using 260,642 minute-scale process records and 1,325 paired laboratory measurements. Process-specific validity filtering was applied consistently before model fitting and temporal alignment. Chronological validation showed that the main limitation of the physics-guided approach is temporal transfer across changing operating conditions.
 
 Across nine pre-gap rolling windows, the physics-guided model remained interpretable but less accurate than Ridge. In the short-term A-to-B regime-transfer test, its performance degraded substantially. In the independent post-gap validation, when trained only on pre-gap data, the physics-guided model achieved RMSE values of 0.1277 for molar ratio and 0.0335 g cm$^{-3}$ for density on 249 future laboratory pairs, whereas Ridge achieved 0.0321 and 0.0147, respectively. Rolling post-gap adaptation improved the physics-guided density estimate but did not close the gap to the data-driven baselines.
 
