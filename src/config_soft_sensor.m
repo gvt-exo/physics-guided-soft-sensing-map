@@ -50,7 +50,7 @@ function cfg = config_soft_sensor()
 
     cfg.nh3_channel_switch_threshold_kg_h = 110;
     cfg.min_nh3_flow_kg_h = 1250;
-    cfg.max_h3po4_flow_m3_h = 9.5;
+    cfg.max_h3po4_flow_m3_h = 12;
     cfg.min_h3po4_flow_m3_h = 6;
     cfg.min_h2o_flow_m3_h = 10;
     cfg.max_h2o_flow_m3_h = Inf;
@@ -81,6 +81,9 @@ function cfg = config_soft_sensor()
     cfg.rho_phosphoric_acid_derivative_scale = 0.01;
 
     cfg.spline_num_knots = 5;
+    % Prevent latent-property mappings from extrapolating beyond the
+    % conductivity support observed in the current training set.
+    cfg.clamp_mapping_input_to_training_range = true;
     cfg.optim_max_iter = 3000;
     cfg.optim_max_fun_evals = 12000;
 

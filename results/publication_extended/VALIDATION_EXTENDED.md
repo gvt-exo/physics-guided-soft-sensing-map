@@ -15,23 +15,25 @@ Intervals are left-closed and right-open. Rolling folds use 14 days for training
 
 | Scenario | Split | Train | Test | N train aligned | N test aligned | Included | Reason |
 |---|---:|---|---|---:|---:|---:|---|
-| external_transfer_full | X01 | 2026-03-01 00:00 to 2026-06-06 00:00 | 2026-07-07 00:00 to 2026-09-29 00:00 | 760 | 249 | true | Included: 760 eligible pre-repair train and 249 post-repair test laboratory pairs |
-| post_repair_comparison | P01 | 2026-07-07 00:00 to 2026-07-21 00:00 | 2026-07-21 00:00 to 2026-07-28 00:00 | 68 | 30 | true | Included after process-window alignment: 68 train and 30 common test pairs |
-| post_repair_comparison | P02 | 2026-07-14 00:00 to 2026-07-28 00:00 | 2026-07-28 00:00 to 2026-08-04 00:00 | 67 | 26 | true | Included after process-window alignment: 67 train and 26 common test pairs |
-| post_repair_comparison | P03 | 2026-07-21 00:00 to 2026-08-04 00:00 | 2026-08-04 00:00 to 2026-08-11 00:00 | 60 | 21 | true | Included after process-window alignment: 60 train and 21 common test pairs |
-| post_repair_comparison | P04 | 2026-07-28 00:00 to 2026-08-11 00:00 | 2026-08-11 00:00 to 2026-08-18 00:00 | 56 | 18 | true | Included after process-window alignment: 56 train and 18 common test pairs |
-| post_repair_comparison | P05 | 2026-08-04 00:00 to 2026-08-18 00:00 | 2026-08-18 00:00 to 2026-08-25 00:00 | 56 | 4 | false | Excluded after process-window alignment: 56 train and 4 common test pairs; required at least 40/10 |
-| post_repair_comparison | P06 | 2026-08-11 00:00 to 2026-08-25 00:00 | 2026-08-25 00:00 to 2026-09-01 00:00 | 34 | 0 | false | Excluded after process-window alignment: 34 train and 0 common test pairs; required at least 40/10 |
-| post_repair_comparison | P07 | 2026-08-18 00:00 to 2026-09-01 00:00 | 2026-09-01 00:00 to 2026-09-08 00:00 | 11 | 1 | false | Excluded after process-window alignment: 11 train and 1 common test pairs; required at least 40/10 |
-| post_repair_comparison | P08 | 2026-08-25 00:00 to 2026-09-08 00:00 | 2026-09-08 00:00 to 2026-09-15 00:00 | 6 | 1 | false | Excluded after process-window alignment: 6 train and 1 common test pairs; required at least 40/10 |
-| post_repair_comparison | P09 | 2026-09-01 00:00 to 2026-09-15 00:00 | 2026-09-15 00:00 to 2026-09-22 00:00 | 4 | 26 | false | Excluded after process-window alignment: 4 train and 26 common test pairs; required at least 40/10 |
-| post_repair_comparison | P10 | 2026-09-08 00:00 to 2026-09-22 00:00 | 2026-09-22 00:00 to 2026-09-29 00:00 | 29 | 27 | false | Excluded after process-window alignment: 29 train and 27 common test pairs; required at least 40/10 |
+| external_transfer_full | X01 | 2026-03-01 00:00 to 2026-06-06 00:00 | 2026-07-07 00:00 to 2026-09-29 00:00 | 761 | 438 | true | Included: 761 eligible pre-repair train and 438 post-repair test laboratory pairs |
+| post_repair_comparison | P01 | 2026-07-07 00:00 to 2026-07-21 00:00 | 2026-07-21 00:00 to 2026-07-28 00:00 | 68 | 42 | true | Included after process-window alignment: 68 train and 42 common test pairs |
+| post_repair_comparison | P02 | 2026-07-14 00:00 to 2026-07-28 00:00 | 2026-07-28 00:00 to 2026-08-04 00:00 | 76 | 42 | true | Included after process-window alignment: 76 train and 42 common test pairs |
+| post_repair_comparison | P03 | 2026-07-21 00:00 to 2026-08-04 00:00 | 2026-08-04 00:00 to 2026-08-11 00:00 | 84 | 34 | true | Included after process-window alignment: 84 train and 34 common test pairs |
+| post_repair_comparison | P04 | 2026-07-28 00:00 to 2026-08-11 00:00 | 2026-08-11 00:00 to 2026-08-18 00:00 | 78 | 42 | true | Included after process-window alignment: 78 train and 42 common test pairs |
+| post_repair_comparison | P05 | 2026-08-04 00:00 to 2026-08-18 00:00 | 2026-08-18 00:00 to 2026-08-25 00:00 | 78 | 25 | true | Included after process-window alignment: 78 train and 25 common test pairs |
+| post_repair_comparison | P06 | 2026-08-11 00:00 to 2026-08-25 00:00 | 2026-08-25 00:00 to 2026-09-01 00:00 | 69 | 38 | true | Included after process-window alignment: 69 train and 38 common test pairs |
+| post_repair_comparison | P07 | 2026-08-18 00:00 to 2026-09-01 00:00 | 2026-09-01 00:00 to 2026-09-08 00:00 | 68 | 39 | true | Included after process-window alignment: 68 train and 39 common test pairs |
+| post_repair_comparison | P08 | 2026-08-25 00:00 to 2026-09-08 00:00 | 2026-09-08 00:00 to 2026-09-15 00:00 | 81 | 40 | true | Included after process-window alignment: 81 train and 40 common test pairs |
+| post_repair_comparison | P09 | 2026-09-01 00:00 to 2026-09-15 00:00 | 2026-09-15 00:00 to 2026-09-22 00:00 | 81 | 28 | true | Included after process-window alignment: 81 train and 28 common test pairs |
+| post_repair_comparison | P10 | 2026-09-08 00:00 to 2026-09-22 00:00 | 2026-09-22 00:00 to 2026-09-29 00:00 | 70 | 27 | true | Included after process-window alignment: 70 train and 27 common test pairs |
 
-Thus, 4 of 10 potential post-repair calendar windows enter `post_repair_comparison`. The other 6 are excluded by the pre-specified minimum-sample rule after authoritative process filtering and temporal alignment; they are not silently omitted and do not contribute to pooled metrics.
+Thus, 10 of 10 potential post-repair calendar windows enter `post_repair_comparison`. The other 0 are excluded by the pre-specified minimum-sample rule after authoritative process filtering and temporal alignment; they are not silently omitted and do not contribute to pooled metrics.
 
 ## Configuration selection
 
 The frozen configuration was selected on the last 14 pre-repair days. The adapted configuration was selected once on the first 14 post-repair days and then frozen. Both use a 9-day inner fit and 5-day inner validation. Coefficients are refit for every rolling training window.
+
+At prediction time, the conductivity input to each fitted latent-property mapping is limited to that model's training-data range. This prevents unconstrained polynomial or PCHIP extrapolation while leaving the process filters, temporal splits, and test targets unchanged.
 
 | Strategy | Lag min | Window min | Mapping | Inner fit | Inner validation | Score |
 |---|---:|---:|---|---|---|---:|
@@ -54,17 +56,17 @@ Bias is prediction minus measurement. Fractions are on the 0-1 scale. Per-fold m
 
 | Scenario | Model | Splits | N test | RMSE MO | MAE MO | Bias MO | P95 MO | Within 0.03 | RMSE density | MAE density | Bias density | P95 density | Within 0.01 |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| external_transfer_full | physics_guided_frozen | 1 | 249 | 0.1277 | 0.1023 | -0.0931 | 0.2405 | 0.112 | 0.0335 | 0.0289 | +0.0286 | 0.0628 | 0.076 |
-| external_transfer_full | ridge_frozen | 1 | 249 | 0.0321 | 0.0174 | -0.0049 | 0.0400 | 0.775 | 0.0147 | 0.0116 | +0.0104 | 0.0280 | 0.490 |
-| external_transfer_full | physics_only | 1 | 249 | 0.0962 | 0.0685 | +0.0089 | 0.1800 | 0.281 | 0.0651 | 0.0637 | -0.0635 | 0.0835 | 0.000 |
-| external_transfer_full | gradient_boosting_frozen | 1 | 249 | 0.0328 | 0.0196 | -0.0098 | 0.0500 | 0.711 | 0.0137 | 0.0102 | +0.0060 | 0.0255 | 0.602 |
-| post_repair_comparison | physics_guided_frozen | 4 | 95 | 0.1386 | 0.1218 | -0.1218 | 0.2500 | 0.021 | 0.0366 | 0.0331 | +0.0331 | 0.0671 | 0.021 |
-| post_repair_comparison | ridge_frozen | 4 | 95 | 0.0195 | 0.0141 | -0.0061 | 0.0400 | 0.811 | 0.0136 | 0.0105 | +0.0102 | 0.0304 | 0.537 |
-| post_repair_comparison | physics_only | 4 | 95 | 0.0753 | 0.0574 | -0.0136 | 0.1575 | 0.274 | 0.0622 | 0.0610 | -0.0610 | 0.0737 | 0.000 |
-| post_repair_comparison | gradient_boosting_frozen | 4 | 95 | 0.0233 | 0.0179 | -0.0124 | 0.0500 | 0.705 | 0.0139 | 0.0097 | +0.0067 | 0.0346 | 0.663 |
-| post_repair_comparison | physics_guided_adapted | 4 | 95 | 0.1290 | 0.1129 | +0.0111 | 0.1975 | 0.105 | 0.0234 | 0.0198 | -0.0040 | 0.0391 | 0.274 |
-| post_repair_comparison | ridge_adapted | 4 | 95 | 0.0235 | 0.0182 | -0.0039 | 0.0400 | 0.747 | 0.0116 | 0.0087 | +0.0032 | 0.0275 | 0.674 |
-| post_repair_comparison | gradient_boosting_adapted | 4 | 95 | 0.0260 | 0.0203 | -0.0001 | 0.0575 | 0.663 | 0.0127 | 0.0104 | -0.0057 | 0.0245 | 0.568 |
+| external_transfer_full | physics_guided_frozen | 1 | 438 | 0.1795 | 0.1524 | -0.1472 | 0.3100 | 0.066 | 0.0456 | 0.0401 | +0.0400 | 0.0787 | 0.043 |
+| external_transfer_full | ridge_frozen | 1 | 438 | 0.0286 | 0.0182 | -0.0096 | 0.0400 | 0.731 | 0.0141 | 0.0114 | +0.0103 | 0.0272 | 0.495 |
+| external_transfer_full | physics_only | 1 | 438 | 0.1254 | 0.0992 | -0.0519 | 0.2400 | 0.199 | 0.0587 | 0.0564 | -0.0563 | 0.0799 | 0.000 |
+| external_transfer_full | gradient_boosting_frozen | 1 | 438 | 0.0288 | 0.0186 | -0.0107 | 0.0400 | 0.724 | 0.0128 | 0.0094 | +0.0039 | 0.0255 | 0.653 |
+| post_repair_comparison | physics_guided_frozen | 10 | 357 | 0.1903 | 0.1678 | -0.1677 | 0.3165 | 0.028 | 0.0486 | 0.0442 | +0.0442 | 0.0795 | 0.008 |
+| post_repair_comparison | ridge_frozen | 10 | 357 | 0.0216 | 0.0170 | -0.0111 | 0.0400 | 0.739 | 0.0143 | 0.0119 | +0.0111 | 0.0277 | 0.462 |
+| post_repair_comparison | physics_only | 10 | 357 | 0.1264 | 0.1016 | -0.0710 | 0.2400 | 0.182 | 0.0558 | 0.0536 | -0.0536 | 0.0738 | 0.000 |
+| post_repair_comparison | gradient_boosting_frozen | 10 | 357 | 0.0219 | 0.0171 | -0.0112 | 0.0400 | 0.731 | 0.0126 | 0.0094 | +0.0045 | 0.0259 | 0.655 |
+| post_repair_comparison | physics_guided_adapted | 10 | 357 | 0.1549 | 0.1288 | +0.0090 | 0.2765 | 0.109 | 0.0222 | 0.0188 | +0.0011 | 0.0374 | 0.300 |
+| post_repair_comparison | ridge_adapted | 10 | 357 | 0.0197 | 0.0142 | -0.0007 | 0.0400 | 0.829 | 0.0134 | 0.0093 | +0.0051 | 0.0309 | 0.683 |
+| post_repair_comparison | gradient_boosting_adapted | 10 | 357 | 0.0230 | 0.0177 | -0.0057 | 0.0500 | 0.745 | 0.0110 | 0.0088 | -0.0052 | 0.0221 | 0.650 |
 
 ## Dataset counts
 
@@ -73,16 +75,16 @@ Bias is prediction minus measurement. Fractions are on the 0-1 scale. Per-fold m
 | process_rows_total | 260642 |
 | process_rows_pre_repair | 139679 |
 | process_rows_post_repair | 120961 |
-| process_rows_valid_total | 184387 |
+| process_rows_valid_total | 225114 |
 | temporal_filter_segments | 2 |
 | laboratory_rows_imported_including_blank | 2774 |
 | laboratory_rows_with_timestamp | 2773 |
 | laboratory_pairs_complete_total | 1325 |
 | laboratory_pairs_pre_repair | 860 |
 | laboratory_pairs_post_repair | 465 |
-| aligned_pre_configuration_pre_repair | 760 |
-| aligned_pre_configuration_post_repair | 249 |
-| aligned_post_configuration_post_repair | 256 |
+| aligned_pre_configuration_pre_repair | 761 |
+| aligned_pre_configuration_post_repair | 438 |
+| aligned_post_configuration_post_repair | 438 |
 | source_backward_time_transitions | 181 |
 | source_duplicate_timestamps | 181 |
 
@@ -92,4 +94,4 @@ Bias is prediction minus measurement. Fractions are on the 0-1 scale. Per-fold m
 - `post_repair_comparison` compares frozen and adapted models on identical held-out laboratory rows. The adapted configuration is fixed after the first post-repair training window, preventing later-test leakage.
 - Overlapping rolling training windows are intentional; test windows do not overlap. Pooled uncertainty is therefore descriptive and not an independent-sample confidence interval.
 - The supplied historian export ends on 29 September although laboratory records continue into 1 October, so later laboratory values cannot be evaluated.
-- Full per-split results (32 rows) and all predictions are retained in CSV files for audit.
+- Full per-split results (74 rows) and all predictions are retained in CSV files for audit.

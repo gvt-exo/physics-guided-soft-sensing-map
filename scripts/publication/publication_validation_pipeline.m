@@ -37,6 +37,8 @@ function outputs = publication_validation_pipeline(repoRoot, mode)
     cfg.publication.ensemble_learn_rate = 0.05;
     cfg.publication.ensemble_min_leaf = 10;
     cfg.publication.ensemble_max_splits = 20;
+    cfg.publication.use_parallel = true;
+    cfg.publication.parallel_workers = 24;
 
     fprintf('Loading canonical publication data...\n');
     journal = load_journal_data(labFile);
@@ -75,6 +77,7 @@ function outputs = publication_validation_pipeline(repoRoot, mode)
     splits = build_publication_splits(journal.Date, cfg);
     writetable(splits, fullfile(resultsDir, 'splits.csv'));
 
+    ensure_parallel_pool(cfg.publication.parallel_workers);
     fprintf('Selecting configuration for regime-A rolling validation...\n');
     firstA = splits(splits.Scenario == "A_within" & splits.Eligible, :);
     firstA = firstA(1, :);
@@ -736,6 +739,7 @@ function write_extended_validation_markdown(filename, splits, selected, models, 
 
     fprintf(fid, '\n## Configuration selection\n\n');
     fprintf(fid, 'The frozen configuration was selected on the last 14 pre-repair days. The adapted configuration was selected once on the first 14 post-repair days and then frozen. Both use a 9-day inner fit and 5-day inner validation. Coefficients are refit for every rolling training window.\n\n');
+    fprintf(fid, 'At prediction time, the conductivity input to each fitted latent-property mapping is limited to that model''s training-data range. This prevents unconstrained polynomial or PCHIP extrapolation while leaving the process filters, temporal splits, and test targets unchanged.\n\n');
     fprintf(fid, '| Strategy | Lag min | Window min | Mapping | Inner fit | Inner validation | Score |\n');
     fprintf(fid, '|---|---:|---:|---|---|---|---:|\n');
     for i = 1:height(selected)
@@ -1094,6 +1098,11 @@ end
 
 function pred = predict_physics_guided(ds, model, cfg)
     conductivity = ds.conductivity_median;
+    if isfield(cfg, 'clamp_mapping_input_to_training_range') && ...
+            cfg.clamp_mapping_input_to_training_range
+        trainRange = model.conductivity_train_range;
+        conductivity = min(max(conductivity, trainRange(1)), trainRange(2));
+    end
     switch lower(model.model_type)
         case {'linear', 'quadratic'}
             p2o5 = polyval(model.p2o5_coeff, conductivity);
@@ -1635,6 +1644,7 @@ function write_validation_markdown(filename, splits, selectedConfigurations, ...
     end
     fprintf(fid, '\nThe physics-guided implementation and preprocessing functions in `src/` follow the R&D code, except that the requested wash-mode rule invalidates conductivity above %.0f (the previous upper limit was 50). Molar-ratio predictions are rounded to two decimals before validation, matching the production reporting setting.\n\n', ...
         cfg.conductivity_valid_max);
+    fprintf(fid, 'At prediction time, the conductivity input to each fitted latent-property mapping is limited to that model''s training-data range. This prevents unconstrained polynomial or PCHIP extrapolation without changing preprocessing, temporal splits, or test targets.\n\n');
 
     fprintf(fid, '## 3. Final metrics\n\n');
     fprintf(fid, 'Residuals and bias use `prediction - measurement`. Fractions are reported on the 0-1 scale.\n\n');

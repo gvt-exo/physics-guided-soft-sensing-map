@@ -28,7 +28,7 @@ Lag, averaging window, and physics-guided nonlinearity were selected only once p
 
 | Scenario | Lag (min) | Window (min) | Mapping | Inner train | Inner validation | Score |
 |---|---:|---:|---|---|---|---:|
-| A_within | 90 | 60 | quadratic | 2026-03-01 00:00 to 2026-03-10 00:00 | 2026-03-10 00:00 to 2026-03-15 00:00 | 1.8982 |
+| A_within | 90 | 60 | pchip_spline | 2026-03-01 00:00 to 2026-03-10 00:00 | 2026-03-10 00:00 to 2026-03-15 00:00 | 1.8799 |
 | A_to_B_transfer | 100 | 30 | quadratic | 2026-05-07 00:00 to 2026-05-16 00:00 | 2026-05-16 00:00 to 2026-05-21 00:00 | 3.0417 |
 
 | Model | Inputs | Configuration |
@@ -40,6 +40,8 @@ Lag, averaging window, and physics-guided nonlinearity were selected only once p
 
 The physics-guided implementation and preprocessing functions in `src/` follow the R&D code, except that the requested wash-mode rule invalidates conductivity above 30 (the previous upper limit was 50). Molar-ratio predictions are rounded to two decimals before validation, matching the production reporting setting.
 
+At prediction time, the conductivity input to each fitted latent-property mapping is limited to that model's training-data range. This prevents unconstrained polynomial or PCHIP extrapolation without changing preprocessing, temporal splits, or test targets.
+
 ## 3. Final metrics
 
 Residuals and bias use `prediction - measurement`. Fractions are reported on the 0-1 scale.
@@ -48,43 +50,43 @@ Residuals and bias use `prediction - measurement`. Fractions are reported on the
 
 | Scenario | Split | Model | N train | N test | RMSE MO | MAE MO | Bias MO | P95 MO | Within 0.03 | RMSE density | MAE density | Bias density | P95 density | Within 0.01 |
 |---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| A_within | A01 | physics_guided | 106 | 48 | 0.0453 | 0.0304 | +0.0067 | 0.0960 | 0.604 | 0.0166 | 0.0144 | +0.0101 | 0.0301 | 0.312 |
+| A_within | A01 | physics_guided | 106 | 48 | 0.0267 | 0.0217 | -0.0033 | 0.0510 | 0.729 | 0.0163 | 0.0139 | +0.0117 | 0.0289 | 0.333 |
 | A_within | A01 | ridge | 106 | 48 | 0.0140 | 0.0088 | +0.0008 | 0.0310 | 0.938 | 0.0073 | 0.0057 | +0.0045 | 0.0121 | 0.688 |
 | A_within | A01 | physics_only | 106 | 48 | 0.1124 | 0.1106 | +0.1106 | 0.1410 | 0.000 | 0.0821 | 0.0818 | -0.0818 | 0.0953 | 0.000 |
-| A_within | A01 | gradient_boosting | 106 | 48 | 0.0181 | 0.0142 | -0.0117 | 0.0300 | 0.833 | 0.0071 | 0.0059 | -0.0030 | 0.0149 | 0.854 |
-| A_within | A02 | physics_guided | 107 | 54 | 0.0464 | 0.0343 | +0.0146 | 0.1120 | 0.500 | 0.0136 | 0.0117 | +0.0092 | 0.0222 | 0.407 |
-| A_within | A02 | ridge | 107 | 54 | 0.0141 | 0.0106 | +0.0002 | 0.0300 | 0.907 | 0.0060 | 0.0050 | +0.0017 | 0.0090 | 0.963 |
-| A_within | A02 | physics_only | 107 | 54 | 0.1165 | 0.1109 | +0.1109 | 0.1800 | 0.019 | 0.0845 | 0.0842 | -0.0842 | 0.0970 | 0.000 |
-| A_within | A02 | gradient_boosting | 107 | 54 | 0.0149 | 0.0126 | -0.0063 | 0.0280 | 0.944 | 0.0109 | 0.0090 | -0.0065 | 0.0193 | 0.593 |
-| A_within | A03 | physics_guided | 102 | 56 | 0.0288 | 0.0239 | -0.0157 | 0.0600 | 0.554 | 0.0071 | 0.0062 | -0.0019 | 0.0124 | 0.857 |
-| A_within | A03 | ridge | 102 | 56 | 0.0150 | 0.0121 | +0.0011 | 0.0300 | 0.911 | 0.0058 | 0.0054 | -0.0016 | 0.0092 | 0.982 |
-| A_within | A03 | physics_only | 102 | 56 | 0.0975 | 0.0937 | +0.0937 | 0.1470 | 0.000 | 0.0842 | 0.0839 | -0.0839 | 0.0932 | 0.000 |
-| A_within | A03 | gradient_boosting | 102 | 56 | 0.0161 | 0.0125 | -0.0082 | 0.0300 | 0.839 | 0.0112 | 0.0099 | -0.0093 | 0.0174 | 0.482 |
-| A_within | A04 | physics_guided | 110 | 64 | 0.0270 | 0.0197 | +0.0138 | 0.0500 | 0.672 | 0.0085 | 0.0066 | +0.0031 | 0.0191 | 0.812 |
-| A_within | A04 | ridge | 110 | 64 | 0.0117 | 0.0086 | -0.0005 | 0.0200 | 0.984 | 0.0069 | 0.0050 | +0.0022 | 0.0171 | 0.891 |
-| A_within | A04 | physics_only | 110 | 64 | 0.1119 | 0.1094 | +0.1094 | 0.1430 | 0.000 | 0.0826 | 0.0823 | -0.0823 | 0.0904 | 0.000 |
-| A_within | A04 | gradient_boosting | 110 | 64 | 0.0155 | 0.0130 | -0.0058 | 0.0300 | 0.938 | 0.0079 | 0.0066 | -0.0033 | 0.0138 | 0.719 |
-| A_within | A05 | physics_guided | 120 | 74 | 0.0259 | 0.0211 | -0.0016 | 0.0500 | 0.649 | 0.0100 | 0.0081 | -0.0028 | 0.0180 | 0.649 |
+| A_within | A01 | gradient_boosting | 106 | 48 | 0.0182 | 0.0144 | -0.0115 | 0.0300 | 0.833 | 0.0071 | 0.0059 | -0.0029 | 0.0149 | 0.854 |
+| A_within | A02 | physics_guided | 107 | 55 | 0.0331 | 0.0256 | -0.0016 | 0.0700 | 0.636 | 0.0130 | 0.0112 | +0.0090 | 0.0220 | 0.382 |
+| A_within | A02 | ridge | 107 | 55 | 0.0140 | 0.0105 | +0.0000 | 0.0300 | 0.909 | 0.0061 | 0.0051 | +0.0015 | 0.0096 | 0.964 |
+| A_within | A02 | physics_only | 107 | 55 | 0.1162 | 0.1107 | +0.1107 | 0.1800 | 0.018 | 0.0846 | 0.0843 | -0.0843 | 0.0968 | 0.000 |
+| A_within | A02 | gradient_boosting | 107 | 55 | 0.0148 | 0.0125 | -0.0064 | 0.0275 | 0.945 | 0.0111 | 0.0092 | -0.0068 | 0.0194 | 0.582 |
+| A_within | A03 | physics_guided | 103 | 56 | 0.0314 | 0.0270 | -0.0177 | 0.0640 | 0.500 | 0.0073 | 0.0063 | +0.0001 | 0.0131 | 0.839 |
+| A_within | A03 | ridge | 103 | 56 | 0.0150 | 0.0121 | +0.0011 | 0.0300 | 0.911 | 0.0058 | 0.0054 | -0.0016 | 0.0093 | 1.000 |
+| A_within | A03 | physics_only | 103 | 56 | 0.0975 | 0.0937 | +0.0937 | 0.1470 | 0.000 | 0.0842 | 0.0839 | -0.0839 | 0.0932 | 0.000 |
+| A_within | A03 | gradient_boosting | 103 | 56 | 0.0166 | 0.0130 | -0.0088 | 0.0300 | 0.839 | 0.0114 | 0.0101 | -0.0096 | 0.0178 | 0.464 |
+| A_within | A04 | physics_guided | 111 | 64 | 0.0256 | 0.0184 | +0.0069 | 0.0600 | 0.781 | 0.0093 | 0.0072 | +0.0033 | 0.0184 | 0.766 |
+| A_within | A04 | ridge | 111 | 64 | 0.0117 | 0.0086 | -0.0005 | 0.0200 | 0.984 | 0.0068 | 0.0050 | +0.0020 | 0.0170 | 0.891 |
+| A_within | A04 | physics_only | 111 | 64 | 0.1119 | 0.1094 | +0.1094 | 0.1430 | 0.000 | 0.0826 | 0.0823 | -0.0823 | 0.0904 | 0.000 |
+| A_within | A04 | gradient_boosting | 111 | 64 | 0.0156 | 0.0130 | -0.0061 | 0.0300 | 0.922 | 0.0080 | 0.0066 | -0.0033 | 0.0138 | 0.734 |
+| A_within | A05 | physics_guided | 120 | 74 | 0.0310 | 0.0250 | -0.0082 | 0.0600 | 0.568 | 0.0097 | 0.0079 | -0.0036 | 0.0174 | 0.649 |
 | A_within | A05 | ridge | 120 | 74 | 0.0188 | 0.0154 | -0.0108 | 0.0400 | 0.811 | 0.0082 | 0.0070 | -0.0045 | 0.0151 | 0.797 |
 | A_within | A05 | physics_only | 120 | 74 | 0.1004 | 0.0954 | +0.0954 | 0.1500 | 0.014 | 0.0863 | 0.0860 | -0.0860 | 0.0973 | 0.000 |
 | A_within | A05 | gradient_boosting | 120 | 74 | 0.0185 | 0.0154 | -0.0116 | 0.0300 | 0.865 | 0.0109 | 0.0093 | -0.0082 | 0.0204 | 0.554 |
-| A_within | A06 | physics_guided | 138 | 60 | 0.0224 | 0.0190 | -0.0033 | 0.0400 | 0.717 | 0.0085 | 0.0069 | +0.0028 | 0.0160 | 0.750 |
+| A_within | A06 | physics_guided | 138 | 60 | 0.0245 | 0.0200 | -0.0033 | 0.0500 | 0.717 | 0.0099 | 0.0081 | +0.0050 | 0.0203 | 0.683 |
 | A_within | A06 | ridge | 138 | 60 | 0.0129 | 0.0103 | +0.0030 | 0.0250 | 0.950 | 0.0096 | 0.0078 | +0.0040 | 0.0178 | 0.717 |
 | A_within | A06 | physics_only | 138 | 60 | 0.1075 | 0.1047 | +0.1047 | 0.1450 | 0.000 | 0.0812 | 0.0808 | -0.0808 | 0.0932 | 0.000 |
 | A_within | A06 | gradient_boosting | 138 | 60 | 0.0123 | 0.0088 | +0.0002 | 0.0300 | 0.933 | 0.0100 | 0.0080 | -0.0054 | 0.0186 | 0.617 |
-| A_within | A07 | physics_guided | 134 | 59 | 0.0229 | 0.0188 | +0.0053 | 0.0400 | 0.695 | 0.0071 | 0.0062 | -0.0016 | 0.0116 | 0.881 |
-| A_within | A07 | ridge | 134 | 59 | 0.0126 | 0.0098 | +0.0054 | 0.0200 | 0.983 | 0.0060 | 0.0052 | -0.0004 | 0.0098 | 0.949 |
+| A_within | A07 | physics_guided | 134 | 59 | 0.0240 | 0.0200 | +0.0075 | 0.0455 | 0.695 | 0.0070 | 0.0059 | -0.0005 | 0.0122 | 0.864 |
+| A_within | A07 | ridge | 134 | 59 | 0.0126 | 0.0098 | +0.0054 | 0.0200 | 0.983 | 0.0060 | 0.0052 | -0.0004 | 0.0099 | 0.949 |
 | A_within | A07 | physics_only | 134 | 59 | 0.1170 | 0.1144 | +0.1144 | 0.1555 | 0.000 | 0.0847 | 0.0845 | -0.0845 | 0.0940 | 0.000 |
-| A_within | A07 | gradient_boosting | 134 | 59 | 0.0137 | 0.0097 | -0.0039 | 0.0255 | 0.949 | 0.0102 | 0.0084 | -0.0079 | 0.0190 | 0.627 |
-| A_within | A08 | physics_guided | 119 | 37 | 0.0419 | 0.0349 | -0.0095 | 0.0865 | 0.378 | 0.0115 | 0.0091 | -0.0020 | 0.0241 | 0.595 |
+| A_within | A07 | gradient_boosting | 134 | 59 | 0.0137 | 0.0095 | -0.0037 | 0.0255 | 0.949 | 0.0103 | 0.0086 | -0.0080 | 0.0188 | 0.610 |
+| A_within | A08 | physics_guided | 119 | 37 | 0.0429 | 0.0362 | -0.0119 | 0.0865 | 0.351 | 0.0128 | 0.0101 | -0.0032 | 0.0260 | 0.486 |
 | A_within | A08 | ridge | 119 | 37 | 0.0229 | 0.0162 | -0.0130 | 0.0400 | 0.838 | 0.0093 | 0.0072 | -0.0014 | 0.0181 | 0.676 |
 | A_within | A08 | physics_only | 119 | 37 | 0.1046 | 0.0951 | +0.0951 | 0.1665 | 0.081 | 0.0847 | 0.0841 | -0.0841 | 0.1032 | 0.000 |
 | A_within | A08 | gradient_boosting | 119 | 37 | 0.0237 | 0.0176 | -0.0143 | 0.0465 | 0.838 | 0.0135 | 0.0107 | -0.0073 | 0.0288 | 0.622 |
-| A_within | A09 | physics_guided | 96 | 47 | 0.0598 | 0.0487 | -0.0411 | 0.1215 | 0.298 | 0.0152 | 0.0099 | -0.0023 | 0.0208 | 0.617 |
+| A_within | A09 | physics_guided | 96 | 47 | 0.0615 | 0.0491 | -0.0483 | 0.1315 | 0.319 | 0.0148 | 0.0096 | -0.0020 | 0.0205 | 0.574 |
 | A_within | A09 | ridge | 96 | 47 | 0.0173 | 0.0109 | -0.0019 | 0.0315 | 0.894 | 0.0152 | 0.0090 | -0.0003 | 0.0156 | 0.723 |
 | A_within | A09 | physics_only | 96 | 47 | 0.0702 | 0.0640 | +0.0581 | 0.1100 | 0.106 | 0.0865 | 0.0854 | -0.0854 | 0.0963 | 0.000 |
 | A_within | A09 | gradient_boosting | 96 | 47 | 0.0213 | 0.0147 | -0.0079 | 0.0415 | 0.787 | 0.0165 | 0.0100 | -0.0071 | 0.0228 | 0.638 |
-| A_to_B_transfer | T01 | physics_guided | 84 | 56 | 0.0966 | 0.0932 | -0.0932 | 0.1300 | 0.018 | 0.0588 | 0.0574 | +0.0574 | 0.0786 | 0.000 |
+| A_to_B_transfer | T01 | physics_guided | 84 | 56 | 0.0320 | 0.0263 | -0.0152 | 0.0500 | 0.500 | 0.0191 | 0.0166 | +0.0158 | 0.0319 | 0.304 |
 | A_to_B_transfer | T01 | ridge | 84 | 56 | 0.0170 | 0.0132 | +0.0093 | 0.0300 | 0.875 | 0.0130 | 0.0106 | +0.0082 | 0.0229 | 0.536 |
 | A_to_B_transfer | T01 | physics_only | 84 | 56 | 0.0966 | 0.0912 | +0.0912 | 0.1500 | 0.018 | 0.0877 | 0.0871 | -0.0871 | 0.1008 | 0.000 |
 | A_to_B_transfer | T01 | gradient_boosting | 84 | 56 | 0.0174 | 0.0136 | +0.0039 | 0.0370 | 0.911 | 0.0134 | 0.0110 | -0.0040 | 0.0245 | 0.536 |
@@ -93,11 +95,11 @@ Residuals and bias use `prediction - measurement`. Fractions are reported on the
 
 | Scenario | Model | Splits | N train range | N test | RMSE MO | MAE MO | Bias MO | P95 MO | Within 0.03 | RMSE density | MAE density | Bias density | P95 density | Within 0.01 |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| A_within | physics_guided | 9 | 96-138 | 499 | 0.0362 | 0.0267 | -0.0024 | 0.0700 | 0.581 | 0.0111 | 0.0086 | +0.0015 | 0.0212 | 0.667 |
-| A_within | ridge | 9 | 96-138 | 499 | 0.0155 | 0.0114 | -0.0016 | 0.0300 | 0.914 | 0.0085 | 0.0063 | +0.0004 | 0.0155 | 0.830 |
-| A_within | physics_only | 9 | 96-138 | 499 | 0.1055 | 0.1005 | +0.1000 | 0.1500 | 0.020 | 0.0841 | 0.0837 | -0.0837 | 0.0957 | 0.000 |
-| A_within | gradient_boosting | 9 | 96-138 | 499 | 0.0171 | 0.0130 | -0.0074 | 0.0300 | 0.886 | 0.0110 | 0.0086 | -0.0065 | 0.0193 | 0.629 |
-| A_to_B_transfer | physics_guided | 1 | 84-84 | 56 | 0.0966 | 0.0932 | -0.0932 | 0.1300 | 0.018 | 0.0588 | 0.0574 | +0.0574 | 0.0786 | 0.000 |
+| A_within | physics_guided | 9 | 96-138 | 500 | 0.0340 | 0.0260 | -0.0078 | 0.0700 | 0.604 | 0.0112 | 0.0087 | +0.0021 | 0.0216 | 0.636 |
+| A_within | ridge | 9 | 96-138 | 500 | 0.0155 | 0.0114 | -0.0016 | 0.0300 | 0.914 | 0.0085 | 0.0063 | +0.0003 | 0.0155 | 0.832 |
+| A_within | physics_only | 9 | 96-138 | 500 | 0.1055 | 0.1005 | +0.1000 | 0.1500 | 0.020 | 0.0841 | 0.0837 | -0.0837 | 0.0957 | 0.000 |
+| A_within | gradient_boosting | 9 | 96-138 | 500 | 0.0171 | 0.0130 | -0.0075 | 0.0300 | 0.884 | 0.0111 | 0.0086 | -0.0065 | 0.0194 | 0.626 |
+| A_to_B_transfer | physics_guided | 1 | 84-84 | 56 | 0.0320 | 0.0263 | -0.0152 | 0.0500 | 0.500 | 0.0191 | 0.0166 | +0.0158 | 0.0319 | 0.304 |
 | A_to_B_transfer | ridge | 1 | 84-84 | 56 | 0.0170 | 0.0132 | +0.0093 | 0.0300 | 0.875 | 0.0130 | 0.0106 | +0.0082 | 0.0229 | 0.536 |
 | A_to_B_transfer | physics_only | 1 | 84-84 | 56 | 0.0966 | 0.0912 | +0.0912 | 0.1500 | 0.018 | 0.0877 | 0.0871 | -0.0871 | 0.1008 | 0.000 |
 | A_to_B_transfer | gradient_boosting | 1 | 84-84 | 56 | 0.0174 | 0.0136 | +0.0039 | 0.0370 | 0.911 | 0.0134 | 0.0110 | -0.0040 | 0.0245 | 0.536 |
@@ -106,9 +108,9 @@ Residuals and bias use `prediction - measurement`. Fractions are reported on the
 
 The canonical source contains **860** paired laboratory observations before process alignment. Before the requested conductivity-above-30 wash-mode exclusion, the canonical rerun with the previous upper limit of 50 reproduced **637** regime-A records (`lag=180 min, window=60 min`), **119** regime-B records (`lag=20 min, window=20 min`), and **767** combined records (`lag=50 min, window=60 min`). The combined mask partitioned as 643 regime A + 124 regime B = 767. Thus the original 11-record difference, `767 - (637 + 119)`, was caused by configuration-dependent acceptance masks.
 
-With the current wash-mode exclusion, the independently regenerated counts are **619** for regime A, **119** for regime B, and **750** for the combined mask; the current combined partition is **626 regime A + 124 regime B = 750**. These values are reported as observed and are not forced to match the R&D report.
+With the current wash-mode exclusion, the independently regenerated counts are **621** for regime A, **119** for regime B, and **751** for the combined mask; the current combined partition is **627 regime A + 124 regime B = 751**. These values are reported as observed and are not forced to match the R&D report.
 
-Independent process counts reproduce **139681 imported minute records** and **118647 jointly valid minute records**.
+Independent process counts reproduce **139681 imported minute records** and **118893 jointly valid minute records**.
 
 ## 5. Limitations and leakage risks
 
