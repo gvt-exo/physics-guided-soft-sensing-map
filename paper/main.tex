@@ -170,23 +170,25 @@ The dataset comprises 139,679 pre-repair process rows and 120,961 post-repair ro
 
 \subsection{Data quality and preprocessing}
 
-The source data contain noisy process signals, short spikes and dropouts, missing or invalid values, incomplete time-series segments, and operating-regime changes. The preprocessing logic used in the validation study follows the R\&D implementation documented in the NTO and is treated as authoritative for this paper.
+The source data contain noisy process signals, short spikes and dropouts, missing or invalid values, incomplete time-series segments, and operating-state changes. The source workbook also contained 181 backward timestamp transitions and 181 duplicate timestamps; all channels were sorted together before filtering, and no observation was deleted by sorting.
 
-The workflow is:
+The preprocessing workflow is:
 \begin{enumerate}[leftmargin=1.8em]
 \item read the native one-minute process series;
+\item sort channels jointly by timestamp and preserve large acquisition gaps;
 \item select the active redundant flow channel where applicable;
+\item invalidate conductivity values above 30;
 \item apply the authoritative conductivity filter and flow despiking;
-\item apply process plausibility/range checks;
+\item apply process plausibility and range checks;
 \item construct timestamps at which all required inputs are jointly valid;
 \item associate each laboratory observation with an eligible process window determined by lag $\tau$ and window length $W$.
 \end{enumerate}
 
-A plant technologist confirmed that conductivity values above 30 are outside normal production operation; such values can occur during vessel washing or other non-production tests and are not representative of MAP production. Accordingly, the production-validity rule $c>30$ was added to the preprocessing pipeline. The rule is process-based rather than model-error-based and is applied globally before conductivity smoothing, model fitting, and laboratory-window aggregation. It invalidates 2,828 raw process minutes. After this update, 118,647 of 139,681 minute records are jointly valid. The conductivity filter corrected 5,586 values in total. None of these preprocessing steps uses laboratory target values.
+A plant technologist confirmed that conductivity values above 30 are outside normal production operation and may correspond to vessel washing or other non-production tests. Accordingly, the process-validity rule $c>30$ was added to the preprocessing pipeline. This rule is process-based rather than model-error-based and is applied globally before conductivity smoothing, model fitting, and laboratory-window aggregation. Because the maintenance outage exceeds the continuity limit, temporal filters reset at gaps longer than 5 minutes; the gap-aware processing therefore produces two independent telemetry segments. None of these preprocessing steps uses laboratory target values.
 
 \subsection{Operating-regime shift}
 
-The conductivity trajectory changes abruptly on 21 May 2026. We define Regime A as the period before 21 May and Regime B as the period beginning 21 May. The boundary is used as an externally observed process change, not as a label learned by the prediction models.
+The conductivity trajectory changes abruptly on 21 May 2026. We define Regime~A as the period before 21 May and Regime~B as the period beginning 21 May. The boundary is used as an externally observed process change, not as a label learned by the prediction models. The maintenance outage from 6 June to 7 July is preserved explicitly and serves as the boundary for the independent post-repair validation.
 
 \begin{figure}[htbp]
 \centering
@@ -200,6 +202,13 @@ The conductivity trajectory changes abruptly on 21 May 2026. We define Regime A 
 \figplaceholder{figures/fig_sparse_sampling_anonymized.png}{0.98\linewidth}
 \caption{Sparse laboratory references on the process timeline, illustrating the mismatch between one-minute telemetry and laboratory sampling every few hours.}
 \label{fig:sparse}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\figplaceholder{figures/fig_extended_coverage.png}{0.98\linewidth}
+\caption{Extended process and laboratory coverage across the maintenance outage. The maintenance gap and the first post-maintenance data point are shown explicitly. For public release, the upper-panel internal signal tag must be replaced by a generic conductivity-signal label.}
+\label{fig:extendedcoverage}
 \end{figure}
 
 \section{Methodology}
@@ -261,7 +270,7 @@ Candidate lags and aggregation windows are
 W\in\{10,20,30,60\}\ \mathrm{min}.
 \end{equation}
 
-For each validation scenario, lag, window, and physics-guided mapping type were selected using only the scenario training data. The first 9 days of the initial training interval were used for fitting and the following 5 days for inner chronological validation. The selection score was
+For each validation scenario, lag, window, and physics-guided mapping type are selected using only the corresponding training data. The first 9 days of a training interval are used for inner fitting and the following 5 days for inner chronological validation. The selection score is
 \begin{equation}
 J=
 \frac{\mathrm{RMSE}_R}{0.03}
@@ -269,7 +278,9 @@ J=
 \frac{\mathrm{RMSE}_{\rho}}{0.01}.
 \end{equation}
 
-The selected configuration was then frozen for all outer splits in that scenario, while fitted coefficients were re-estimated from each outer training interval only. Within Regime A the selected configuration was $\tau=90$ min, $W=60$ min with a quadratic latent-property mapping. For A-to-B transfer it was $\tau=100$ min, $W=30$ min with a quadratic mapping.
+The selected configuration is then frozen for the relevant outer scenario, while fitted coefficients are re-estimated from each outer training interval only.
+
+For the final pre-repair frozen model, the selected configuration is $\tau=0$ min, $W=60$ min, with a quadratic mapping. For the adapted post-repair physics-guided model, the selected configuration is $\tau=140$ min, $W=10$ min, with PCHIP spline mapping.
 
 \subsection{Baseline models}
 
@@ -283,18 +294,17 @@ All baselines use the same temporally aligned rows as the physics-guided model.
 
 The physics-only model is a reference calculation, not a separately calibrated mechanistic model.
 
-\subsection{Chronological validation}
+\subsection{Chronological validation design}
 
-The prespecified outer protocol is a fixed 14-day training interval followed immediately by a 7-day held-out interval. Within Regime A, rolling origins advance by 7 days and yield nine complete tests (A01--A09).
+Validation is entirely temporal. No random shuffling is used.
 
-Regime B does not contain the 21 days of paired laboratory coverage required for a complete within-regime 14+7-day split. No shortened or randomly sampled substitute was introduced.
+\textbf{Pre-repair evaluation.} The prespecified outer protocol is a fixed 14-day training interval followed immediately by a 7-day held-out interval. Within Regime~A, rolling origins advance by 7 days and yield nine complete tests (A01--A09). Regime~B does not contain the 21 days of paired laboratory coverage required for a complete within-regime 14+7-day split.
 
-Cross-regime transfer uses:
-\begin{itemize}[leftmargin=1.5em]
-\item train: 7 May--21 May 2026;
-\item test: 21 May--28 May 2026.
-\end{itemize}
-No random shuffling is used.
+\textbf{Short-term regime-transfer evaluation.} Cross-regime transfer uses 7 May--21 May 2026 for training and 21 May--28 May 2026 for testing.
+
+\textbf{External post-repair evaluation.} The strict external test trains on all eligible pre-repair observations and evaluates on the post-repair period 7 July--29 September 2026. This scenario is denoted \texttt{external\_transfer\_full}.
+
+\textbf{Post-repair frozen-versus-adapted comparison.} Ten post-repair calendar windows are considered, each using 14 days for training and the next 7 days for testing. A window enters the pooled comparison only if temporal alignment leaves at least 40 training and 10 common test laboratory pairs. Four of the ten candidate windows satisfy this rule (P01--P04); the other six are excluded explicitly and do not contribute to pooled metrics.
 
 \subsection{Evaluation metrics}
 
