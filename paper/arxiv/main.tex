@@ -70,7 +70,7 @@ Evgeny S. Gornev\textsuperscript{b}\\[0.35em]
 \end{itemize}
 
 \begin{abstract}
-Industrial plants collect high-frequency telemetry while critical quality variables may be measured only every few hours. We study soft sensing for an industrial monoammonium phosphate process using 260,642 one-minute records and 1,325 paired laboratory observations. The grey-box model reconstructs latent acid properties from conductivity and combines them with material-balance calculations to estimate molar ratio and downstream density. Validation is entirely chronological: nine pre-gap rolling tests, a short-term regime-transfer test, a strict external post-gap test on 249 future laboratory pairs, and four post-gap rolling comparisons. A process-domain rule excludes conductivity values above 30, identified by plant technologists as washing or other non-production operation. Physics-guided structure improves interpretability but does not ensure temporal robustness. Across regime change and the post-gap period, Ridge and LSBoost remain substantially more accurate than the physics-guided model, demonstrating the need for regime-aware updating of industrial virtual telemetry.
+Industrial plants collect high-frequency telemetry while critical quality variables may be measured only every few hours. We study soft sensing for an industrial monoammonium phosphate process using 260,642 one-minute records and 1,325 paired laboratory observations. The grey-box model reconstructs latent acid properties from conductivity and combines them with material-balance calculations to estimate molar ratio and downstream density. Validation is entirely chronological: nine pre-gap rolling tests, a short-term regime-transfer test, a strict external post-gap test on 249 future laboratory pairs, and four post-gap rolling comparisons. A process-domain rule excludes conductivity values above 30, which were classified as non-production operation on the basis of plant process knowledge. Physics-guided structure improves interpretability but does not ensure temporal robustness. Across regime change and the post-gap period, Ridge and LSBoost remain substantially more accurate than the physics-guided model, demonstrating the need for regime-aware updating of industrial virtual telemetry.
 \end{abstract}
 
 \noindent\textbf{Keywords:} soft sensor; virtual sensor; hybrid modeling; process monitoring; regime shift; monoammonium phosphate
@@ -104,7 +104,7 @@ Hybrid and physics-guided models are often proposed as a way to improve interpre
 
 Fertilizer production provides a relevant test case because composition and neutralization variables strongly affect product quality while several feed and intermediate-state properties are not continuously available. Hybrid soft sensing has previously been demonstrated for nutrient-content estimation in compound-fertilizer production \citep{fu2007}. The novelty claimed here is therefore not the generic application of a soft sensor to fertilizer production. Instead, this study examines an industrial monoammonium phosphate (MAP) process with four characteristics that are important for real deployment: one-minute telemetry versus laboratory measurements every few hours, latent feed properties, substantial data-quality problems, and a pronounced operating-regime shift during the observation interval.
 
-The original engineering prototype estimated molar ratio and downstream density from online measurements and used these estimates in an offline decision-support layer. The scientific question addressed here is stricter: \emph{how robust is a physics-guided soft sensor under chronological hold-out testing, regime change, and an independent post-gap period, and how does it compare with simpler data-driven baselines?}
+This study focuses on the temporal robustness of physics-guided soft sensing under sparse laboratory supervision: \emph{how reliably does the model generalize under chronological hold-out testing, regime change, and an independent post-gap period, and how does its performance compare with simpler data-driven baselines?}
 
 The contributions are:
 \begin{enumerate}[leftmargin=1.8em]
@@ -124,7 +124,7 @@ The investigated process is part of an industrial MAP production line. Clarified
 NH_3 + H_3PO_4 \rightarrow NH_4H_2PO_4.
 \end{equation}
 
-The two quality variables considered in this work are the $NH_3/H_3PO_4$ molar ratio $R$ and downstream solution density $\rho_M$. The operational targets used during prototype development were
+The two quality variables considered in this work are the $NH_3/H_3PO_4$ molar ratio $R$ and downstream solution density $\rho_M$. The nominal operating targets considered in the study were
 \begin{equation}
 R_{\mathrm{target}}=1.06,
 \qquad
@@ -170,7 +170,7 @@ The preprocessing workflow is:
 \item associate each laboratory observation with an eligible process window determined by lag $\tau$ and window length $W$.
 \end{enumerate}
 
-A plant technologist confirmed that conductivity values above 30 are outside normal production operation and may correspond to vessel washing or other non-production tests. Accordingly, the process-validity rule $c>30$ was added to the preprocessing pipeline. This rule is process-based rather than model-error-based and is applied globally before conductivity smoothing, model fitting, and laboratory-window aggregation. Because the one-month data gap exceeds the continuity limit, temporal filters reset at gaps longer than 5 minutes; the gap-aware processing therefore produces two independent telemetry segments. None of these preprocessing steps uses laboratory target values.
+Based on plant process knowledge, conductivity values above 30 were classified as outside normal production operation and potentially associated with washing or other non-production states. Accordingly, the process-validity rule $c>30$ was applied in the preprocessing pipeline. This rule is process-based rather than model-error-based and is applied globally before conductivity smoothing, model fitting, and laboratory-window aggregation. Because the one-month data gap exceeds the continuity limit, temporal filters reset at gaps longer than 5 minutes; the gap-aware processing therefore produces two independent telemetry segments. None of these preprocessing steps uses laboratory target values.
 
 \subsection{Operating regimes and data gap}
 
@@ -214,7 +214,7 @@ The acid mass flow and $P_2O_5$ mass flow are
 \dot m_{P_2O_5}=\dot m_A\widehat{w}_{P_2O_5}.
 \end{equation}
 
-The prototype converts $P_2O_5$ mass to equivalent 100\% phosphoric-acid mass using
+The physics-guided calculation converts $P_2O_5$ mass to equivalent 100\% phosphoric-acid mass using
 \begin{equation}
 \dot m_{H_3PO_4,100\%}=1.38\,\dot m_{P_2O_5}.
 \end{equation}
@@ -233,14 +233,14 @@ with $M_{H_3PO_4}=98$ g mol$^{-1}$ and $M_{NH_3}=17$ g mol$^{-1}$. The virtual m
 \frac{\dot n_{NH_3}}{\dot n_{H_3PO_4}}.
 \end{equation}
 
-For publication, the downstream density balance is written in dimensionally explicit form as
+The downstream density balance is written in dimensionally explicit form as
 \begin{equation}
 \widehat{\rho}_M=
 \frac{\sum_i \dot m_i}{\sum_i Q_i},
 \qquad
 \dot m_i=\rho_iQ_i,
 \end{equation}
-where the sums contain the streams used by the implemented downstream balance. This expression uses the additive-volume approximation of the prototype. Any plant-specific correction terms should be stated separately rather than folded into the definition of density.
+where the sums contain the streams included in the downstream balance. The calculation uses an additive-volume approximation.
 
 \subsection{Time alignment and model selection}
 
@@ -359,7 +359,7 @@ Gradient boosting & 0.0174 & 0.0136 & +0.0039 & 0.911 & 0.0134 & 0.0110 & -0.004
 \end{tabular}}
 \end{table}
 
-The transfer test changes the interpretation of the prototype. After the production-validity filter has removed non-production excursions, the physics-guided architecture still generalizes substantially worse than the data-driven baselines across the regime boundary. Ridge gives the lowest molar-ratio and density RMSE values, while gradient boosting is nearly identical in RMSE and gives the highest molar-ratio tolerance hit rate. The physics-guided model exhibits a strong negative molar-ratio bias and positive density bias after the regime transition.
+After the production-validity filter removes non-production excursions, the physics-guided model still generalizes substantially worse than the data-driven baselines across the regime boundary. Ridge gives the lowest molar-ratio and density RMSE values, while gradient boosting is nearly identical in RMSE and gives the highest molar-ratio tolerance hit rate. The physics-guided model exhibits a strong negative molar-ratio bias and positive density bias after the regime transition.
 
 \subsection{No complete within-regime-B test}
 
@@ -386,7 +386,7 @@ Gradient boosting frozen & 0.0328 & 0.0196 & -0.0098 & 0.711 & 0.0137 & 0.0102 &
 \end{tabular}}
 \end{table}
 
-This result is the strongest evidence in the paper. Because neither fitting nor hyperparameter selection uses post-gap target values, the table represents a true future-period validation. The physics-guided model preserves interpretability but transfers poorly; Ridge and LSBoost remain substantially more accurate on both outputs.
+Because neither fitting nor hyperparameter selection uses post-gap target values, this scenario provides an independent future-period evaluation. The physics-guided model preserves interpretability but transfers poorly, whereas Ridge and LSBoost remain substantially more accurate on both outputs.
 
 \subsection{Post-gap frozen versus adapted comparison}
 
@@ -432,7 +432,7 @@ Figure~\ref{fig:postgaprmse} summarizes the normalized held-out errors for the f
 
 \subsection{Implications for model selection}
 
-Across all validations, the hold-out results do not support a claim that the current physics-guided model is the most accurate virtual sensor. Instead, they distinguish two different issues. First, non-production measurements can create misleading apparent failures if process-state validity is not enforced. Second, even after invalid intervals are excluded, the physics-guided calibration transfers poorly across operating-regime change and the post-gap period.
+Across all validations, the physics-guided model is less accurate than the strongest data-driven baselines under temporal shift. The results distinguish two different issues. First, non-production measurements can create misleading apparent failures if process-state validity is not enforced. Second, even after invalid intervals are excluded, the physics-guided calibration transfers poorly across operating-regime change and the post-gap period.
 
 For the present dataset, Ridge is the most stable model across both outputs. LSBoost is generally close to Ridge and sometimes slightly better on a single target, while the physics-only reference remains substantially worse than all fitted models.
 
@@ -448,15 +448,15 @@ The contribution is therefore not only a specific soft sensor. It is a validatio
 
 Physics-guided structure provides interpretability: conductivity is used to reconstruct latent acid composition and density, and these variables enter a material-balance calculation. However, the learned latent-property mappings are still empirical. When their calibration becomes unstable or the conductivity-to-composition relationship changes, the physical downstream equations propagate rather than remove the error.
 
-The comparison with Ridge and gradient boosting is therefore not an argument against physics-guided modeling in general. It shows that the present grey-box implementation needs explicit safeguards: bounded latent-property mappings, extrapolation detection, regime-conditioned calibration, or fallback to a more stable predictor when the current input domain is outside calibration support.
+The results indicate that this grey-box implementation requires explicit safeguards for temporal transfer, including bounded latent-property mappings, extrapolation detection, regime-conditioned calibration, or fallback to a more stable predictor when the input domain lies outside calibration support.
 
 \subsection{Regime shift and model updating}
 
-The A-to-B experiment demonstrates that the relation among conductivity, latent feed properties, and downstream quality is not stationary enough for the current calibration to be carried unchanged across the boundary. A deployment architecture should include operating-regime detection, drift monitoring, bounded mappings where physically justified, controlled recalibration, and fallback behavior selected on prospective validation.
+The A-to-B experiment demonstrates that the relation among conductivity, latent feed properties, and downstream quality is not stationary enough for a frozen calibration to be carried unchanged across the boundary. A deployment architecture should include operating-regime detection, drift monitoring, bounded mappings where physically justified, controlled recalibration, and fallback behavior selected on prospective validation.
 
-\subsection{Why the post-gap extension strengthens the article}
+\subsection{Long-horizon temporal generalization}
 
-The extended dataset changes the manuscript from a short-horizon industrial case study to a stronger temporal generalization study. The external post-gap experiment is especially important because it evaluates the frozen pre-gap models on a completely future period without using post-gap targets. This makes the central conclusion much more robust: the relative weakness of the physics-guided model is not an artifact of one short interval around 21 May.
+The extended observation period enables a stricter temporal generalization test than the short-horizon regime-transfer experiment alone. The external post-gap evaluation applies models fitted exclusively on pre-gap data to a completely future period without using post-gap targets. The persistence of the performance gap over this longer horizon indicates that the weak transfer of the physics-guided model is not confined to the short interval around the 21 May regime boundary.
 
 \subsection{Sparse labels and validation design}
 
@@ -470,13 +470,7 @@ The validation contains no outer-test target leakage: hyperparameter selection i
 
 First, the authoritative conductivity filtering and signal-reconstruction routines include centered operations, including robust windows, Savitzky--Golay smoothing, and PCHIP repair, which can use nearby future process values. Second, laboratory alignment uses a centered averaging window around $t_{\mathrm{lab}}-\tau$; when $\tau<W/2$, the window can extend beyond the nominal laboratory timestamp.
 
-These operations are retained because the present study validates the implemented R\&D prototype. A truly online deployment study should replace them with causal alternatives and repeat the validation.
-
-\subsection{Decision-support scope}
-
-The prototype also calculates 10-minute recommendations for acid, ammonia, and water flows. Those calculations remain an offline decision-support demonstration. Because recommendation quality inherits soft-sensor error and no prospective plant intervention was performed, the present article does not claim closed-loop control performance, safety benefit, or economic benefit.
-
-The production-output calculation used during the R\&D project is likewise excluded from the primary claim because contemporaneous density measurements were unavailable for part of that calculation. The plant uses a moisture coefficient $K=1.55$; that module is retained as Supporting Information until independently validated with complete time-series inputs.
+These operations are retained to reproduce the evaluated preprocessing pipeline. A prospective online implementation should replace them with causal alternatives and repeat the validation.
 
 \section{Limitations}
 
@@ -490,19 +484,17 @@ The production-output calculation used during the R\&D project is likewise exclu
 
 \section{Conclusions}
 
-A physics-guided soft-sensor prototype was evaluated for industrial MAP production using 260,642 minute-scale process records and 1,325 paired laboratory measurements. A process-domain rule excluded conductivity values above 30 as non-production operation, removing spurious failures caused by washing or test states. Chronological validation then showed that the main residual weakness of the physics-guided approach is temporal transfer rather than boundedness within the production domain.
+A physics-guided soft sensor was evaluated for industrial MAP production using 260,642 minute-scale process records and 1,325 paired laboratory measurements. A process-domain rule excluded conductivity values above 30 as non-production operation, removing spurious failures caused by washing or test states. Chronological validation then showed that the main residual weakness of the physics-guided approach is temporal transfer rather than boundedness within the production domain.
 
-Across nine pre-gap rolling windows, the physics-guided model remained interpretable but less accurate than Ridge. In the short-term A-to-B regime transfer test, its performance degraded substantially. The strongest evidence came from the independent post-gap validation: when trained only on pre-gap data, the physics-guided model achieved RMSE values of 0.1277 for molar ratio and 0.0335 g cm$^{-3}$ for density on 249 future laboratory pairs, whereas Ridge achieved 0.0321 and 0.0147, respectively. Rolling post-gap adaptation improved the physics-guided density estimate but did not close the gap to the data-driven baselines.
+Across nine pre-gap rolling windows, the physics-guided model remained interpretable but less accurate than Ridge. In the short-term A-to-B regime-transfer test, its performance degraded substantially. In the independent post-gap validation, when trained only on pre-gap data, the physics-guided model achieved RMSE values of 0.1277 for molar ratio and 0.0335 g cm$^{-3}$ for density on 249 future laboratory pairs, whereas Ridge achieved 0.0321 and 0.0147, respectively. Rolling post-gap adaptation improved the physics-guided density estimate but did not close the gap to the data-driven baselines.
 
 The study therefore shows that physics-guided virtual telemetry can provide interpretable estimates, but physical structure alone does not guarantee robustness to operating change. Industrial deployment should combine process-state validation, leakage-safe temporal testing, regime-aware maintenance, and explicit fallback behavior under sparse laboratory supervision.
 
-\section*{Author contributions}
-
-\textbf{To be confirmed before submission.} Final CRediT roles must be agreed by all authors. Relevant roles include Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Data curation, Writing -- original draft, Writing -- review \& editing, Visualization, Project administration, and Supervision.
+% TODO before journal submission: insert finalized CRediT author-contribution statement agreed by all authors.
 
 \section*{Funding}
 
-This work was performed within an industrial R\&D project. The industrial data owner requested anonymization of the company, production site, equipment identifiers, and internal project identifiers. Funding metadata should be finalized before journal submission in a form consistent with that agreement.
+This work was conducted within an industrial research project. Project and partner identifiers are omitted in accordance with confidentiality requirements.
 
 \section*{Declaration of competing interest}
 
@@ -510,28 +502,11 @@ The authors declare that they have no known competing financial interests or per
 
 \section*{Data availability}
 
-The industrial data owner authorized use of the operational data for research calculations but requested de-identification of the company, site, equipment identifiers, and internal signal tags. Raw historian and laboratory data therefore cannot be made public. The manuscript reports derived aggregate metrics and the validation protocol. Subject to the same confidentiality constraints, analysis code and de-identified derived results may be released with the final article.
+Raw industrial historian and laboratory data are not publicly available because of confidentiality restrictions. The manuscript reports de-identified aggregate metrics and the complete validation protocol used for the analyses presented here.
 
 \section*{Declaration of generative AI and AI-assisted technologies}
 
-Generative AI tools were used for language and structural assistance during manuscript preparation. All scientific content, equations, calculations, citations, interpretations, and conclusions are subject to author verification and approval. The final disclosure should be adapted to the policy of the selected journal at submission.
-
-\section*{Supporting Information}
-
-Recommended Supporting Information:
-
-\begin{itemize}[leftmargin=1.5em]
-\item exact engineering preprocessing thresholds and signal-validity rules;
-\item the exact list of included and excluded post-gap windows;
-\item all per-split validation metrics and residual summaries;
-\item latent-property model coefficients for each chronological fit;
-\item validation of the production-domain conductivity exclusion;
-\item baseline configurations and regularization settings;
-\item diagnostic comparison of the primary and duplicate acid-flow channels;
-\item decision-support equations and offline examples;
-\item production-output reconstruction using the plant moisture coefficient $K=1.55$;
-\item data-provenance table using anonymized variable names.
-\end{itemize}
+Generative AI tools were used for language editing and structural assistance during manuscript preparation. The authors reviewed and edited the resulting text and take responsibility for the scientific content, calculations, citations, interpretations, and conclusions.
 
 \bibliographystyle{plainnat}
 \bibliography{references}
