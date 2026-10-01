@@ -213,6 +213,15 @@ The conductivity trajectory changes abruptly on 21 May 2026. We define Regime~A 
 
 \section{Methodology}
 
+The overall soft-sensor architecture is summarized in Fig.~\ref{fig:soft_sensor_architecture}. The main solid-arrow pathway represents online inference. Minute-scale process telemetry first passes process-validity filtering and temporal alignment; the conductivity signal is then used to reconstruct latent acid properties, which are propagated through the physics-guided material-balance model to obtain the virtual molar-ratio and solution-density estimates. The sparse laboratory measurements are not direct runtime inputs. Instead, they are used only for calibration, chronological model selection, and validation, as indicated by the dashed training pathway. This separation between the online inference path and the calibration path is important for interpreting the model as a deployable virtual-sensing layer rather than as an interpolation of contemporaneous laboratory measurements.
+
+\begin{figure}[htbp]
+\centering
+\figplaceholder{figures/soft_sensor_architecture.pdf}{0.98\linewidth}
+\caption{Architecture of the physics-guided soft sensor and its calibration/validation workflow. Solid arrows denote the online inference pathway, whereas dashed arrows denote the training, calibration, and validation pathway based on sparse laboratory reference measurements.}
+\label{fig:soft_sensor_architecture}
+\end{figure}
+
 \subsection{Physics-guided soft sensor}
 
 The soft sensor is a grey-box sequence rather than a direct unconstrained regression. Conductivity is first mapped to a latent $P_2O_5$ fraction,
