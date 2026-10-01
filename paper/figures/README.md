@@ -5,10 +5,10 @@
 ## Figures used in the manuscript
 
 1. `fig_extended_validation_timeline.pdf`
-   - purpose: complete March–September process/laboratory coverage and maintenance gap;
+   - purpose: complete March–September process/laboratory coverage and data gap;
    - before public release:
      - replace any internal signal tag such as `D420` with `Conductivity signal`;
-     - use `Maintenance outage` / `Post-maintenance data begin` rather than internal plant wording;
+     - use `Data gap` / `Data resume` rather than internal plant wording;
      - verify the density axis is plotted and labeled in g cm^-3 with the physical scale shown directly (not a ×1000/secondary-axis mismatch);
      - use dark, publication-readable title/annotations.
 
@@ -19,11 +19,11 @@
    - no company, site, equipment, or internal tag identifiers.
 
 3. `fig_extended_adaptation_comparison.pdf`
-   - purpose: frozen-versus-adapted post-maintenance RMSE comparison;
+   - purpose: frozen-versus-adapted post-gap RMSE comparison;
    - before public release: increase title/annotation contrast if needed and keep the normalized tolerance labels readable at journal column width.
 
 4. `fig_extended_transfer_timeseries.pdf`
-   - purpose: post-maintenance frozen-versus-adapted physics-guided predictions and residuals;
+   - purpose: post-gap frozen-versus-adapted physics-guided predictions and residuals;
    - before public release: increase title/annotation contrast if needed and verify all axis units remain readable after scaling.
 
 ## Legacy figures
