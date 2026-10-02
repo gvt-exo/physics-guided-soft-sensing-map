@@ -69,22 +69,26 @@ soft sensor \sep hybrid modeling \sep temporal validation \sep process monitorin
 
 \section*{Nomenclature}
 
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.10\linewidth}X>{\raggedright\arraybackslash}p{0.16\linewidth}@{}}
+\begin{table}[!ht]
+\centering
+\small
+\begin{tabular}{@{}p{0.11\linewidth}p{0.60\linewidth}p{0.20\linewidth}@{}}
 \toprule
-Symbol & Definition & Unit\\
+\textbf{Symbol} & \textbf{Definition} & \textbf{Unit} \\
 \midrule
-$c$ & preprocessed conductivity signal used as a proxy for acid state & process unit\\
-$Q_A$ & clarified phosphoric-acid volumetric flow & m$^3$ h$^{-1}$\\
-$\dot m_N$ & ammonia mass flow & kg h$^{-1}$\\
-$Q_W$ & process-water volumetric flow & m$^3$ h$^{-1}$\\
-$w_{P_2O_5}$ & $P_2O_5$ content in the acid stream & mass \%\\
-$\rho_A$ & phosphoric-acid density & g cm$^{-3}$\\
-$R$ & $NH_3/H_3PO_4$ molar ratio & dimensionless\\
-$\rho_M$ & downstream solution density & g cm$^{-3}$\\
-$\tau$ & time lag between telemetry and laboratory reference & min\\
-$W$ & aggregation-window length & min\\
+$c$ & Preprocessed conductivity signal used as a proxy for acid state & Process unit \\
+$Q_A$ & Clarified phosphoric-acid volumetric flow & m$^3$ h$^{-1}$ \\
+$\dot m_N$ & Ammonia mass flow & kg h$^{-1}$ \\
+$Q_W$ & Process-water volumetric flow & m$^3$ h$^{-1}$ \\
+$w_{P_2O_5}$ & $P_2O_5$ content in the acid stream & mass \% \\
+$\rho_A$ & Phosphoric-acid density & g cm$^{-3}$ \\
+$R$ & $NH_3/H_3PO_4$ molar ratio & Dimensionless \\
+$\rho_M$ & Downstream solution density & g cm$^{-3}$ \\
+$\tau$ & Time lag between telemetry and laboratory reference & min \\
+$W$ & Aggregation-window length & min \\
 \bottomrule
-\end{tabularx}
+\end{tabular}
+\end{table}
 
 \medskip
 \noindent Density is reported in g~cm$^{-3}$ to match plant laboratory practice; the SI equivalent is obtained as $1~\mathrm{g\,cm^{-3}}=1000~\mathrm{kg\,m^{-3}}$. The conductivity channel is an instrument-specific scaled historian signal used only as an empirical proxy for acid state; no conversion to a physical conductivity unit is assumed.
@@ -129,16 +133,23 @@ The reference values were obtained from sparse laboratory/operator measurements 
 
 The full study covers 1 March--29 September 2026 and preserves the one-month data gap from 6 June to 7 July.
 
-\begin{table}[htbp]
+\begin{table}[!ht]
 \centering
 \caption{Data sources used in the study.}
 \label{tab:data}
-\begin{tabular}{@{}p{3.0cm}p{4.3cm}p{4.4cm}p{2.7cm}@{}}
+\small
+\begin{tabular}{@{}p{0.19\linewidth}p{0.27\linewidth}p{0.32\linewidth}p{0.16\linewidth}@{}}
 \toprule
-Data source & Variables & Sampling / count & Role\\
+\textbf{Data source} & \textbf{Variables} & \textbf{Sampling / count} & \textbf{Role} \\
 \midrule
-Plant telemetry & conductivity, acid flow, ammonia flow, water flow & 260,642 one-minute records; 225,114 jointly valid after preprocessing & model inputs\\
-Laboratory/operator references & molar ratio and solution density & 1,325 paired observations & calibration and evaluation targets\\
+Plant telemetry &
+Conductivity, acid flow, ammonia flow, water flow &
+260,642 one-minute records; 225,114 jointly valid after preprocessing &
+Model inputs \\
+Laboratory/operator references &
+Molar ratio and solution density &
+1,325 paired observations &
+Calibration and evaluation targets \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -180,10 +191,14 @@ The conductivity trajectory changes abruptly on 21 May 2026. We define Regime~A 
 
 The overall soft-sensor architecture is summarized in Fig.~\ref{fig:soft_sensor_architecture}. The main solid-arrow pathway represents online inference. Minute-scale process telemetry first passes process-validity filtering and temporal alignment; the preprocessed conductivity signal prepared for algorithmic use is then used to reconstruct latent acid properties, which are propagated through the physics-guided material-balance model to obtain the virtual molar-ratio and solution-density estimates. The sparse laboratory measurements are not direct runtime inputs. Instead, they are used only for calibration, chronological model selection, and validation, as indicated by the dashed training pathway. This separation between the online inference path and the calibration path is important for interpreting the model as a deployable virtual-sensing layer rather than as an interpolation of contemporaneous laboratory measurements.
 
-\begin{figure}[htbp]
+\begin{figure}[!ht]
 \centering
-\figplaceholder{figures/soft_sensor_architecture.eps}{0.98\linewidth}
-\caption{Architecture of the physics-guided soft sensor and its calibration/validation workflow. The conductivity input denotes the preprocessed signal prepared for algorithmic use. Solid arrows denote the online inference pathway, whereas dashed arrows denote the training, calibration, and validation pathway based on sparse laboratory reference measurements. The initial explanatory schematic was created with OpenAI image-generation assistance and subsequently reviewed and edited by the authors.}
+\includegraphics[
+    width=0.88\linewidth,
+    height=0.42\textheight,
+    keepaspectratio
+]{figures/soft_sensor_architecture.eps}
+\caption{Architecture of the physics-guided soft sensor and its calibration/validation workflow. Solid arrows denote online inference; dashed arrows denote calibration and validation using sparse laboratory references. The conductivity input is the preprocessed signal used by the algorithm. The initial schematic was created with OpenAI image-generation assistance and subsequently reviewed and edited by the authors.}
 \label{fig:soft_sensor_architecture}
 \end{figure}
 
@@ -286,7 +301,7 @@ The selected configuration is then frozen for the relevant outer scenario, while
 All baseline models use exactly the same temporally aligned rows and the same four process features as the physics-guided model: conductivity, acid flow, ammonia flow, and water flow. Separate target models are fitted for molar ratio and downstream density where applicable.
 
 \begin{itemize}[leftmargin=1.5em]
-\item \textbf{Ridge regression}: the four inputs are standardized from the training set. The regularization parameter is selected from $\{0,10^{-4},10^{-3},10^{-2},10^{-1},1,10,100\}$ using an inner chronological split in which the earlier approximately two thirds of the outer training period are used for fitting and the final third for validation. The selected model is then refitted on the full outer training set.
+\item \textbf{Ridge regression}: the four inputs are standardized from the training set. The regularization parameter is selected from $\{0,\allowbreak 10^{-4},\allowbreak 10^{-3},\allowbreak 10^{-2},\allowbreak 10^{-1},\allowbreak 1,\allowbreak 10,\allowbreak 100\}$ using an inner chronological split in which the earlier approximately two thirds of the outer training period are used for fitting and the final third for validation. The selected model is then refitted on the full outer training set.
 \item \textbf{Physics-only reference}: the same material balance is evaluated with $P_2O_5$ fixed at 52~wt\% and acid density given by the unfitted prior relation above. This model contains no target-fitted parameters and is intended as a mechanistic reference rather than a calibrated first-principles model.
 \item \textbf{Gradient boosting}: least-squares boosting (LSBoost) uses 100 regression trees, learning rate 0.05, minimum leaf size 10, and at most 20 splits per tree. These hyperparameters are fixed for all outer splits; separate ensembles are fitted for the two targets.
 \end{itemize}
