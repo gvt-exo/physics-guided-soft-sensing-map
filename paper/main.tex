@@ -7,6 +7,7 @@
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{tabularx}
 \usepackage{graphicx}
 \usepackage{siunitx}
 \usepackage{hyperref}
@@ -68,7 +69,7 @@ soft sensor \sep hybrid modeling \sep temporal validation \sep process monitorin
 
 \section*{Nomenclature}
 
-\begin{tabular}{@{}lll@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.10\linewidth}X>{\raggedright\arraybackslash}p{0.16\linewidth}@{}}
 \toprule
 Symbol & Definition & Unit\\
 \midrule
@@ -83,7 +84,7 @@ $\rho_M$ & downstream solution density & g cm$^{-3}$\\
 $\tau$ & time lag between telemetry and laboratory reference & min\\
 $W$ & aggregation-window length & min\\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 
 \medskip
 \noindent Density is reported in g~cm$^{-3}$ to match plant laboratory practice; the SI equivalent is obtained as $1~\mathrm{g\,cm^{-3}}=1000~\mathrm{kg\,m^{-3}}$. The conductivity channel is an instrument-specific scaled historian signal used only as an empirical proxy for acid state; no conversion to a physical conductivity unit is assumed.
