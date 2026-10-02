@@ -57,7 +57,7 @@
 \address[ural]{UralAiTech LLC, 6, Bldg. 2, Presnenskaya Embankment, Presnensky Municipal District, Moscow 123112, Russian Federation}
 
 \begin{abstract}
-Soft sensors for industrial chemical processes are often developed from high-frequency process measurements and sparse laboratory labels, yet their performance is commonly assessed over periods in which the input--output relationship is approximately stationary. This study evaluates temporal robustness under realistic regime change using 260,642 one-minute records and 1,325 paired laboratory observations from industrial monoammonium phosphate production. A physics-guided grey-box model reconstructs latent phosphoric-acid properties from conductivity and propagates them through a material balance to estimate the ammonia-to-phosphoric-acid molar ratio and downstream solution density. Model selection and evaluation are strictly chronological and include nine within-regime rolling tests, a short-term regime-transfer test, an independent post-gap test on 438 future laboratory pairs, and ten post-gap rolling comparisons. A training-domain guard prevents the empirical latent-property mappings from extrapolating beyond the conductivity range observed during fitting. In the independent future-period test, Ridge regression achieved molar-ratio and density RMSE values of 0.0286 and 0.0141~g~cm$^{-3}$, respectively, compared with 0.1795 and 0.0456~g~cm$^{-3}$ for the frozen physics-guided model. Gradient boosting achieved the lowest density RMSE, 0.0128~g~cm$^{-3}$. The results show that physical structure improves interpretability and constrains extrapolation but does not guarantee temporal transferability when empirical latent-state mappings drift. Reliable deployment therefore requires chronological validation, drift monitoring, recalibration, and explicit fallback behavior.
+Soft sensors for industrial chemical processes are often developed from high-frequency process measurements and sparse laboratory labels, yet their performance is commonly assessed over periods in which the input--output relationship is approximately stationary. This study evaluates temporal robustness under realistic regime change using 260,642 one-minute records and 1,325 paired laboratory observations from industrial monoammonium phosphate production. A physics-guided gray-box model reconstructs latent phosphoric-acid properties from conductivity and propagates them through a material balance to estimate the ammonia-to-phosphoric-acid molar ratio and downstream solution density. Model selection and evaluation are strictly chronological and include nine within-regime rolling tests, a short-term regime-transfer test, an independent post-gap test on 438 future laboratory pairs, and ten post-gap rolling comparisons. A training-domain guard prevents the empirical latent-property mappings from extrapolating beyond the conductivity range observed during fitting. In the independent future-period test, Ridge regression achieved molar-ratio and density RMSE values of 0.0286 and 0.0141~g~cm$^{-3}$, respectively, compared with 0.1795 and 0.0456~g~cm$^{-3}$ for the frozen physics-guided model. Gradient boosting achieved the lowest density RMSE, 0.0128~g~cm$^{-3}$. The results show that physical structure improves interpretability and constrains extrapolation but does not guarantee temporal transferability when empirical latent-state mappings drift. Reliable deployment therefore requires chronological validation, drift monitoring, recalibration, and explicit fallback behavior.
 \end{abstract}
 
 \begin{keyword}
@@ -188,7 +188,7 @@ The overall soft-sensor architecture is summarized in Fig.~\ref{fig:soft_sensor_
 
 \subsection{Physics-guided soft sensor}
 
-The physics-guided model is a grey-box sequence rather than a direct unconstrained input--output regression. The latent acid state is represented by the $P_2O_5$ content $w_{P_2O_5}$ (mass \%) and phosphoric-acid density $\rho_A$ (g~cm$^{-3}$). Before evaluating the fitted conductivity-to-composition mapping, the conductivity input is restricted to the support observed in the corresponding training set,
+The physics-guided model is a gray-box sequence rather than a direct unconstrained input--output regression. The latent acid state is represented by the $P_2O_5$ content $w_{P_2O_5}$ (mass \%) and phosphoric-acid density $\rho_A$ (g~cm$^{-3}$). Before evaluating the fitted conductivity-to-composition mapping, the conductivity input is restricted to the support observed in the corresponding training set,
 \begin{equation}
 \widetilde c=
 \min\!\left[
@@ -467,11 +467,11 @@ The process-systems implication is that physical structure alone is insufficient
 
 \section*{Funding}
 
-This work was carried out within the framework of a cooperation agreement between Molecular Electronics Research Institute, JSC (MERI), and UralAiTech LLC. The supporting organizations had no role beyond providing organizational and financial support; all decisions regarding study design, data collection and curation, data analysis and interpretation, manuscript preparation, and submission for publication were made by the authors.
+This work was supported by Molecular Electronics Research Institute, JSC (MERI), and UralAiTech LLC under a cooperation agreement. The supporting organizations had no role beyond providing organizational and financial support; all decisions regarding study design, data collection and curation, data analysis and interpretation, manuscript preparation, and submission for publication were made by the authors.
 
 \section*{Declaration of competing interest}
 
-The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+German A. Karnup, Oleg A. Telminov, and Evgeny S. Gornev report financial support from JSC Molecular Electronics Research Institute related to this work. Andrey N. Sychev declares that he has no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
 
 \section*{Data availability}
 
