@@ -57,7 +57,7 @@
 \address[ural]{UralAiTech LLC, 6, Bldg. 2, Presnenskaya Embankment, Presnensky Municipal District, Moscow 123112, Russian Federation}
 
 \begin{abstract}
-Soft sensors for industrial chemical processes are often developed from high-frequency process measurements and sparse laboratory labels, yet their performance is commonly assessed over periods in which the input--output relationship is approximately stationary. This study evaluates temporal robustness under realistic regime change using 260,642 one-minute records and 1,325 paired laboratory observations from industrial monoammonium phosphate production. A physics-guided gray-box model reconstructs latent phosphoric-acid properties from conductivity and propagates them through a material balance to estimate the ammonia-to-phosphoric-acid molar ratio and downstream solution density. Model selection and evaluation are strictly chronological and include nine within-regime rolling tests, a short-term regime-transfer test, an independent post-gap test on 438 future laboratory pairs, and ten post-gap rolling comparisons. A training-domain guard prevents the empirical latent-property mappings from extrapolating beyond the conductivity range observed during fitting. In the independent future-period test, Ridge regression achieved molar-ratio and density RMSE values of 0.0286 and 0.0141~g~cm$^{-3}$, respectively, compared with 0.1795 and 0.0456~g~cm$^{-3}$ for the frozen physics-guided model. Gradient boosting achieved the lowest density RMSE, 0.0128~g~cm$^{-3}$. The results show that physical structure improves interpretability and constrains extrapolation but does not guarantee temporal transferability when empirical latent-state mappings drift. Reliable deployment therefore requires chronological validation, drift monitoring, recalibration, and explicit fallback behavior.
+Soft sensors for industrial chemical processes are often developed from high-frequency process measurements and sparse laboratory labels, yet their performance is commonly assessed over periods in which the input--output relationship is approximately stationary. This study evaluates temporal robustness under realistic regime change using 260,642 one-minute records and 1,325 paired laboratory observations from industrial monoammonium phosphate production. A physics-guided gray-box model reconstructs latent phosphoric-acid properties from conductivity and propagates them through a material balance to estimate the ammonia-to-phosphoric-acid molar ratio and downstream solution density. Target-label splitting, model fitting, and model selection are chronological and include nine within-regime rolling tests, a short-term regime-transfer test, an independent post-gap test on 438 future laboratory pairs, and ten post-gap rolling comparisons. A training-domain guard prevents the empirical latent-property mappings from extrapolating beyond the conductivity range observed during fitting. In the independent future-period test, Ridge regression achieved molar-ratio and density RMSE values of 0.0286 and 0.0141~g~cm$^{-3}$, respectively, compared with 0.1795 and 0.0456~g~cm$^{-3}$ for the frozen physics-guided model. Gradient boosting achieved the lowest density RMSE, 0.0128~g~cm$^{-3}$. The results show that physical structure improves interpretability and constrains extrapolation but does not guarantee temporal transferability when empirical latent-state mappings drift. Reliable deployment therefore requires chronological validation, drift monitoring, recalibration, and explicit fallback behavior.
 \end{abstract}
 
 \begin{keyword}
@@ -102,7 +102,7 @@ Accordingly, the objective of this study is to evaluate \emph{temporal transfera
 \begin{enumerate}[leftmargin=1.8em]
 \item an industrial multi-rate soft-sensing case containing 260,642 one-minute process records and 1,325 paired laboratory observations;
 \item a physics-guided latent-property reconstruction coupled to a material balance, with explicit training-domain control to prevent unconstrained extrapolation;
-\item a leakage-aware chronological validation design spanning within-regime rolling tests, a regime-boundary transfer test, an independent future-period test, and rolling post-gap adaptation; and
+\item a target-leakage-free chronological validation design spanning within-regime rolling tests, a regime-boundary transfer test, an independent future-period test, and rolling post-gap adaptation; and
 \item a direct comparison showing when physical structure improves interpretability without improving predictive transfer, thereby separating numerical extrapolation control from genuine robustness to temporal process change.
 \end{enumerate}
 
@@ -182,7 +182,7 @@ The overall soft-sensor architecture is summarized in Fig.~\ref{fig:soft_sensor_
 \begin{figure}[htbp]
 \centering
 \figplaceholder{figures/soft_sensor_architecture.pdf}{0.98\linewidth}
-\caption{Architecture of the physics-guided soft sensor and its calibration/validation workflow. The conductivity input denotes the preprocessed signal prepared for algorithmic use. Solid arrows denote the online inference pathway, whereas dashed arrows denote the training, calibration, and validation pathway based on sparse laboratory reference measurements.}
+\caption{Architecture of the physics-guided soft sensor and its calibration/validation workflow. The conductivity input denotes the preprocessed signal prepared for algorithmic use. Solid arrows denote the online inference pathway, whereas dashed arrows denote the training, calibration, and validation pathway based on sparse laboratory reference measurements. The initial explanatory schematic was created with OpenAI image-generation assistance and subsequently reviewed and edited by the authors.}
 \label{fig:soft_sensor_architecture}
 \end{figure}
 
@@ -253,7 +253,7 @@ For a training set, residuals in molar ratio and downstream density are standard
 \begin{equation}
 \rho_A^{\mathrm{prior}}(w)=0.00008w^2+0.0063w+0.9977,
 \end{equation}
-with $w$ in mass \% and $\rho_A^{\mathrm{prior}}$ in g~cm$^{-3}$. Parameters are optimized by Nelder--Mead search with at most 3000 iterations and 12,000 function evaluations. These regularization terms constrain the fitted latent states but do not use test-period target values.
+with $w$ in mass \% and $\rho_A^{\mathrm{prior}}$ in g~cm$^{-3}$. The acid-density prior residual is scaled by 0.10~g~cm$^{-3}$, and the monotonicity penalty uses a derivative scale of 0.01~g~cm$^{-3}$ per mass-\% $P_2O_5$. Parameters are optimized by Nelder--Mead search with at most 3000 iterations and 12,000 function evaluations. These regularization terms constrain the fitted latent states but do not use test-period target values.
 
 \subsection{Time alignment and model selection}
 
@@ -479,7 +479,7 @@ Raw industrial historian and laboratory data are not publicly available because 
 
 \section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
 
-During the preparation of this work, the authors used ChatGPT (OpenAI) for language editing and structural assistance. After using this tool, the authors reviewed and edited the content as needed and take full responsibility for the content of the published article.
+During the preparation of this work, the authors used ChatGPT (OpenAI) for language editing and structural assistance and an OpenAI image-generation tool to assist with the initial explanatory architecture schematic in Fig.~\ref{fig:soft_sensor_architecture}. The authors subsequently reviewed and edited the text and schematic as needed and take full responsibility for the content of the published article.
 
 \bibliographystyle{elsarticle-harv}
 \bibliography{references}
