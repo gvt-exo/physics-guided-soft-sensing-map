@@ -1,6 +1,5 @@
-\documentclass[11pt]{article}
+\documentclass[preprint,12pt,authoryear]{elsarticle}
 
-\usepackage[a4paper,margin=2.3cm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
@@ -10,11 +9,11 @@
 \usepackage{array}
 \usepackage{graphicx}
 \usepackage{siunitx}
-\usepackage[authoryear,round]{natbib}
 \usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{enumitem}
-\usepackage{caption}
+
+\journal{Digital Chemical Engineering}
 
 \hypersetup{
   colorlinks=true,
@@ -24,8 +23,6 @@
 }
 
 \sisetup{detect-all=true}
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{0.55em}
 
 \newcommand{\figplaceholder}[2]{%
   \IfFileExists{#1}{%
@@ -36,44 +33,38 @@
   }%
 }
 
-\title{\textbf{Physics-Guided Soft Sensing under Sparse Laboratory Measurements and Temporal Regime Shifts in Industrial Monoammonium Phosphate Production}}
-
-\author{%
-German A. Karnup\textsuperscript{a,b,*}\quad
-Oleg A. Telminov\textsuperscript{b}\quad
-Andrey N. Sychev\textsuperscript{c}\quad
-Evgeny S. Gornev\textsuperscript{b}\\[0.35em]
-\small
-\href{https://orcid.org/0000-0001-6517-4712}{Karnup ORCID 0000-0001-6517-4712}\quad
-\href{https://orcid.org/0000-0002-2358-3689}{Telminov ORCID 0000-0002-2358-3689}
-}
-
-\date{}
-
 \begin{document}
-\maketitle
 
-\begin{center}
-\small
-\textsuperscript{a}Moscow Institute of Physics and Technology (National Research University), Dolgoprudny, Moscow Region, Russian Federation\\
-\textsuperscript{b}Molecular Electronics Research Institute, JSC (MERI), Zelenograd, Moscow, Russian Federation\\
-\textsuperscript{c}UralAItech LLC, Russian Federation\\
-\textsuperscript{*}Corresponding author: \href{mailto:gkarnup@niime.ru}{gkarnup@niime.ru}
-\end{center}
+\begin{frontmatter}
 
-\section*{Highlights}
-\begin{itemize}[leftmargin=1.5em]
-\item Physics-guided soft sensing was evaluated on long-horizon industrial data.
-\item Ridge and LSBoost transferred better across temporal shifts.
-\item Independent future-period validation exposed weak physics-guided transfer.
-\item Deployment requires drift monitoring, recalibration, and fallback logic.
-\end{itemize}
+\title{Physics-Guided Soft Sensing under Sparse Laboratory Measurements and Temporal Regime Shifts in Industrial Monoammonium Phosphate Production}
+
+\author[mipt,meri]{German A. Karnup\corref{cor1}}
+\ead{gkarnup@niime.ru}
+\ead[url]{https://orcid.org/0000-0001-6517-4712}
+
+\author[meri]{Oleg A. Telminov}
+\ead[url]{https://orcid.org/0000-0002-2358-3689}
+
+\author[ural]{Andrey N. Sychev}
+
+\author[meri]{Evgeny S. Gornev}
+
+\cortext[cor1]{Corresponding author}
+
+\address[mipt]{Moscow Institute of Physics and Technology (National Research University), Dolgoprudny, Moscow Region, Russian Federation}
+\address[meri]{Molecular Electronics Research Institute, JSC (MERI), Zelenograd, Moscow, Russian Federation}
+\address[ural]{UralAItech LLC, Russian Federation}
 
 \begin{abstract}
 Industrial plants collect high-frequency telemetry while critical quality variables may be measured only every few hours. We study soft sensing for an industrial monoammonium phosphate process using 260,642 one-minute records and 1,325 paired laboratory observations. The grey-box model reconstructs latent acid properties from conductivity and combines them with material-balance calculations to estimate molar ratio and downstream density. Validation is entirely chronological: nine pre-gap rolling tests, a short-term regime-transfer test, a strict external post-gap test on 438 future laboratory pairs, and ten post-gap rolling comparisons. To prevent uncontrolled extrapolation, the conductivity input to the fitted latent-property mappings is limited to the range observed in the corresponding training data. Ridge and LSBoost remain more accurate than the physics-guided model, particularly in the independent long-horizon evaluation. The results show that physical structure improves interpretability but does not by itself ensure temporal robustness, motivating regime-aware monitoring, recalibration, and fallback logic for industrial virtual telemetry.
 \end{abstract}
 
-\noindent\textbf{Keywords:} soft sensor; virtual sensor; hybrid modeling; process monitoring; regime shift; monoammonium phosphate
+\begin{keyword}
+soft sensor \sep virtual sensor \sep hybrid modeling \sep process monitoring \sep regime shift \sep monoammonium phosphate
+\end{keyword}
+
+\end{frontmatter}
 
 \section*{Nomenclature}
 
@@ -478,11 +469,11 @@ The authors declare that they have no known competing financial interests or per
 
 Raw industrial historian and laboratory data are not publicly available because of confidentiality restrictions. The analysis code, validation workflow, and de-identified derived results used to support the study are publicly available at \url{https://github.com/gvt-exo/physics-guided-soft-sensing-map}. The repository does not contain the proprietary raw process or laboratory data required to reproduce the numerical results from source measurements.
 
-\section*{Declaration of generative AI and AI-assisted technologies}
+\section*{Declaration of generative AI and AI-assisted technologies in the writing process}
 
 Generative AI tools were used for language editing and structural assistance during manuscript preparation. The authors reviewed and edited the resulting text and take responsibility for the scientific content, calculations, citations, interpretations, and conclusions.
 
-\bibliographystyle{plainnat}
+\bibliographystyle{elsarticle-harv}
 \bibliography{references}
 
 \end{document}
