@@ -429,22 +429,22 @@ Gradient boosting adapted & 0.0230 & 0.0177 & -0.0057 & 0.745 & 0.0110 & 0.0088 
 
 Rolling adaptation substantially reduces the physics-guided density error and improves its molar-ratio error relative to the frozen physics-guided model, but it does not close the molar-ratio gap to Ridge or gradient boosting. Ridge adaptation gives the lowest pooled molar-ratio RMSE, while gradient-boosting adaptation gives the lowest density RMSE.
 
-Figure~\ref{fig:postgaprmse} summarizes the normalized held-out errors for the frozen and adapted strategies on identical post-gap samples. Figure~\ref{fig:frozenadapted} shows the corresponding physics-guided time series and residuals.
-
-\begin{figure}[htbp]
-\centering
-\figplaceholder{figures/fig_extended_adaptation_comparison.pdf}{0.98\linewidth}
-\caption{Post-gap held-out performance on identical rolling test samples. Bars show RMSE normalized by the engineering tolerance.}
-\label{fig:postgaprmse}
-\end{figure}
+Figure~\ref{fig:postgaprmse} summarizes the normalized held-out errors for the frozen and adapted strategies on identical post-gap samples.
 
 \subsection{Discussion: temporal robustness and deployment implications}
 
-The central result is that interpretability and predictive transfer are distinct properties. Across the chronological tests, Ridge regression and gradient boosting transfer more accurately than the physics-guided model, even though the latter embeds a chemically meaningful latent-state reconstruction and material balance. This finding is consistent with a broader process-systems perspective in which reliability depends not only on model structure but also on whether the relationships used by that structure remain valid as the process evolves \citep{kadlec2009,offermans2024,metcalfe2025,zhai2025}.
+The central result is that interpretability and predictive transfer are distinct properties. Figure~\ref{fig:postgaprmse} places the frozen and adapted errors on the same tolerance-normalized scale and makes the model-selection trade-off explicit: adaptation improves the physics-guided model, particularly for density, but the statistical baselines retain lower held-out errors. Across the chronological tests, Ridge regression and gradient boosting transfer more accurately than the physics-guided model, even though the latter embeds a chemically meaningful latent-state reconstruction and material balance. This finding is consistent with a broader process-systems perspective in which reliability depends not only on model structure but also on whether the relationships used by that structure remain valid as the process evolves \citep{kadlec2009,offermans2024,metcalfe2025,zhai2025}.
 
 The external test identifies the transfer failure more clearly than the short A-to-B experiment. The material-balance equations themselves do not depend on the operating regime, but the conductivity-to-$P_2O_5$ and $P_2O_5$-to-density mappings are estimated from data. The observed systematic bias is therefore consistent with temporal change in one or both empirical latent-state relationships. Because these latent properties are not measured continuously, the present data do not identify which mapping changed or establish a causal mechanism for the shift. In this sense, the model is physics-guided but not demonstrably regime-invariant. The result cautions against treating the presence of first-principles equations as evidence of extrapolative validity without an explicit test of the data-dependent submodels.
 
 The training-domain guard addresses a different problem. Restricting conductivity to the training support prevents uncontrolled polynomial or spline extrapolation and removes a source of numerical instability, but it cannot recover a changed latent-state relationship. Domain guarding should therefore be interpreted as a safety constraint, not as a substitute for transfer validation. This distinction is important for hybrid models because numerical plausibility can otherwise be mistaken for predictive reliability.
+
+\begin{figure}[!ht]
+\centering
+\figplaceholder{figures/fig_extended_adaptation_comparison.pdf}{0.90\linewidth}
+\caption{Post-gap held-out performance on identical rolling test samples. Bars show RMSE normalized by the engineering tolerance.}
+\label{fig:postgaprmse}
+\end{figure}
 
 Rolling post-gap recalibration improves the physics-guided density estimate substantially, but the molar-ratio error remains larger than for the statistical baselines. The target-dependent response to adaptation indicates that a single recalibration rule need not restore all outputs simultaneously. A practical soft-sensor lifecycle should therefore include distribution- or process-state monitoring, periodic comparison with new laboratory measurements, target-specific acceptance criteria, and a validated fallback predictor or an explicit unavailable/unreliable state when the current operating condition is outside the validated regime \citep{kay2024,metcalfe2025}.
 
