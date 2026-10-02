@@ -446,7 +446,14 @@ The training-domain guard addresses a different problem. Restricting conductivit
 \label{fig:postgaprmse}
 \end{figure}
 
-Rolling post-gap recalibration improves the physics-guided density estimate substantially, but the molar-ratio error remains larger than for the statistical baselines. The target-dependent response to adaptation indicates that a single recalibration rule need not restore all outputs simultaneously. A practical soft-sensor lifecycle should therefore include distribution- or process-state monitoring, periodic comparison with new laboratory measurements, target-specific acceptance criteria, and a validated fallback predictor or an explicit unavailable/unreliable state when the current operating condition is outside the validated regime \citep{kay2024,metcalfe2025}.
+Rolling post-gap recalibration improves the physics-guided density estimate substantially, but the molar-ratio error remains larger than for the statistical baselines. Figure~\ref{fig:frozenadapted} shows the corresponding held-out time series and residuals for the frozen and adapted physics-guided models, making the persistent molar-ratio transfer limitation and the density improvement after recalibration visible over time. The target-dependent response to adaptation indicates that a single recalibration rule need not restore all outputs simultaneously. A practical soft-sensor lifecycle should therefore include distribution- or process-state monitoring, periodic comparison with new laboratory measurements, target-specific acceptance criteria, and a validated fallback predictor or an explicit unavailable/unreliable state when the current operating condition is outside the validated regime \citep{kay2024,metcalfe2025}.
+
+\begin{figure}[!ht]
+\centering
+\figplaceholder{figures/fig_extended_transfer_timeseries.eps}{0.90\linewidth}
+\caption{Frozen pre-gap physics-guided model versus 14-day rolling adaptation on post-gap held-out dates. Adaptation reduces the density error substantially but does not eliminate the molar-ratio transfer limitation.}
+\label{fig:frozenadapted}
+\end{figure}
 
 Several boundaries of the present evidence are important. First, the signal processing and laboratory-window aggregation are retrospective and partly noncausal, as described in Section~2.3; the reported errors quantify temporal model transfer after retrospective preprocessing and are not direct estimates of closed-loop online performance. Second, the study concerns one industrial process and one extended observation period, so the numerical ranking of models should not be assumed to generalize to other plants or chemistries. Third, unmeasured process changes may contribute to the observed regime shift, and the externally observed 21 May boundary is used for evaluation rather than interpreted causally. Finally, the proprietary raw historian and laboratory records cannot be released, although the analysis code, validation workflow, and de-identified derived results are public. These limitations do not alter the within-study model comparison because all models are evaluated on identical chronological samples, but they define the scope of the conclusions.
 
