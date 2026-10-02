@@ -56,7 +56,7 @@ Evgeny S. Gornev\textsuperscript{b}\\[0.35em]
 \begin{center}
 \small
 \textsuperscript{a}Moscow Institute of Physics and Technology (National Research University), Dolgoprudny, Moscow Region, Russian Federation\\
-\textsuperscript{b}Molecular Electronics Research Institute, JSC (NIIME), Zelenograd, Moscow, Russian Federation\\
+\textsuperscript{b}Molecular Electronics Research Institute, JSC (MERI), Zelenograd, Moscow, Russian Federation\\
 \textsuperscript{c}UralAItech LLC, Russian Federation\\
 \textsuperscript{*}Corresponding author: \href{mailto:gkarnup@niime.ru}{gkarnup@niime.ru}
 \end{center}
@@ -436,16 +436,16 @@ Figure~\ref{fig:postgaprmse} summarizes the normalized held-out errors for the f
 \label{fig:postgaprmse}
 \end{figure}
 
-\begin{figure}[htbp]
-\centering
-\figplaceholder{figures/fig_extended_transfer_timeseries.pdf}{0.98\linewidth}
-\caption{Frozen pre-gap physics-guided model versus 14-day rolling adaptation on post-gap held-out dates. Adaptation reduces the density error substantially but does not eliminate the molar-ratio transfer limitation.}
-\label{fig:frozenadapted}
-\end{figure}
-
 \subsection{Implications for model selection and deployment}
 
 Across all validations, Ridge and gradient boosting provide the strongest predictive transfer under temporal shift, while the physics-guided model provides a more explicit process interpretation but larger long-horizon errors. The training-domain guard is important because it prevents uncontrolled polynomial or spline extrapolation without discarding difficult test observations; however, domain control alone does not ensure temporal transferability.
+
+\begin{figure}[!ht]
+\centering
+\figplaceholder{figures/fig_extended_transfer_timeseries.pdf}{0.90\linewidth}
+\caption{Frozen pre-gap physics-guided model versus 14-day rolling adaptation on post-gap held-out dates. Adaptation reduces the density error substantially but does not eliminate the molar-ratio transfer limitation.}
+\label{fig:frozenadapted}
+\end{figure}
 
 The results therefore support a lifecycle rather than a static view of industrial soft sensing. This is consistent with previous work emphasizing model maintenance, transfer, and continuous monitoring in industrial soft-sensor systems \citep{kadlec2009,kay2024,metcalfe2025}. A deployed model should be accompanied by process-state or distribution-shift monitoring and by periodic comparison against newly available laboratory measurements.
 
@@ -468,7 +468,7 @@ The study therefore shows that physically structured virtual telemetry can provi
 
 \section*{Funding}
 
-This work was carried out within the framework of a cooperation agreement between Molecular Electronics Research Institute, JSC (NIIME), and UralAItech LLC.
+This work was carried out within the framework of a cooperation agreement between Molecular Electronics Research Institute, JSC (MERI), and UralAItech LLC.
 
 \section*{Declaration of competing interest}
 
