@@ -64,7 +64,7 @@ Soft sensors for industrial chemical processes are often developed from high-fre
 soft sensor \sep hybrid modeling \sep temporal validation \sep process monitoring \sep regime shift \sep monoammonium phosphate
 \end{keyword}
 
-\end{frontmatter}\end{frontmatter}
+\end{frontmatter}
 
 \section*{Nomenclature}
 
@@ -106,7 +106,7 @@ Accordingly, the objective of this study is to evaluate \emph{temporal transfera
 \item a direct comparison showing when physical structure improves interpretability without improving predictive transfer, thereby separating numerical extrapolation control from genuine robustness to temporal process change.
 \end{enumerate}
 
-\section{Industrial process and data}\section{Industrial process and data}
+\section{Industrial process and data}
 
 \subsection{Process description}
 
@@ -255,7 +255,7 @@ For a training set, residuals in molar ratio and downstream density are standard
 \end{equation}
 with $w$ in mass \% and $\rho_A^{\mathrm{prior}}$ in g~cm$^{-3}$. Parameters are optimized by Nelder--Mead search with at most 3000 iterations and 12,000 function evaluations. These regularization terms constrain the fitted latent states but do not use test-period target values.
 
-\subsection{Time alignment and model selection}\subsection{Time alignment and model selection}
+\subsection{Time alignment and model selection}
 
 Candidate lags and aggregation windows are
 \begin{equation}
@@ -290,7 +290,7 @@ All baseline models use exactly the same temporally aligned rows and the same fo
 \item \textbf{Gradient boosting}: least-squares boosting (LSBoost) uses 100 regression trees, learning rate 0.05, minimum leaf size 10, and at most 20 splits per tree. These hyperparameters are fixed for all outer splits; separate ensembles are fitted for the two targets.
 \end{itemize}
 
-\subsection{Chronological validation design}\subsection{Chronological validation design}
+\subsection{Chronological validation design}
 
 Validation is entirely temporal. No random shuffling is used.
 
@@ -458,7 +458,7 @@ Chronological testing reveals a clear difference between numerical extrapolation
 
 The process-systems implication is that physical structure alone is insufficient evidence of robustness when empirical latent-state mappings remain regime dependent. For industrial soft sensing, training-domain control should be combined with leakage-aware chronological validation, process-state or distribution-shift monitoring, regime-aware recalibration, and explicit fallback behavior. The present results are retrospective; prospective deployment additionally requires causal signal processing and validation under live operating conditions.
 
-\section*{CRediT authorship contribution statement}\section*{CRediT authorship contribution statement}
+\section*{CRediT authorship contribution statement}
 
 \textbf{German A. Karnup:} Conceptualization, Methodology, Software, Investigation, Writing -- original draft. 
 \textbf{Andrey N. Sychev:} Data curation, Resources. 
