@@ -1,0 +1,4 @@
+Physics-guided soft sensing was evaluated on long-horizon industrial data.
+Ridge and LSBoost transferred better across temporal shifts.
+Independent future-period validation exposed weak physics-guided transfer.
+Deployment requires drift monitoring, recalibration, and fallback logic.
