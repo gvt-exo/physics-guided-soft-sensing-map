@@ -1,4 +1,4 @@
-Chronological validation exposes transfer limits of physics-guided soft sensing.
-Ridge and boosting transfer better across an industrial regime shift.
-Training-domain guards prevent unstable latent-property extrapolation.
-Rolling recalibration improves transfer but does not remove target-specific bias.
+- Chronological validation exposes transfer limits of physics-guided soft sensing.
+- Ridge and boosting transfer better across an industrial regime shift.
+- Training-domain guards prevent unstable latent-property extrapolation.
+- Rolling recalibration improves transfer but does not remove target-specific bias.
