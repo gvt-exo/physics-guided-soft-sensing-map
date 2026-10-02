@@ -101,7 +101,7 @@ The contributions are:
 \begin{enumerate}[leftmargin=1.8em]
 \item a real industrial multi-rate soft-sensing case with 260,642 one-minute records and 1,325 paired laboratory observations;
 \item a reproducible chronological evaluation using fixed 14-day training and 7-day test windows;
-\item comparison of physics-guided, Ridge, physics-only, and LSBoost models on identical temporal splits;
+\item comparison of physics-guided, Ridge, physics-only, and gradient-boosting models on identical temporal splits;
 \item explicit separation of process-validity failures from genuine model-transfer limitations;
 \item a strict external post-gap validation showing the effect of long-term temporal shift.
 \end{enumerate}
@@ -251,7 +251,7 @@ Candidate lags and aggregation windows are
 W\in\{10,20,30,60\}\ \mathrm{min}.
 \end{equation}
 
-For each validation scenario, lag, window, and physics-guided mapping type are selected using only the corresponding training data. The first 9 days of a training interval are used for inner fitting and the following 5 days for inner chronological validation. The selection score is
+For each validation scenario, lag, window, and physics-guided mapping type are selected using only the corresponding training data. The first 9 days of a training interval are used for inner fitting and the following 5 days for inner chronological validation. The selection score is based on root-mean-square error (RMSE):
 \begin{equation}
 J=
 \frac{\mathrm{RMSE}_R}{0.03}
@@ -293,7 +293,7 @@ Validation is entirely temporal. No random shuffling is used.
 
 \subsection{Evaluation metrics}
 
-For target $y_i$ and prediction $\hat y_i$,
+For target $y_i$ and prediction $\hat y_i$, the mean absolute error (MAE) is
 \begin{equation}
 \mathrm{MAE}=\frac{1}{n}\sum_{i=1}^{n}|y_i-\hat y_i|,
 \end{equation}
