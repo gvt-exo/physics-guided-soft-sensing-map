@@ -1,14 +1,15 @@
 function journal = load_journal_data(filename, sheetName)
 %LOAD_JOURNAL_DATA Reads lab journal and removes empty values.
-%   journal = LOAD_JOURNAL_DATA() reads ''журнал.xlsx'' from the current folder.
 %   journal = LOAD_JOURNAL_DATA(filename, sheetName) reads the specified file.
 
     if nargin < 1 || isempty(filename)
-        filename = 'журнал.xlsx';
+        error('load_journal_data:MissingFilename', [ ...
+            'A private laboratory-data workbook path is required. ' ...
+            'See docs/DATA_REQUIREMENTS.md for the anonymized input contract.']);
     end
 
     if nargin < 2 || isempty(sheetName)
-        sheetName = 'Лист1';
+        sheetName = 1;
     end
 
     opts = detectImportOptions(filename, 'Sheet', sheetName, ...
@@ -16,6 +17,13 @@ function journal = load_journal_data(filename, sheetName)
     opts.DataRange = 'A:C';
 
     T = readtable(filename, opts);
+
+    if width(T) < 3
+        error('load_journal_data:InvalidSchema', [ ...
+            'The laboratory workbook must contain timestamp, laboratory ' ...
+            'molar ratio, and laboratory density as its first three columns. ' ...
+            'See docs/DATA_REQUIREMENTS.md.']);
+    end
 
     rawDate = T{:, 1};
     Date_all = parse_date_column(rawDate);
@@ -81,7 +89,8 @@ function Date = parse_date_column(rawDate)
         return;
     end
 
-    error('Не удалось распознать формат столбца с датой.');
+    error('load_journal_data:InvalidTimestamp', ...
+        'The laboratory timestamp column could not be parsed.');
 end
 
 function Date = parse_date_strings(textValues)

@@ -44,15 +44,20 @@ desktop.ini
 .env
 .env.*
 !.env.example
+private/
+local/
+config/local*
+config/*.private.*
 
-# Local raw/intermediate data
-data/raw/*
-!data/raw/.gitkeep
-data/interim/*
-!data/interim/.gitkeep
-
-# Confidential industrial validation inputs are never published.
-data/publication/
+# Confidential industrial inputs and local derived datasets are never published.
+data/
+*.xlsx
+*.xls
+*.xlsm
+*.xlsb
+*.ods
+*.parquet
+*.feather
 
 # Local ingestion utilities retain private workbook schema details.
 scripts/publication/prepare_extended_dataset.py
@@ -61,10 +66,6 @@ scripts/publication/node_modules/
 
 # Generated results
 results/*
-!results/figures/
-!results/tables/
-!results/figures/.gitkeep
-!results/tables/.gitkeep
 !results/publication/
 !results/publication/**
 !results/publication_extended/

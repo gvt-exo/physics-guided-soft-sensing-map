@@ -1,10 +1,11 @@
 function exportData = load_export_data(filename, sheetName)
 %LOAD_EXPORT_DATA Reads process export file and maps columns into fields.
-%   exportData = LOAD_EXPORT_DATA() reads ''выгрузка.xlsx'' from the current folder.
 %   exportData = LOAD_EXPORT_DATA(filename, sheetName) reads the specified file.
 
     if nargin < 1 || isempty(filename)
-        filename = 'выгрузка.xlsx';
+        error('load_export_data:MissingFilename', [ ...
+            'A private process-data workbook path is required. ' ...
+            'See docs/DATA_REQUIREMENTS.md for the anonymized input contract.']);
     end
 
     if nargin < 2 || isempty(sheetName)
@@ -14,6 +15,13 @@ function exportData = load_export_data(filename, sheetName)
     opts = detectImportOptions(filename, 'Sheet', sheetName, ...
         'VariableNamingRule', 'preserve');
     T = readtable(filename, opts);
+
+    if width(T) < 6
+        error('load_export_data:InvalidSchema', [ ...
+            'The process workbook must contain at least six columns: ' ...
+            'timestamp, water flow, conductivity, ammonia flow fallback, ' ...
+            'acid flow, and ammonia flow primary. See docs/DATA_REQUIREMENTS.md.']);
+    end
 
     rawDate = T{:, 1};
     Date = parse_date_column(rawDate);
@@ -149,7 +157,8 @@ function Date = parse_date_column(rawDate)
         return;
     end
 
-    error('Не удалось распознать формат столбца с датой.');
+    error('load_export_data:InvalidTimestamp', ...
+        'The process timestamp column could not be parsed.');
 end
 
 function Date = parse_date_strings(textValues)

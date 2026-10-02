@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software or its derived validation outputs, please cite the accompanying manuscript."
+type: software
+title: "Physics-Guided Soft Sensing under Sparse Laboratory Measurements and Temporal Regime Shifts in Industrial Monoammonium Phosphate Production"
+authors:
+  - family-names: Karnup
+    given-names: German A.
+  - family-names: Sychev
+    given-names: Andrey N.
+  - family-names: Telminov
+    given-names: Oleg A.
+  - family-names: Gornev
+    given-names: Evgeny S.
+repository-code: "https://github.com/gvt-exo/physics-guided-soft-sensing-map"

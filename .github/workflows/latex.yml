@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Audit public release and derived outputs
+        run: python tests/test_public_release.py
       - name: Compile paper/main.tex
         uses: xu-cheng/latex-action@v4
         with:

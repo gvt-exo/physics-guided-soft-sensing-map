@@ -11,7 +11,9 @@ function outputs = publication_validation_pipeline(repoRoot, mode)
 
     dataDir = fullfile(repoRoot, 'data', 'publication');
     resultsDir = fullfile(repoRoot, 'results', 'publication');
-    figureDir = fullfile(repoRoot, 'paper', 'figures');
+    % The March--June diagnostic figures are not part of the current
+    % manuscript; keep regenerated copies with their numeric results.
+    figureDir = fullfile(resultsDir, 'figures');
     ensure_dir(resultsDir);
     ensure_dir(figureDir);
 
@@ -22,8 +24,8 @@ function outputs = publication_validation_pipeline(repoRoot, mode)
 
     processFile = fullfile(dataDir, 'process_2026-03-01_2026-06-06.xlsx');
     labFile = fullfile(dataDir, 'laboratory_2026-03-01_2026-06-06.xlsx');
-    assert(isfile(processFile), 'Missing canonical process workbook: %s', processFile);
-    assert(isfile(labFile), 'Missing canonical laboratory workbook: %s', labFile);
+    require_private_input(processFile, 'process', repoRoot);
+    require_private_input(labFile, 'laboratory', repoRoot);
 
     cfg = config_soft_sensor();
     cfg.publication.random_seed = 20260928;
@@ -208,8 +210,8 @@ function outputs = extended_validation_workflow(repoRoot)
 
     processFile = fullfile(dataDir, 'process_2026-03-01_2026-09-29.xlsx');
     labFile = fullfile(dataDir, 'laboratory_2026-03-01_2026-10-01.xlsx');
-    assert(isfile(processFile), 'Missing extended process workbook: %s', processFile);
-    assert(isfile(labFile), 'Missing extended laboratory workbook: %s', labFile);
+    require_private_input(processFile, 'extended process', repoRoot);
+    require_private_input(labFile, 'extended laboratory', repoRoot);
 
     cfg = config_soft_sensor();
     cfg.publication.random_seed = 20261001;
@@ -621,7 +623,7 @@ function make_extended_timeline_figure(process, lab, cfg, figureDir)
     xlabel(ax2, 'Date in 2026'); grid(ax2, 'on');
     title(tl, 'Extended process and laboratory coverage across the maintenance outage', ...
         'Color', colors.dark, 'FontWeight', 'bold');
-    export_figure_pair(fig, fullfile(figureDir, 'fig_extended_validation_timeline'));
+    export_figure_pdf(fig, fullfile(figureDir, 'fig_extended_validation_timeline'));
 end
 
 function make_extended_transfer_figure(predictions, figureDir)
@@ -659,7 +661,7 @@ function make_extended_transfer_figure(predictions, figureDir)
     ylabel(ax4, 'Density residual'); xlabel(ax4, 'Post-maintenance held-out date'); grid(ax4, 'on');
     title(tl, 'Frozen pre-maintenance model versus 14-day rolling adaptation', ...
         'Color', colors.dark, 'FontWeight', 'bold');
-    export_figure_pair(fig, fullfile(figureDir, 'fig_extended_transfer_timeseries'));
+    export_figure_pdf(fig, fullfile(figureDir, 'fig_extended_transfer_timeseries'));
 end
 
 function make_extended_comparison_figure(summary, figureDir)
@@ -692,7 +694,7 @@ function make_extended_comparison_figure(summary, figureDir)
     title(ax2, 'Density');
     title(tl, 'Post-maintenance held-out performance on identical rolling test samples', ...
         'Color', colors.dark, 'FontWeight', 'bold');
-    export_figure_pair(fig, fullfile(figureDir, 'fig_extended_adaptation_comparison'));
+    export_figure_pdf(fig, fullfile(figureDir, 'fig_extended_adaptation_comparison'));
 end
 
 function write_extended_validation_markdown(filename, splits, selected, models, ...
@@ -1369,7 +1371,7 @@ function make_data_regimes_figure(process, rawConductivity, cfg, figureDir)
         'Color', 'black');
     subtitle(tl, 'Red markers denote 10-minute bins containing at least one invalid minute', ...
         'Color', 'black');
-    export_figure_pair(fig, fullfile(figureDir, 'fig_data_regimes'));
+    export_figure_pdf(fig, fullfile(figureDir, 'fig_data_regimes'));
 end
 
 function make_sparse_sampling_figure(process, lab, cfg, figureDir)
@@ -1409,7 +1411,7 @@ function make_sparse_sampling_figure(process, lab, cfg, figureDir)
     title(tl, 'Sparse laboratory references on the process timeline', 'Color', 'black');
     subtitle(tl, sprintf('%d paired laboratory observations over %d minute records', ...
         numel(lab.Date), height(process)), 'Color', 'black');
-    export_figure_pair(fig, fullfile(figureDir, 'fig_sparse_sampling'));
+    export_figure_pdf(fig, fullfile(figureDir, 'fig_sparse_sampling'));
 end
 
 function make_holdout_timeseries_figure(predictions, figureDir)
@@ -1451,7 +1453,7 @@ function make_holdout_timeseries_figure(predictions, figureDir)
 
     title(tl, 'A-to-B transfer holdout: physics-guided prediction and residuals', ...
         'Color', 'black');
-    export_figure_pair(fig, fullfile(figureDir, 'fig_holdout_timeseries'));
+    export_figure_pdf(fig, fullfile(figureDir, 'fig_holdout_timeseries'));
 end
 
 function make_predicted_measured_figure(predictions, figureDir)
@@ -1480,7 +1482,7 @@ function make_predicted_measured_figure(predictions, figureDir)
         grid(axRho, 'on'); axis(axRho, 'square');
     end
     title(tl, 'Held-out measured versus predicted values', 'Color', 'black');
-    export_figure_pair(fig, fullfile(figureDir, 'fig_predicted_vs_measured'));
+    export_figure_pdf(fig, fullfile(figureDir, 'fig_predicted_vs_measured'));
 end
 
 function add_identity_line(ax)
@@ -1518,7 +1520,7 @@ function make_baseline_comparison_figure(summary, figureDir)
     legend(ax2, {'Regime A rolling tests', 'A to B transfer'}, ...
         'Location', 'northoutside', 'Orientation', 'horizontal', 'Box', 'off');
     title(tl, 'Held-out baseline comparison', 'Color', 'black');
-    export_figure_pair(fig, fullfile(figureDir, 'fig_baseline_comparison'));
+    export_figure_pdf(fig, fullfile(figureDir, 'fig_baseline_comparison'));
 end
 
 function [dateAgg, rawD, validD, acid, ammonia, water, invalidShare] = ...
@@ -1564,13 +1566,25 @@ function fig = publication_figure(sizeInches)
         'DefaultTextColor', 'black');
 end
 
-function export_figure_pair(fig, stem)
+function export_figure_pdf(fig, stem)
     style_publication_figure(fig);
     exportgraphics(fig, [stem '.pdf'], 'ContentType', 'vector', ...
         'BackgroundColor', 'white');
-    exportgraphics(fig, [stem '.png'], 'Resolution', 300, ...
-        'BackgroundColor', 'white');
     close(fig);
+end
+
+function require_private_input(filename, label, repoRoot)
+    if isfile(filename)
+        return;
+    end
+
+    relativePath = erase(filename, [repoRoot filesep]);
+    contractPath = fullfile(repoRoot, 'docs', 'DATA_REQUIREMENTS.md');
+    error('publication_validation_pipeline:MissingPrivateData', [ ...
+        'Required private %s workbook is not available:\n  %s\n' ...
+        'Raw industrial data are confidential and are not distributed with ' ...
+        'this repository. Supply the file locally according to:\n  %s'], ...
+        label, relativePath, contractPath);
 end
 
 function style_publication_figure(fig)
