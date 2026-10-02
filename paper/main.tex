@@ -43,21 +43,21 @@
 \ead{gkarnup@niime.ru}
 \ead[url]{https://orcid.org/0000-0001-6517-4712}
 
+\author[ural]{Andrey N. Sychev}
+
 \author[meri]{Oleg A. Telminov}
 \ead[url]{https://orcid.org/0000-0002-2358-3689}
-
-\author[ural]{Andrey N. Sychev}
 
 \author[meri]{Evgeny S. Gornev}
 
 \cortext[cor1]{Corresponding author}
 
-\address[mipt]{Moscow Institute of Physics and Technology (National Research University), Dolgoprudny, Moscow Region, Russian Federation}
-\address[meri]{Molecular Electronics Research Institute, JSC (MERI), Zelenograd, Moscow, Russian Federation}
-\address[ural]{UralAItech LLC, Russian Federation}
+\address[mipt]{Moscow Institute of Physics and Technology (National Research University), 9 Institutskiy Pereulok, Dolgoprudny, Moscow Region 141701, Russian Federation}
+\address[meri]{Molecular Electronics Research Institute, JSC (MERI), 12, Bldg. 1, Akademika Valieva Street, Zelenograd, Moscow 124460, Russian Federation}
+\address[ural]{UralAiTech LLC, 6, Bldg. 2, Presnenskaya Embankment, Presnensky Municipal District, Moscow 123112, Russian Federation}
 
 \begin{abstract}
-Industrial plants collect high-frequency telemetry while critical quality variables may be measured only every few hours. We study soft sensing for an industrial monoammonium phosphate process using 260,642 one-minute records and 1,325 paired laboratory observations. The grey-box model reconstructs latent acid properties from conductivity and combines them with material-balance calculations to estimate molar ratio and downstream density. Validation is entirely chronological: nine pre-gap rolling tests, a short-term regime-transfer test, a strict external post-gap test on 438 future laboratory pairs, and ten post-gap rolling comparisons. To prevent uncontrolled extrapolation, the conductivity input to the fitted latent-property mappings is limited to the range observed in the corresponding training data. Ridge and LSBoost remain more accurate than the physics-guided model, particularly in the independent long-horizon evaluation. The results show that physical structure improves interpretability but does not by itself ensure temporal robustness, motivating regime-aware monitoring, recalibration, and fallback logic for industrial virtual telemetry.
+Industrial plants collect high-frequency telemetry while critical quality variables may be measured only every few hours. We study soft sensing for an industrial monoammonium phosphate process using 260,642 one-minute records and 1,325 paired laboratory observations. The grey-box model reconstructs latent acid properties from conductivity and combines them with material-balance calculations to estimate molar ratio and downstream density. Validation is entirely chronological: nine pre-gap rolling tests, a short-term regime-transfer test, a strict external post-gap test on 438 future laboratory pairs, and ten post-gap rolling comparisons. To prevent uncontrolled extrapolation, the conductivity input to the fitted latent-property mappings is limited to the range observed in the corresponding training data. Ridge regression and gradient boosting remain more accurate than the physics-guided model, particularly in the independent long-horizon evaluation. The results show that physical structure improves interpretability but does not by itself ensure temporal robustness, motivating regime-aware monitoring, recalibration, and fallback logic for industrial virtual telemetry.
 \end{abstract}
 
 \begin{keyword}
@@ -91,7 +91,7 @@ Chemical-process plants routinely collect high-frequency online measurements whi
 
 Industrial deployment is substantially harder than benchmark soft-sensor development. Real plant data contain missing values, sensor faults, short transients, asynchronous sampling, changing operating conditions, and uncertain reference measurements. Data preparation, temporal alignment, and model-update strategy can therefore be as important as model class selection \citep{kadlec2009,offermans2024,dai2025}.
 
-Hybrid and physics-guided models are often proposed as a way to improve interpretability and extrapolation by embedding empirical relationships inside process knowledge rather than learning an unconstrained input-output map \citep{sansana2021,bradley2022,schweidtmann2024,mousa2025}. Industrial soft sensors are also increasingly treated as a digitalization layer that converts existing sensing infrastructure into higher-level virtual measurements for monitoring and decision support \citep{hamid2022,pietrasik2024,boskabadi2025}.
+Hybrid and physics-guided models are often proposed as a way to improve interpretability and extrapolation by embedding empirical relationships inside process knowledge rather than learning an unconstrained input-output map \citep{sansana2021,bradley2022,schweidtmann2024,mousa2025}. Industrial soft sensors are also increasingly treated as a digitalization layer that converts existing sensing infrastructure into higher-level virtual measurements for monitoring and decision support \citep{hamid2022,pietrasik2024,boskabadi2025}. Recent work in \emph{Digital Chemical Engineering} has also demonstrated explainable product-quality prediction using modern data-driven architectures in industrial settings \citep{fricz2026}.
 
 Fertilizer production provides a relevant test case because composition and neutralization variables strongly affect product quality while several feed and intermediate-state properties are not continuously available. Hybrid soft sensing has previously been demonstrated for nutrient-content estimation in compound-fertilizer production \citep{fu2007}. The novelty claimed here is therefore not the generic application of a soft sensor to fertilizer production. Instead, this study examines an industrial monoammonium phosphate (MAP) process with four characteristics that are important for real deployment: one-minute telemetry versus laboratory measurements every few hours, latent feed properties, substantial data-quality problems, and a pronounced operating-regime shift during the observation interval.
 
@@ -162,7 +162,7 @@ The preprocessing workflow is:
 
 Process-specific validity rules were applied to the telemetry channels to remove invalid measurements, short abnormal excursions, and observations outside the production domain before smoothing, model fitting, and laboratory-window aggregation. The same preprocessing rules were applied consistently across the analyzed periods and did not use laboratory target values. Because the one-month data gap exceeds the continuity limit, temporal filters reset at gaps longer than 5 minutes; the gap-aware processing therefore produces two independent telemetry segments.
 
-For retrospective validation, the evaluated preprocessing pipeline retains centered filtering and signal-reconstruction operations, including robust windows, Savitzky--Golay smoothing, and PCHIP repair. These operations can use nearby future process values. Laboratory alignment also uses a centered averaging window around $t_{\mathrm{lab}}-\tau$; when $\tau<W/2$, the window can extend beyond the nominal laboratory timestamp. No outer-test laboratory targets are used in fitting or hyperparameter selection, but a prospective online implementation should replace these process-data operations with causal alternatives.
+For retrospective validation, the evaluated preprocessing pipeline retains centered filtering and signal-reconstruction operations, including robust windows, Savitzky--Golay smoothing, and piecewise cubic Hermite interpolating polynomial (PCHIP) repair. These operations can use nearby future process values. Laboratory alignment also uses a centered averaging window around $t_{\mathrm{lab}}-\tau$; when $\tau<W/2$, the window can extend beyond the nominal laboratory timestamp. No outer-test laboratory targets are used in fitting or hyperparameter selection, but a prospective online implementation should replace these process-data operations with causal alternatives.
 
 \subsection{Operating regimes and data gap}
 
@@ -274,7 +274,7 @@ All baselines use the same temporally aligned rows as the physics-guided model.
 \begin{itemize}[leftmargin=1.5em]
 \item \textbf{Ridge}: standardized multivariate Ridge regression using conductivity, acid flow, ammonia flow, and water flow; regularization selected on chronological inner validation.
 \item \textbf{Physics-only}: acid flow, ammonia flow, and water flow with $P_2O_5$ fixed at 52 wt\% and an unfitted acid-density prior.
-\item \textbf{Gradient boosting}: LSBoost with 100 cycles, learning rate 0.05, minimum leaf size 10, and maximum 20 splits.
+\item \textbf{Gradient boosting}: least-squares boosting (LSBoost) with 100 cycles, learning rate 0.05, minimum leaf size 10, and maximum 20 splits.
 \end{itemize}
 
 The physics-only model is a reference calculation, not a separately calibrated mechanistic model.
@@ -306,7 +306,7 @@ For target $y_i$ and prediction $\hat y_i$,
 \frac{1}{n}\sum_{i=1}^{n}(\hat y_i-y_i).
 \end{equation}
 
-We also report P95 absolute error and the fractions within
+We also report the 95th percentile (P95) of the absolute error and the fractions within
 \begin{equation}
 |R-\widehat R|\le0.03,
 \qquad
@@ -459,7 +459,7 @@ The study therefore shows that physically structured virtual telemetry can provi
 
 \section*{Funding}
 
-This work was carried out within the framework of a cooperation agreement between Molecular Electronics Research Institute, JSC (MERI), and UralAItech LLC.
+This work was carried out within the framework of a cooperation agreement between Molecular Electronics Research Institute, JSC (MERI), and UralAiTech LLC. The supporting organizations had no role beyond providing organizational and financial support; all decisions regarding study design, data collection and curation, data analysis and interpretation, manuscript preparation, and submission for publication were made by the authors.
 
 \section*{Declaration of competing interest}
 
@@ -469,9 +469,9 @@ The authors declare that they have no known competing financial interests or per
 
 Raw industrial historian and laboratory data are not publicly available because of confidentiality restrictions. The analysis code, validation workflow, and de-identified derived results used to support the study are publicly available at \url{https://github.com/gvt-exo/physics-guided-soft-sensing-map}. The repository does not contain the proprietary raw process or laboratory data required to reproduce the numerical results from source measurements.
 
-\section*{Declaration of generative AI and AI-assisted technologies in the writing process}
+\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
 
-Generative AI tools were used for language editing and structural assistance during manuscript preparation. The authors reviewed and edited the resulting text and take responsibility for the scientific content, calculations, citations, interpretations, and conclusions.
+During the preparation of this work, the authors used ChatGPT (OpenAI) for language editing and structural assistance. After using this tool, the authors reviewed and edited the content as needed and take full responsibility for the content of the published article.
 
 \bibliographystyle{elsarticle-harv}
 \bibliography{references}
