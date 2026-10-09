@@ -1,4 +1,4 @@
-- Chronological validation exposes transfer limits of physics-guided soft sensing.
-- Ridge and boosting transfer better across an industrial regime shift.
-- Training-domain guards prevent unstable latent-property extrapolation.
-- Rolling recalibration improves transfer but does not remove target-specific bias.
+- Retrospective tests reveal weak physics-guided transfer across process changes.
+- Ridge and boosting outperform a frozen physics-guided soft sensor.
+- A training-range guard avoids extrapolation but does not prevent drift.
+- Rolling recalibration improves density estimates but not molar-ratio ranking.
