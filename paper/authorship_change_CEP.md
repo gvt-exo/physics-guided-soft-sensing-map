@@ -3,7 +3,7 @@
 **Original journal:** Computers & Chemical Engineering
 **Original manuscript reference:** CACE-D-26-01792
 **Receiving journal:** Control Engineering Practice
-**Manuscript title:** Physics-Guided Soft Sensing under Sparse Laboratory Measurements and Temporal Regime Shifts in Industrial Monoammonium Phosphate Production
+**Manuscript title:** Temporal Transferability of Industrial Soft Sensors under Sparse Laboratory Measurements and Changing Operating Conditions in Monoammonium Phosphate Production
 
 ## Proposed change
 
