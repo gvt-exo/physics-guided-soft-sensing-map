@@ -101,7 +101,7 @@ Reliable measurement of process quality variables is essential for monitoring, s
 
 In industrial practice, changes in operating conditions, process instrumentation, or the relationship between measured and unmeasured states can invalidate a soft-sensor calibration. Missing historian data, asynchronous laboratory sampling, sensor noise, and gaps in the recorded time series complicate both model development and assessment \citep{kadlec2009,offermans2024,dai2025}. The control-engineering literature has addressed these challenges through adaptive and transfer-learning soft sensors. For example, moving-window supervised latent-factor analysis has been proposed for state-shifting processes \citep{yao2017}, an online transfer-kernel algorithm has been studied for variable working conditions \citep{zhang2023cep}, and automated soft-sensor design has been demonstrated for industrial applications \citep{cao2025cep}. These studies motivate practical model updating but also underline the importance of testing whether a fixed model remains reliable when operating conditions change.
 
-Physics-guided and hybrid soft sensors offer an alternative to unconstrained statistical regression by incorporating known process relationships, such as material balances, into an empirical estimator \citep{sansana2021,bradley2022,schweidtmann2024,mousa2025}. Such structure can make predictions easier to interpret; however, it does not guarantee reliable transfer if the empirical relationships used to estimate latent process properties are no longer valid. This is a particularly important distinction in applications where measurements of those latent properties are unavailable during routine operation.
+Physics-guided and hybrid soft sensors offer an alternative to unconstrained statistical regression by incorporating known process relationships, such as material balances, into an empirical estimator \citep{sansana2021,bradley2022,schweidtmann2024,mousa2025}. Such structure can make predictions easier to interpret; however, it does not guarantee reliable transfer if the empirical relationships used to estimate latent process properties are no longer valid. Related physics-informed modeling approaches emphasize the value of process knowledge when measurements are limited \citep{velioglu2025}. This is a particularly important distinction in applications where measurements of those latent properties are unavailable during routine operation.
 
 The industrial case considered here is monoammonium phosphate (MAP) production. Product-related molar ratio and downstream solution density are available from sparse laboratory or operator records, while process telemetry is sampled approximately once per minute. A conductivity signal acts as a proxy for unmeasured phosphoric-acid properties. Fertilizer-production soft sensing has been investigated previously \citep{fu2007}; the present work is not intended to claim a new general soft-sensor architecture or a new control algorithm. Instead, it provides an industrial validation study of what happens when a physically structured estimator is transferred across a change in process conditions, including a long gap in available data.
 
@@ -170,7 +170,7 @@ The preprocessing workflow is:
 
 Process-specific validity rules were applied to the telemetry channels to remove invalid measurements, short abnormal excursions, and observations outside the production domain before smoothing, model fitting, and laboratory-window aggregation. The same preprocessing rules were applied consistently across the analyzed periods and did not use laboratory target values. Because the one-month data gap exceeds the continuity limit, temporal filters reset at gaps longer than 5 minutes; the gap-aware processing therefore produces two independent telemetry segments.
 
-The present analysis is retrospective. The evaluated signal-processing pipeline includes centered robust filtering, Savitzky--Golay smoothing, and piecewise cubic Hermite interpolating polynomial (PCHIP) reconstruction; these operations can use neighboring process values on both sides of a timestamp. Laboratory alignment likewise uses a centered process window around $t_{\mathrm{lab}}-\tau$, so when $\tau<W/2$ part of that window can occur after the nominal laboratory timestamp. No outer-test laboratory targets are used in preprocessing, fitting, or hyperparameter selection. Nevertheless, because the process-signal preprocessing is noncausal, the reported errors should be interpreted as retrospective model-transfer performance rather than end-to-end prospective online performance. A real-time implementation would require causal filtering and one-sided aggregation, followed by separate prospective validation.
+The present evaluation is retrospective. The evaluated signal-processing pipeline includes centered robust filtering, Savitzky--Golay smoothing, and piecewise cubic Hermite interpolating polynomial (PCHIP) reconstruction; these operations can use neighboring process values on both sides of a timestamp. Laboratory alignment likewise uses a centered process window around $t_{\mathrm{lab}}-\tau$, so when $\tau<W/2$ part of that window can occur after the nominal laboratory timestamp. No outer-test laboratory targets are used in preprocessing, fitting, or hyperparameter selection. Nevertheless, because the process-signal preprocessing is noncausal, the reported errors should be interpreted as retrospective model-transfer performance rather than end-to-end prospective online performance. A real-time implementation would require causal filtering and one-sided aggregation, followed by separate prospective validation.
 
 \subsection{Operating regimes and data gap}
 
@@ -340,7 +340,7 @@ Molar-ratio predictions from the physics-guided implementation are rounded to tw
 
 \section{Results}
 
-\subsection{Within-regime-A rolling validation}
+\subsection{Rolling validation within Regime A}
 
 Nine non-overlapping 7-day test intervals produced 500 held-out laboratory observations in total. Training-set size varied from 96 to 138 observations.
 
@@ -386,7 +386,7 @@ Gradient boosting & 0.0174 & 0.0136 & +0.0039 & 0.911 & 0.0134 & 0.0110 & -0.004
 
 With training-domain input saturation, the physics-guided model remains numerically stable across the short-term regime boundary, although Ridge and gradient boosting retain lower held-out errors on both outputs. The larger performance separation emerges in the independent long-horizon post-gap evaluation.
 
-\subsection{No complete within-regime-B test}
+\subsection{Insufficient Regime-B coverage for a complete rolling test}
 
 The first paired laboratory record in Regime B occurs after the 21 May boundary and the final paired record is on 5 June. Consequently, there is no complete 14-day training plus 7-day held-out interval entirely within Regime B. The study reports this absence directly rather than shortening the test horizon or introducing a different protocol after observing the data.
 
@@ -489,6 +489,8 @@ For industrial monitoring, physical interpretability and predictive reliability 
 
 This work was supported by Molecular Electronics Research Institute, JSC (MERI), and UralAiTech LLC under a cooperation agreement. The supporting organizations had no role beyond providing organizational and financial support; all decisions regarding study design, data collection and curation, data analysis and interpretation, manuscript preparation, and submission for publication were made by the authors.
 
+% SUBMISSION CHECK: Verify Arkady V. Boyko's conflict-of-interest disclosure and
+% update this section and the separate Elsevier declaration form as necessary.
 \section*{Declaration of competing interest}
 
 German A. Karnup, Oleg A. Telminov, and Evgeny S. Gornev report financial support from JSC Molecular Electronics Research Institute related to this work. Andrey N. Sychev declares that he has no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
