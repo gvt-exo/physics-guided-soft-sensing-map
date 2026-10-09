@@ -127,7 +127,7 @@ The reference values were obtained from sparse laboratory/operator measurements 
 
 \subsection{Data sources}
 
-The full study covers 1 March--29 September 2026 and preserves the one-month data gap from 6 June to 7 July.
+The full study covers 1 March--29 September 2026 and preserves the one-month data gap from 6 June to 7 July. Table~\ref{tab:data} summarizes the process inputs and laboratory references.
 
 \begin{table}[!ht]
 \centering
@@ -342,7 +342,7 @@ Molar-ratio predictions from the physics-guided implementation are rounded to tw
 
 \subsection{Rolling validation within Regime A}
 
-Nine non-overlapping 7-day test intervals produced 500 held-out laboratory observations in total. Training-set size varied from 96 to 138 observations.
+Nine non-overlapping 7-day test intervals produced 500 held-out laboratory observations in total. Training-set size varied from 96 to 138 observations. Table~\ref{tab:pooledA} reports pooled errors and engineering-tolerance attainment.
 
 \begin{table}[htbp]
 \centering
@@ -365,7 +365,7 @@ Across Regime~A, the physics-guided model provides bounded and interpretable est
 
 \subsection{A-to-B regime transfer}
 
-The transfer experiment trains on the final 14 days of Regime~A and tests on the first 7 days of Regime~B, with 84 training and 56 test laboratory observations.
+The transfer experiment trains on the final 14 days of Regime~A and tests on the first 7 days of Regime~B, with 84 training and 56 test laboratory observations. Table~\ref{tab:transfer} compares the held-out errors across the four models.
 
 \begin{table}[htbp]
 \centering
@@ -392,7 +392,7 @@ The first paired laboratory record in Regime B occurs after the 21 May boundary 
 
 \subsection{Independent external post-gap validation}
 
-The most stringent evaluation uses all eligible pre-gap observations for training and tests the frozen models on the future post-gap period from 7 July to 29 September 2026. This future-period transfer experiment contains 761 aligned training pairs and 438 aligned post-gap test pairs.
+The most stringent evaluation uses all eligible pre-gap observations for training and tests the frozen models on the future post-gap period from 7 July to 29 September 2026. This future-period transfer experiment contains 761 aligned training pairs and 438 aligned post-gap test pairs. Table~\ref{tab:externaltransfer} summarizes the frozen-model results.
 
 \begin{table}[htbp]
 \centering
@@ -417,7 +417,7 @@ The persistence of this performance gap over the full July--September period sho
 
 \subsection{Post-gap frozen versus adapted comparison}
 
-All ten post-gap rolling windows (P01--P10) satisfy the pre-specified sample-size criterion. Frozen and adapted models are evaluated on identical held-out laboratory rows within each window, yielding a pooled total of 357 non-overlapping test pairs.
+All ten post-gap rolling windows (P01--P10) satisfy the pre-specified sample-size criterion. Frozen and adapted models are evaluated on identical held-out laboratory rows within each window, yielding a pooled total of 357 non-overlapping test pairs. The paired comparison is given in Table~\ref{tab:postgapcomparison}.
 
 \begin{table}[htbp]
 \centering
