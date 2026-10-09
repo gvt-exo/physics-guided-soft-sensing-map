@@ -16,10 +16,11 @@
 
 ## Mandatory author and ethics checks before transfer submission
 
-- [ ] Submit and obtain editorial approval for the post-submission authorship change; use the official Elsevier form and written consent of all five authors. See `paper/authorship_change_CEP.md`.
+- [ ] Submit and obtain editorial approval for the post-submission authorship change; the four existing authors agreed to add Boyko, but keep written documentation and obtain Boyko's own confirmation for the official Elsevier form. See `paper/authorship_change_CEP.md`.
 - [ ] Confirm Arkady V. Boyko's preferred English spelling and whether `Data curation` / `Resources` accurately represent his substantive contribution.
 - [ ] Confirm the new author has read/approved the full manuscript, agrees to be accountable for the work, and meets authorship criteria.
-- [ ] Confirm Arkady V. Boyko's employment or financial support and other relevant competing interests; update both the manuscript statement and the declaration Word file. **The existing statement lists previously confirmed disclosures only.**
+- [x] MERI salary support for Arkady V. Boyko confirmed by the corresponding author and disclosed in `main.tex`.
+- [ ] Collect Boyko's full interests declaration and regenerate the separate Elsevier Word disclosure file with all four MERI-salaried authors. Other interests cannot be assumed absent.
 - [ ] Ensure the new author is also entered in Editorial Manager, in the same order.
 - [ ] Confirm the official name and address of the JSC MERI affiliation.
 - [ ] Ensure all authors approve the updated manuscript and cover letter.
