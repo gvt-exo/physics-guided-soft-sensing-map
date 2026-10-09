@@ -14,7 +14,7 @@
 \usepackage{xcolor}
 \usepackage{enumitem}
 
-\journal{Computers \& Chemical Engineering}
+\journal{Control Engineering Practice}
 
 \hypersetup{
   colorlinks=true,
@@ -51,6 +51,8 @@
 
 \author[meri]{Evgeny S. Gornev}
 
+\author[meri]{Arkady V. Boyko}
+
 \cortext[cor1]{Corresponding author}
 
 \address[mipt]{Moscow Institute of Physics and Technology (National Research University), 9 Institutskiy Pereulok, Dolgoprudny, Moscow Region 141701, Russian Federation}
@@ -58,11 +60,11 @@
 \address[ural]{UralAiTech LLC, 6, Bldg. 2, Presnenskaya Embankment, Presnensky Municipal District, Moscow 123112, Russian Federation}
 
 \begin{abstract}
-Soft sensors for industrial chemical processes are often developed from high-frequency process measurements and sparse laboratory labels, yet their performance is commonly assessed over periods in which the input--output relationship is approximately stationary. This study evaluates temporal robustness under realistic regime change using 260,642 one-minute records and 1,325 paired laboratory observations from industrial monoammonium phosphate production. A physics-guided gray-box model reconstructs latent phosphoric-acid properties from conductivity and propagates them through a material balance to estimate the ammonia-to-phosphoric-acid molar ratio and downstream solution density. Target-label splitting, model fitting, and model selection follow chronological boundaries. Evaluation includes nine within-regime rolling tests, a short-term regime-transfer test, an independent post-gap test on 438 future laboratory pairs, and ten post-gap rolling comparisons. A training-domain guard prevents the empirical latent-property mappings from extrapolating beyond the conductivity range observed during fitting. In the independent future-period test, Ridge regression achieved an RMSE of 0.0286 for molar ratio and 0.0141~g~cm$^{-3}$ for density, compared with 0.1795 and 0.0456~g~cm$^{-3}$, respectively, for the frozen physics-guided model. Gradient boosting achieved the lowest density RMSE, 0.0128~g~cm$^{-3}$. The results show that physical structure improves interpretability and constrains extrapolation but does not guarantee transferability under temporal process change. Reliable deployment therefore requires chronological validation, drift monitoring, recalibration, and explicit fallback behavior.
+Reliable soft sensing is needed when industrial quality measurements are sparse and operating conditions change after model calibration. This study evaluates the retrospective transfer performance of a physics-guided soft sensor for molar ratio and downstream solution density in industrial monoammonium phosphate production. The analysis uses 260,642 one-minute process records and 1,325 paired laboratory measurements. A gray-box model reconstructs latent phosphoric-acid properties from a preprocessed conductivity signal and propagates them through a material balance. It is compared with ridge regression, gradient boosting, and a physics-only reference using chronological validation: nine within-regime rolling tests, a regime-boundary test, an independent post-gap evaluation on 438 future laboratory pairs, and ten post-gap rolling comparisons. Conductivity inputs to the fitted latent-property mapping are constrained to the corresponding training range to prevent uncontrolled extrapolation. In the independent future-period test, ridge regression achieved root-mean-square errors of 0.0286 for molar ratio and 0.0141~g~cm$^{-3}$ for density, compared with 0.1795 and 0.0456~g~cm$^{-3}$ for the frozen physics-guided model. Gradient boosting achieved a density error of 0.0128~g~cm$^{-3}$. Rolling recalibration improved the physics-guided estimates but did not restore competitive molar-ratio accuracy. The results show why training-domain checks, target-specific performance monitoring, recalibration, and fallback rules are needed before relying on soft-sensor estimates in plant operations. Because some signal-processing steps are noncausal, the reported performance is retrospective rather than a demonstration of online closed-loop control.
 \end{abstract}
 
 \begin{keyword}
-soft sensor \sep hybrid modeling \sep temporal validation \sep process monitoring \sep regime shift \sep monoammonium phosphate
+soft sensor \sep industrial process monitoring \sep model drift \sep chronological validation \sep hybrid modeling \sep operating-regime change
 \end{keyword}
 
 \end{frontmatter}
@@ -91,25 +93,19 @@ $W$ & Aggregation-window length & min \\
 \end{table}
 
 \medskip
-\noindent Density is reported in g~cm$^{-3}$ to match plant laboratory practice; the SI equivalent is obtained as $1~\mathrm{g\,cm^{-3}}=1000~\mathrm{kg\,m^{-3}}$. The conductivity channel is an instrument-specific scaled historian signal used only as an empirical proxy for acid state; no conversion to a physical conductivity unit is assumed.
+\noindent Density is reported in g~cm$^{-3}$ to match plant laboratory practice; the SI equivalent is obtained as $1~\mathrm{g\,cm^{-3}}=1000~\mathrm{kg\,m^{-3}}$. The conductivity channel is an instrument-scaled process-historian signal used as an empirical proxy for acid state; a physical conductivity unit is not assumed.
 
 \section{Introduction}
 
-Soft sensors infer difficult-to-measure process or quality variables from routinely available process measurements and are therefore widely used in process monitoring, control, and operational decision support \citep{kadlec2009,souza2016}. Their industrial value is greatest when laboratory measurements are sparse or delayed, but this is also the setting in which model validation is most difficult: the labeled sample size is small relative to the process historian, measurements are asynchronous, and the process may evolve between calibration and deployment.
+Reliable measurement of process quality variables is essential for monitoring, supervision, and control, yet industrial laboratories often provide such measurements only at sparse and irregular intervals. Soft sensors use continuously available process measurements to estimate variables that cannot be measured directly or economically at the required frequency \citep{kadlec2009,souza2016}. An estimator intended to support plant decisions must maintain acceptable performance beyond the data on which it was calibrated, not merely reproduce historical observations.
 
-Reliability under nonstationary operation is a central process-systems issue rather than only a machine-learning issue. Industrial datasets contain missing values, sensor faults, transient operating states, long acquisition gaps, and changes in the joint distribution of process and quality variables. Consequently, preprocessing, temporal alignment, validation design, and model-update policy can affect soft-sensor reliability as strongly as the regression architecture itself \citep{kadlec2009,offermans2024,dai2025,metcalfe2025,zhai2025}. Recent work has emphasized robust learning, transfer, and lifecycle management for soft sensors, highlighting that models validated under one operating condition may require monitoring or adaptation when process conditions change \citep{kay2024,metcalfe2025}.
+In industrial practice, changes in operating conditions, process instrumentation, or the relationship between measured and unmeasured states can invalidate a soft-sensor calibration. Missing historian data, asynchronous laboratory sampling, sensor noise, and gaps in the recorded time series complicate both model development and assessment \citep{kadlec2009,offermans2024,dai2025}. The control-engineering literature has addressed these challenges through adaptive and transfer-learning soft sensors. For example, moving-window supervised latent-factor analysis has been proposed for state-shifting processes \citep{yao2017}, an online transfer-kernel algorithm has been studied for variable working conditions \citep{zhang2023cep}, and automated soft-sensor design has been demonstrated for industrial applications \citep{cao2025cep}. These studies motivate practical model updating but also underline the importance of testing whether a fixed model remains reliable when operating conditions change.
 
-Hybrid and physics-guided models address a complementary concern. By embedding mass balances, mechanistic relations, or physical constraints into a data-driven model, they can improve interpretability and reduce reliance on unconstrained correlations \citep{sansana2021,bradley2022,schweidtmann2024,mousa2025}. Physics-informed approaches are particularly attractive when process knowledge is incomplete and measurements of internal states are scarce \citep{velioglu2025}. However, physical structure does not automatically make every learned component invariant. If an empirical mapping used to reconstruct an unmeasured state changes with operating regime, its error can propagate through an otherwise physically consistent model.
+Physics-guided and hybrid soft sensors offer an alternative to unconstrained statistical regression by incorporating known process relationships, such as material balances, into an empirical estimator \citep{sansana2021,bradley2022,schweidtmann2024,mousa2025}. Such structure can make predictions easier to interpret; however, it does not guarantee reliable transfer if the empirical relationships used to estimate latent process properties are no longer valid. This is a particularly important distinction in applications where measurements of those latent properties are unavailable during routine operation.
 
-Fertilizer production provides a useful industrial case because composition and neutralization variables directly affect product quality while several feed and intermediate-state properties are not measured continuously. Hybrid soft sensing has previously been demonstrated for nutrient-content estimation in compound-fertilizer production \citep{fu2007}. The process considered here presents a more specific systems question: whether a physically structured soft sensor remains reliable when a high-frequency online proxy is used to reconstruct latent feed properties, laboratory supervision is available only every few hours, and the proxy-to-latent-state relationship may change over time.
+The industrial case considered here is monoammonium phosphate (MAP) production. Product-related molar ratio and downstream solution density are available from sparse laboratory or operator records, while process telemetry is sampled approximately once per minute. A conductivity signal acts as a proxy for unmeasured phosphoric-acid properties. Fertilizer-production soft sensing has been investigated previously \citep{fu2007}; the present work is not intended to claim a new general soft-sensor architecture or a new control algorithm. Instead, it provides an industrial validation study of what happens when a physically structured estimator is transferred across a change in process conditions, including a long gap in available data.
 
-Accordingly, the objective of this study is to evaluate \emph{temporal transferability}, not merely historical fit. The physics-guided model is compared with Ridge regression, a physics-only reference calculation, and gradient boosting on identical chronological samples. Four contributions are made:
-\begin{enumerate}[leftmargin=1.8em]
-\item an industrial multi-rate soft-sensing case containing 260,642 one-minute process records and 1,325 paired laboratory observations;
-\item a physics-guided latent-property reconstruction coupled to a material balance, with explicit training-domain control to prevent unconstrained extrapolation;
-\item a target-leakage-free chronological validation design spanning within-regime rolling tests, a regime-boundary transfer test, an independent future-period test, and rolling post-gap adaptation; and
-\item a direct comparison showing when physical structure improves interpretability without improving predictive transfer, thereby separating numerical extrapolation control from genuine robustness to temporal process change.
-\end{enumerate}
+The central question is whether physically informed estimation remains sufficiently accurate for monitoring when its data-fitted latent-property relationships are carried beyond their training period. We address it by (i) evaluating a gray-box model against ridge regression, gradient boosting, and a physics-only reference on the same laboratory observations; (ii) separating the effect of a training-range extrapolation guard from temporal model transfer; (iii) evaluating an independent future period in addition to shorter chronological windows; and (iv) comparing frozen and recalibrated estimators under identical post-gap test conditions. The aim is to derive evidence-based recommendations for model validation and maintenance in a plant-monitoring setting. Online deployment and closed-loop control are not evaluated.
 
 \section{Industrial process and data}
 
@@ -182,14 +178,14 @@ The conductivity trajectory changes abruptly on 21 May 2026. We define Regime~A 
 
 \begin{figure}[htbp]
 \centering
-\figplaceholder{figures/fig_extended_validation_timeline.eps}{0.98\linewidth}
+\figplaceholder{figures/fig_extended_validation_timeline.pdf}{0.98\linewidth}
 \caption{Extended process and laboratory coverage across the one-month data gap. The upper panel shows the conductivity signal; the lower panels show the sparse laboratory molar-ratio and density references used for calibration and validation.}
 \label{fig:extendedcoverage}
 \end{figure}
 
 \section{Methodology}
 
-The overall soft-sensor architecture is summarized in Fig.~\ref{fig:soft_sensor_architecture}. The main solid-arrow pathway represents online inference. Minute-scale process telemetry first passes process-validity filtering and temporal alignment; the preprocessed conductivity signal prepared for algorithmic use is then used to reconstruct latent acid properties, which are propagated through the physics-guided material-balance model to obtain the virtual molar-ratio and solution-density estimates. The sparse laboratory measurements are not direct runtime inputs. Instead, they are used only for calibration, chronological model selection, and validation, as indicated by the dashed training pathway. This separation between the online inference path and the calibration path is important for interpreting the model as a deployable virtual-sensing layer rather than as an interpolation of contemporaneous laboratory measurements.
+The model and its proposed inference pathway are summarized in Fig.~\ref{fig:soft_sensor_architecture}. The solid-arrow pathway represents the intended runtime calculation, rather than a deployed online implementation. Minute-scale process telemetry first passes process-validity filtering and temporal alignment; the preprocessed conductivity signal prepared for algorithmic use is then used to reconstruct latent acid properties, which are propagated through the physics-guided material-balance model to obtain the virtual molar-ratio and solution-density estimates. The sparse laboratory measurements are not direct runtime inputs. Instead, they are used only for calibration, chronological model selection, and validation, as indicated by the dashed training pathway. This distinction makes clear that laboratory references are used to fit and test the estimator, not as concurrent inputs during prediction. The retrospective preprocessing used in the present experiments is discussed in Section~2.3.
 
 \begin{figure}[!ht]
 \centering
@@ -197,7 +193,7 @@ The overall soft-sensor architecture is summarized in Fig.~\ref{fig:soft_sensor_
     width=0.88\linewidth,
     height=0.42\textheight,
     keepaspectratio
-]{figures/soft_sensor_architecture.eps}
+]{figures/soft_sensor_architecture.pdf}
 \caption{Architecture of the physics-guided soft sensor and its calibration/validation workflow. Solid arrows denote online inference; dashed arrows denote calibration and validation using sparse laboratory references. The conductivity input is the preprocessed signal used by the algorithm. The initial schematic was created with OpenAI image-generation assistance and subsequently reviewed and edited by the authors.}
 \label{fig:soft_sensor_architecture}
 \end{figure}
@@ -457,7 +453,7 @@ The training-domain guard addresses a different problem. Restricting conductivit
 
 \begin{figure}[!ht]
 \centering
-\figplaceholder{figures/fig_extended_adaptation_comparison.eps}{0.90\linewidth}
+\figplaceholder{figures/fig_extended_adaptation_comparison.pdf}{0.90\linewidth}
 \caption{Post-gap held-out performance on identical rolling test samples. Bars show RMSE normalized by the engineering tolerance.}
 \label{fig:postgaprmse}
 \end{figure}
@@ -466,7 +462,7 @@ Rolling post-gap recalibration improves the physics-guided density estimate subs
 
 \begin{figure}[!ht]
 \centering
-\figplaceholder{figures/fig_extended_transfer_timeseries.eps}{0.90\linewidth}
+\figplaceholder{figures/fig_extended_transfer_timeseries.pdf}{0.90\linewidth}
 \caption{Frozen pre-gap physics-guided model versus 14-day rolling adaptation on post-gap held-out dates. Adaptation reduces the density error substantially but does not eliminate the molar-ratio transfer limitation.}
 \label{fig:frozenadapted}
 \end{figure}
@@ -475,18 +471,19 @@ Several boundaries of the present evidence are important. First, the signal proc
 
 \section{Conclusions}
 
-This study evaluated the temporal robustness of a physics-guided soft sensor for industrial monoammonium phosphate production using 260,642 minute-scale process records and 1,325 paired laboratory measurements. The model reconstructs latent phosphoric-acid properties from conductivity, constrains the empirical mapping to the conductivity support observed during training, and propagates the estimated state through a material balance.
+An industrial soft sensor for monoammonium phosphate production was assessed using 260,642 minute-scale process observations and 1,325 paired laboratory measurements. The study compared a physics-guided latent-property estimator with ridge regression, gradient boosting, and a physics-only reference under chronological regime-transfer and recalibration experiments.
 
-Chronological testing reveals a clear difference between numerical extrapolation control and genuine temporal transfer. Within Regime~A, the physics-guided model is interpretable but less accurate than Ridge regression. In the independent post-gap test on 438 future laboratory pairs, the frozen physics-guided model yields RMSE values of 0.1795 for molar ratio and 0.0456~g~cm$^{-3}$ for density, compared with 0.0286 and 0.0141~g~cm$^{-3}$ for Ridge regression; gradient boosting gives the lowest density RMSE, 0.0128~g~cm$^{-3}$. Across ten post-gap rolling windows and 357 held-out pairs, recalibration improves the physics-guided model but does not remove the molar-ratio performance gap.
+The training-range guard prevents unconstrained extrapolation of the empirical conductivity mapping but does not ensure accuracy when process conditions change. In the independent post-gap test on 438 future laboratory pairs, the frozen physics-guided model had root-mean-square errors of 0.1795 for molar ratio and 0.0456~g~cm$^{-3}$ for density, while ridge regression achieved 0.0286 and 0.0141~g~cm$^{-3}$, respectively. Gradient boosting achieved the lowest density error (0.0128~g~cm$^{-3}$). Across ten post-gap rolling windows with 357 held-out pairs, recalibration reduced the physics-guided model's errors, but its molar-ratio estimates remained less accurate than the statistical alternatives.
 
-The process-systems implication is that physical structure alone is insufficient evidence of robustness when empirical latent-state mappings can remain regime dependent. For industrial soft sensing, training-domain control should be combined with leakage-aware chronological validation, process-state or distribution-shift monitoring, regime-aware recalibration, and explicit fallback behavior. The present results are retrospective; prospective deployment additionally requires causal signal processing and validation under live operating conditions.
+For industrial monitoring, physical interpretability and predictive reliability must be verified separately. The observed performance differences support chronological qualification tests, training-domain checks, monitoring against newly acquired laboratory measurements, target-specific recalibration criteria, and fallback rules for unreliable estimates. These are recommendations derived from retrospective validation, not claims of implemented online monitoring or control. Prospective deployment requires causal signal processing and separate live validation.
 
 \section*{CRediT authorship contribution statement}
 
 \textbf{German A. Karnup:} Conceptualization, Methodology, Software, Investigation, Writing -- original draft. 
 \textbf{Andrey N. Sychev:} Data curation, Resources. 
 \textbf{Oleg A. Telminov:} Project administration, Writing -- review \& editing. 
-\textbf{Evgeny S. Gornev:} Supervision, Funding acquisition.
+\textbf{Evgeny S. Gornev:} Supervision, Funding acquisition. 
+\textbf{Arkady V. Boyko:} Data curation, Resources.
 
 \section*{Funding}
 
