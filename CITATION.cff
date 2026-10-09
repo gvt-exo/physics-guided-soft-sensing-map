@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software or its derived validation outputs, please cite the accompanying manuscript."
 type: software
-title: "Physics-Guided Soft Sensing under Sparse Laboratory Measurements and Temporal Regime Shifts in Industrial Monoammonium Phosphate Production"
+title: "Temporal Transferability of Industrial Soft Sensors under Sparse Laboratory Measurements and Changing Operating Conditions in Monoammonium Phosphate Production"
 authors:
   - family-names: Karnup
     given-names: German A.
