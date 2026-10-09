@@ -3,7 +3,7 @@ Control Engineering Practice
 
 Dear Editor,
 
-We submit the manuscript “Physics-Guided Soft Sensing under Sparse Laboratory Measurements and Temporal Regime Shifts in Industrial Monoammonium Phosphate Production” for consideration in Control Engineering Practice. The manuscript is being transferred following the suggestion of the Editor-in-Chief of Computers & Chemical Engineering (former manuscript reference: CACE-D-26-01792).
+We submit the manuscript “Temporal Transferability of Industrial Soft Sensors under Sparse Laboratory Measurements and Changing Operating Conditions in Monoammonium Phosphate Production” for consideration in Control Engineering Practice. The manuscript is being transferred following the suggestion of the Editor-in-Chief of Computers & Chemical Engineering (former manuscript reference: CACE-D-26-01792).
 
 The study addresses the reliability of industrial soft sensors when laboratory measurements are sparse and process operating conditions change after model calibration. We analyze 260,642 one-minute historian records and 1,325 paired laboratory observations from an operating monoammonium phosphate production process. A physics-guided estimator is evaluated alongside ridge regression, gradient boosting, and a physics-only baseline using chronological tests, including an independent post-gap validation and rolling recalibration.
 
