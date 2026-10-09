@@ -1,0 +1,26 @@
+Editor
+Control Engineering Practice
+
+Dear Editor,
+
+We submit the manuscript “Physics-Guided Soft Sensing under Sparse Laboratory Measurements and Temporal Regime Shifts in Industrial Monoammonium Phosphate Production” for consideration in Control Engineering Practice. The manuscript is being transferred following the suggestion of the Editor-in-Chief of Computers & Chemical Engineering (former manuscript reference: CACE-D-26-01792).
+
+The study addresses the reliability of industrial soft sensors when laboratory measurements are sparse and process operating conditions change after model calibration. We analyze 260,642 one-minute historian records and 1,325 paired laboratory observations from an operating monoammonium phosphate production process. A physics-guided estimator is evaluated alongside ridge regression, gradient boosting, and a physics-only baseline using chronological tests, including an independent post-gap validation and rolling recalibration.
+
+The practical contribution is evidence on when a physically interpretable estimator remains insufficiently reliable for industrial monitoring. A training-domain guard prevents uncontrolled extrapolation of latent-property mappings but does not resolve temporal model-transfer failure. The independent future-period comparison and the frozen-versus-recalibrated analysis identify the need for operating-condition checks, periodic verification against laboratory results, target-specific acceptance criteria, and fallback handling before a soft-sensor output is used for operational decisions.
+
+We believe this application-oriented evaluation is relevant to Control Engineering Practice, particularly its areas of soft sensing, process monitoring, model validation, and practical implementation of industrial automation. The results are based on real process measurements. We do not claim prospective online operation or closed-loop control, which are outside the scope of the present experiments.
+
+The manuscript is not under consideration at another journal. An earlier version is available as a ChemRxiv preprint, DOI: 10.26434/chemrxiv.15009979/v1. The raw industrial process and laboratory measurements cannot be released for confidentiality reasons; public analysis code, validation workflows, and de-identified derived results are described in the manuscript and available at https://github.com/gvt-exo/physics-guided-soft-sensing-map.
+
+The author list has been updated to recognize Arkady V. Boyko's contribution to industrial data acquisition and curation. The corresponding author will submit the required authorship-change request and confirmations from all five authors for editorial approval.
+
+Thank you for considering our work.
+
+Sincerely,
+
+German A. Karnup
+Corresponding author
+Moscow Institute of Physics and Technology (National Research University)
+Molecular Electronics Research Institute, JSC (MERI)
+gkarnup@niime.ru
